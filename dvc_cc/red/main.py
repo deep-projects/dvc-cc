@@ -1,10 +1,14 @@
 from argparse import ArgumentParser
+from dvc_cc.red.create_red_yml_file import create_red_yml_file
 # from dvc_cc.red.main_core import *
 
-DESCRIPTION = 'Git-Helper to commit and push all changes to the git repro of the current branch or create a new branch from the current master'
+DESCRIPTION = 'Helper to create the red yml file.'
 
 def main():
 
+    create_red_yml_file()
+
+    """
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument(
         'slide', action='store', type=str, metavar='SLIDEFILE',
@@ -47,3 +51,4 @@ def main():
     )
 
     args = parser.parse_args()
+    """
