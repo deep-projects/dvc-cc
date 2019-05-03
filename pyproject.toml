@@ -5,8 +5,8 @@ description = "This connector is used to combine the work of CC (www.curious-con
 authors = ["Jonas Annuscheit <annusch@htw-berlin.de>"]
 license = "AGPL-3.0"
 readme = "README.md"
-repository = "https://github.com/..."
-homepage = "https://github.com/..."
+repository = "https://github.com/mastaer/dvc-cc.git"
+homepage = "https://github.com/mastaer/dvc-cc.git"
 
 [tool.poetry.dependencies]
 python = "^3.6"
