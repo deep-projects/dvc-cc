@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from camelyon_utils.slide_tiles.main_core import *
+# from dvc_cc.red.main_core import *
 
 DESCRIPTION = 'Git-Helper to commit and push all changes to the git repro of the current branch or create a new branch from the current master'
 
@@ -47,38 +47,3 @@ def main():
     )
 
     args = parser.parse_args()
-
-
-
-
-    wanted_pixel_spacings = args.pixel_spacing
-
-    size = np.array((args.tilesize, args.tilesize))
-    stepsize = np.array((args.stepsize, args.stepsize))
-
-    path_to_output_hdf5 = args.output
-    num_of_epoch_to_save = args.intervall_to_push_to_hdf5
-    level_to_create_otsu = 4
-    
-    if args.run_on_testmode:
-        maximal_number_of_epochs = 5
-    else:
-        maximal_number_of_epochs = None
-
-    slide_path = os.path.expanduser(args.slide)
-
-    if args.mask is None:
-        handler = BinaryMaskHandler(level_to_create_the_otsu_mask=level_to_create_otsu)
-    else:
-        handler = XMLMaskHandler(args.mask)
-
-    convert_openslidefile_to_hdf5(
-        slide_path,
-        handler,
-        path_to_output_hdf5,
-        wanted_pixel_spacings,
-        size,
-        stepsize,
-        maximal_number_of_epochs=maximal_number_of_epochs,
-        num_of_epoch_to_save=num_of_epoch_to_save
-    )

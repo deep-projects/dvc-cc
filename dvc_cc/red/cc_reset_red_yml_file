@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm ~/.local/bin/files/created_job_description.red.yml
+
