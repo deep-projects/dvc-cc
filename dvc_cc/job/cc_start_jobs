@@ -1,8 +1,0 @@
-#!/bin/bash
-
-OUTPUT=$(faice exec ~/.local/bin/files/created_job_description.red.yml --variables ~/.local/bin/files/secrets.yml | tee /dev/stderr)
-OUTPUT=$(echo $OUTPUT | tr " " "\n" | tail -1)
-
-rm ~/.local/bin/files/created_job_description.red.yml
-
-echo $OUTPUT >> ~/.local/bin/files/list_of_job_ids.csv

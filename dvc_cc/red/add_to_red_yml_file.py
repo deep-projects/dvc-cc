@@ -3,8 +3,19 @@
 import os
 from subprocess import check_output
 
-def create_red_yml_file(use_external_data_dir=True, run_every_dvc_file_in_own_docker = True):
+DESCRIPTION = 'This script must be run at a git repro and creates for the current batch a new job for cc. To start the job you need to "call dvc_cc job run"'
 
+def main():
+    
+    if os.path.ismount('data') or os.path.islink('data'):
+        use_external_data_dir = True
+    else:
+        use_external_data_dir = False
+        
+    run_every_dvc_file_in_own_docker = True
+    
+    
+    
     out = check_output(["git", "config", "--get", "remote.origin.url"]).decode("utf8")
     _,_, gitrepo,gitowner,gitname = out.split('/')
     gitname = gitname[:gitname.find('.git')+4]
@@ -51,10 +62,10 @@ def create_red_yml_file(use_external_data_dir=True, run_every_dvc_file_in_own_do
     dvc_servername = dvc_server
     dvc_path_to_working_repository = dvc_path
 
-    if os.path.isdir('~/.cache') == False:
-        os.mkdir('~/.cache')
-    if os.path.isdir('~/.cache/dvc_cc') == False:
-        os.mkdir('~/.cache/dvc_cc')
+    if os.path.isdir(os.path.expanduser('~/.cache')) == False:
+        os.mkdir(os.path.expanduser('~/.cache'))
+    if os.path.isdir(os.path.expanduser('~/.cache/dvc_cc')) == False:
+        os.mkdir(os.path.expanduser('~/.cache/dvc_cc'))
     path = os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml')
     file_exist = os.path.isfile(path)
 
@@ -64,7 +75,7 @@ def create_red_yml_file(use_external_data_dir=True, run_every_dvc_file_in_own_do
       if len(lines) < 3:
         file_exist = False
 
-    dvc_files = [d for d in os.listdir() if d.endswith('.dvc') and not d.startswith('_')]
+    dvc_files = [d for d in os.listdir() if d.endswith('.dvc') and not d.startswith('_') and d is not '.dir']
 
     if len(dvc_files) == 0:
         print('There exist no job to execute!')

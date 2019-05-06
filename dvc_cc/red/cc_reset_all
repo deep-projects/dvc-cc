@@ -1,5 +1,0 @@
-#!/bin/bash
-
-rm ~/.local/bin/files/created_job_description.red.yml
-rm ~/.local/bin/files/list_of_job_ids.csv
-

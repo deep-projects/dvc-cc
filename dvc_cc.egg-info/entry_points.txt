@@ -1,0 +1,3 @@
+[console_scripts]
+dvc-cc = dvc_cc.main:main
+
