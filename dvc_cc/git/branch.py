@@ -4,6 +4,7 @@ import os
 import subprocess
 from subprocess import check_output
 import numpy as np
+from argparse import ArgumentParser
 
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 
@@ -15,11 +16,20 @@ def get_name_of_branch():
 def main():
     git_name_of_branch = get_name_of_branch()
     
-    name_of_branch = sys.argv[1]
+    parser = ArgumentParser()
+    parser.add_argument('name_of_branch', help='The name of the branch', default=None)
+    parser.add_argument('-l', '--last_prefix', help='Use the last prefix', default=False,action='store_true')
+    parser.add_argument('-i', '--init_from_this_branch', help='The init branch is the current one.', default=False,action='store_true')
+    parser.add_argument('-w', '--without_prefix', help='Create the branch name without prefix', default=False,action='store_true')
+    args = parser.parse_args()
+
+    name_of_branch = args.name_of_branch
     
-    initbranch = 'master'
-    
-    if len(sys.argv) == 3 and sys.argv[2] == 'without':
+    if args.init_from_this_branch == False:
+        initbranch = 'master'
+    else:
+        initbranch = git_name_of_branch
+    if args.without_prefix:
         prefix = ''
     else:
         # find last index
@@ -30,12 +40,8 @@ def main():
             last_pos = np.max(pos)
         else:
             last_pos = 0
-        if len(sys.argv) < 3 or sys.argv[2] != 'same':
+        if args.last_prefix == False:
             last_pos += 1
-        if len(sys.argv) >= 3 and sys.argv[2] == '.':
-            initbranch = git_name_of_branch
-        elif len(sys.argv) == 4 and sys.argv[3] == '.':
-            initbranch = git_name_of_branch
             
         prefix = '%0.3d_'%last_pos
     

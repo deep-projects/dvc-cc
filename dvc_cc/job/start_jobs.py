@@ -8,12 +8,12 @@ DESCRIPTION = 'CC JOBS run: Start all jobs at your cc server.'
 
 def main():
     
-    output = subprocess.check_output('faice exec ~/.cache/dvc_cc/created_job_description.red.yml --variables ~/.cache/dvc_cc/secrets.yml'.split())
+    output = subprocess.check_output(('faice exec '+os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml')+ ' --variables ' + os.path.expanduser('~/.cache/dvc_cc/secrets.yml')).split())
     cc_id = output.decode().split()[-1]
     
-    os.remove('~/.cache/dvc_cc/created_job_description.red.yml')
+    os.remove(os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml'))
 
-    filename = '~/.cache/dvc_cc/list_of_job_ids.csv'
+    filename = os.path.expanduser('~/.cache/dvc_cc/list_of_job_ids.csv')
     if os.path.exists(filename):
         append_write = 'a' # append if already exists
     else:

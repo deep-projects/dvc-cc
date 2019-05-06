@@ -6,6 +6,7 @@ import sys
 import os
 import subprocess
 from subprocess import check_output
+from argparse import ArgumentParser
 
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 
@@ -18,11 +19,11 @@ def main():
     git_name_of_branch = get_name_of_branch()
     
     parser = ArgumentParser()
-    parser.add_argument('-m','--message', help='The message to do the git commit.',default=None)
+    parser.add_argument('-m', '--message', help='The message to do the git commit.', default=None)
     args = parser.parse_args()
-    commit_message = args.commit_message
+    commit_message = args.message
     if commit_message is None or commit_message == '':
-        commit_message = 'Build the experiment: ' + git_name_of_branch '.'
+        commit_message = 'Build the experiment: ' + git_name_of_branch + '.'
         
     dvc_files = [d for d in os.listdir() if d.endswith('.dvc') and not d.startswith('_') and d is not '.dir']
     if len(dvc_files) == 0:

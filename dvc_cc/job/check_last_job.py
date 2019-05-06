@@ -28,12 +28,12 @@ def main():
     
     args = parser.parse_args()
     
-    with open(os.path.expanduser('~/.local/bin/files/secrets.yml')) as f:
+    with open(os.path.expanduser('~/.cache/dvc_cc/secrets.yml')) as f:
         secrets = yaml.load(f)
     
     auth = (secrets['agency_username'], secrets['agency_password'])
     
-    with open(os.path.expanduser('~/.local/bin/files/list_of_job_ids.csv')) as f:
+    with open(os.path.expanduser('~/.cache/dvc_cc/list_of_job_ids.csv')) as f:
         experiment_ids = f.read().splitlines()
     
     batch_ids = []

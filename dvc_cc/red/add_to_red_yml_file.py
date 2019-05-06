@@ -2,19 +2,12 @@
 
 import os
 from subprocess import check_output
+import configparser
 
 DESCRIPTION = 'This script must be run at a git repro and creates for the current batch a new job for cc. To start the job you need to "call dvc_cc job run"'
 
 def main():
-    
-    if os.path.ismount('data') or os.path.islink('data'):
-        use_external_data_dir = True
-    else:
-        use_external_data_dir = False
-        
     run_every_dvc_file_in_own_docker = True
-    
-    
     
     out = check_output(["git", "config", "--get", "remote.origin.url"]).decode("utf8")
     _,_, gitrepo,gitowner,gitname = out.split('/')
@@ -69,13 +62,39 @@ def main():
     path = os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml')
     file_exist = os.path.isfile(path)
 
+    if os.path.exists('_data.ini'):
+        config = configparser.ConfigParser()
+        config.read('_data.ini')
+        use_external_data_dir = True
+        if 'data_server' in config["'remote \"nas\"'"]:
+            data_server = config["'remote \"nas\"'"]['data_server']
+        else:
+            print('WARNING: No data_server is set in the "_data.ini" file!')
+            data_server = git_working_repository_name
+        if 'data_username' in config["'remote \"nas\"'"]:
+            data_username = config["'remote \"nas\"'"]['data_username']
+        else:
+            data_username = '{{'+ data_server + '_USERNAME}}'
+        if 'data_path' in config["'remote \"nas\"'"]:
+            data_path = config["'remote \"nas\"'"]['data_path']
+        else:
+            data_path = '{{' + data_server + '_' + git_working_repository_name + '_DATA_PATH}}'
+        data_password = '{{' + data_server + '_PASSWORD}}'
+        if data_server == git_working_repository_name:
+            data_server = '{{' + data_server + '}}'
+    else:
+        use_external_data_dir = False
+
+    print('Using external Data: ' + str(use_external_data_dir))
+
+
     if file_exist:
       with open(path) as f:
           lines = f.read().splitlines()
       if len(lines) < 3:
         file_exist = False
 
-    dvc_files = [d for d in os.listdir() if d.endswith('.dvc') and not d.startswith('_') and d is not '.dir']
+    dvc_files = [d for d in os.listdir() if d.endswith('.dvc') and not d.startswith('_') and d != '.dvc']
 
     if len(dvc_files) == 0:
         print('There exist no job to execute!')
@@ -109,14 +128,15 @@ def main():
                   print("      dvc_data_dir:", file=f)
                   print("        class: Directory", file=f)
                   print("        connector:", file=f)
-                  print("            command: \"red-connector-sshfs\"", file=f)
+                  print("            command: \"red-connector-ssh\"", file=f)
                   print("            mount: true", file=f)
                   print("            access:", file=f)
-                  print("              host: \"avocado01.f4.htw-berlin.de\"", file=f)
+                  print("              host: '"+data_server+'"', file=f)
                   print("              port: 22", file=f)
-                  print("              username: '{{avocado01_f4_htw_berlin_de_username}}'", file=f)
-                  print("              password: '{{avocado01_f4_htw_berlin_de_password}}'", file=f)
-                  print("              dirName: '{{data_dir_on_server}}'", file=f)
+                  print("              auth:", file=f)
+                  print("                username: '"+data_username+"'", file=f)
+                  print("                password: '"+data_password+"'", file=f)
+                  print("              dirName: '"+data_path+"'", file=f)
               if run_every_dvc_file_in_own_docker:
                   print("      dvc_file_to_execute: '" + dvc_files[i] + "'", file=f)
               print("    outputs: {}", file=f)
@@ -187,7 +207,7 @@ def main():
             print("      url: https://agency.f4.htw-berlin.de/cc", file=f)
             print("    batchConcurrencyLimit: 9", file=f)
             print("    retryIfFailed: false", file=f)
-            print("redVersion: '6'", file=f)
+            print("redVersion: '7'", file=f)
             print("", file=f)
 
         print('Added new job: ' + git_path_to_working_repository + ' / ' + git_working_repository_owner + ' / ' + git_working_repository_name + ' ; Branch: ' + git_name_of_branch)

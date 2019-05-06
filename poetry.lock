@@ -199,6 +199,14 @@ six = ">=1.4.0"
 
 [[package]]
 category = "main"
+description = "Pythonic argument parser, that will make you smile"
+name = "docopt"
+optional = false
+python-versions = "*"
+version = "0.6.2"
+
+[[package]]
+category = "main"
 description = "Git for data scientists - manage your code and data together"
 name = "dvc"
 optional = false
@@ -253,6 +261,20 @@ version = "0.17.1"
 
 [[package]]
 category = "main"
+description = "Git subcommands for integrating with central services like github, gitlab and bitbucket"
+name = "git-spindle"
+optional = false
+python-versions = "*"
+version = "3.4.4"
+
+[package.dependencies]
+docopt = ">=0.5.0"
+"github3.py" = ">=0.9.0,<1.0"
+six = "*"
+whelk = ">=2.6"
+
+[[package]]
+category = "main"
 description = "Git Object Database"
 name = "gitdb2"
 optional = false
@@ -261,6 +283,18 @@ version = "2.0.5"
 
 [package.dependencies]
 smmap2 = ">=2.0.0"
+
+[[package]]
+category = "main"
+description = "Python wrapper for the GitHub API(http://developer.github.com/v3)"
+name = "github3.py"
+optional = false
+python-versions = "*"
+version = "0.9.6"
+
+[package.dependencies]
+requests = ">=2.0"
+"uritemplate.py" = ">=0.2.0"
 
 [[package]]
 category = "main"
@@ -284,6 +318,17 @@ version = "0.6"
 [package.dependencies]
 future = "*"
 pyparsing = "*"
+
+[[package]]
+category = "main"
+description = "git-hub and hub were renamed to git-spindle"
+name = "hub"
+optional = false
+python-versions = "*"
+version = "2.0"
+
+[package.dependencies]
+git-spindle = "*"
 
 [[package]]
 category = "main"
@@ -554,6 +599,25 @@ version = "1.5.5"
 
 [[package]]
 category = "main"
+description = "URI templates"
+name = "uritemplate"
+optional = false
+python-versions = "*"
+version = "3.0.0"
+
+[[package]]
+category = "main"
+description = "URI templates"
+name = "uritemplate.py"
+optional = false
+python-versions = "*"
+version = "3.0.2"
+
+[package.dependencies]
+uritemplate = ">=2.0"
+
+[[package]]
+category = "main"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
 optional = false
@@ -589,6 +653,14 @@ version = "0.15.2"
 
 [[package]]
 category = "main"
+description = "Easy access to shell commands from python"
+name = "whelk"
+optional = false
+python-versions = "*"
+version = "2.7.1"
+
+[[package]]
+category = "main"
 description = "Basic inter-process locks"
 name = "zc.lockfile"
 optional = false
@@ -599,7 +671,7 @@ version = "1.4"
 setuptools = "*"
 
 [metadata]
-content-hash = "2c90303ffe7f7757fa027a691fc8834f083e92b2a9c18d32aa8b5deaa57fd062"
+content-hash = "a0fe914f1ac51aea5769bdefa2f2da03eaf13003eeb7fa5d2a66ade62ece4522"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -622,12 +694,16 @@ decorator = ["86156361c50488b84a3f148056ea716ca587df2f0de1d34750d35c21312725de",
 distro = ["362dde65d846d23baee4b5c058c8586f219b5a54be1cf5fc6ff55c4578392f57", "eedf82a470ebe7d010f1872c17237c79ab04097948800029994fa458e52fb4b4"]
 docker = ["2b1f48041cfdcc9f6b5da0e04e0e326ded225e736762ade2060000e708f4c9b7", "c456ded5420af5860441219ff8e51cdec531d65f4a9e948ccd4133e063b72f50"]
 docker-pycreds = ["6ce3270bcaf404cc4c3e27e4b6c70d3521deae82fb508767870fdbf772d584d4", "7266112468627868005106ec19cd0d722702d2b7d5912a28e19b826c3d37af49"]
+docopt = ["49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"]
 dvc = ["9c28549f221956d9f77ab17375c1f1322e5425ef40ceb792e7913c3db10294d4", "f0fcc1c97192d98abeed34690e4a9f2c86df6cc7a270aa2ebbbbb87330b784ef"]
 flask = ["2271c0070dbcb5275fad4a82e29f23ab92682dc45f9dfbc22c02ba9b9322ce48", "a080b744b7e345ccfcbc77954861cb05b3c63786e93f2b3875e0913d44b43f05"]
 future = ["67045236dcfd6816dc439556d009594abf643e5eb48992e36beac09c2ca659b8"]
+git-spindle = ["566efcc2a61582340aa1cb25616fa34147c2e38def508d0ab1860373072b54d0"]
 gitdb2 = ["83361131a1836661a155172932a13c08bda2db3674e4caa32368aa6eb02f38c2", "e3a0141c5f2a3f635c7209d56c496ebe1ad35da82fe4d3ec4aaa36278d70648a"]
+"github3.py" = ["650d31dbc3f3290ea56b18cfd0e72e00bbbd6777436578865a7e45b496f09e4c", "b831db85d7ff4a99d6f4e8368918095afeea10f0ec50798f9a937c830ab41dc5"]
 gitpython = ["563221e5a44369c6b79172f455584c9ebbb122a13368cc82cb4b5addff788f82", "8237dc5bfd6f1366abeee5624111b9d6879393d84745a507de0fda86043b65a8"]
 grandalf = ["357946e2fd35fc92c327cf3c091acc5aef93e0c74c60fed0a727d827ab3b1272", "51e34e141be2dd19bca74448918ebce88c1cd95498842a13d191df0a52a3955a", "7471db231bd7338bc0035b16edf0dc0c900c82d23060f4b4d0c4304caedda6e4", "aa985ba9992aba30e9c09d3cd9574054268b74ff2d34ced68aa9e7ca698724b0", "d671fdfa5310f2639538b6c858c4b1aef7755535ccfcb9c1cdf0d29171326add"]
+hub = ["b04ee792ca374f43262866057747cfb8426e812292500df913298896d4591a27"]
 humanize = ["a43f57115831ac7c70de098e6ac46ac13be00d69abbf60bdcac251344785bb19"]
 idna = ["c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407", "ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"]
 inflect = ["4ded1b2a6fcf0fc0397419c7727f131a93b67b80d899f2973be7758628e12b73", "a82b671b043ddba98ea8b2cf000b31e8b41e9197b3151567239f3bbe215dab7e"]
@@ -657,8 +733,11 @@ schema = ["44add3ef9016c85ac4b0291b45286a657d0df309b31528ca8d0a9c6d0aa68186", "5
 six = ["3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c", "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"]
 smmap2 = ["0555a7bf4df71d1ef4218e4807bbf9b201f910174e6e08af2e138d4e517b4dde", "29a9ffa0497e7f2be94ca0ed1ca1aa3cd4cf25a1f6b4f5f87f74b46ed91d609a"]
 treelib = ["44695f7048b0bd82b45a4fe976611f9fb52902506249d84db255976a5e8738e0", "8fa9461fe4ae835cbe40b57391ca051134b4eb1cc18606fa773b75815ff80144"]
+uritemplate = ["01c69f4fe8ed503b2951bef85d996a9d22434d2431584b5b107b2981ff416fbd", "1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd", "c02643cebe23fc8adb5e6becffe201185bf06c40bda5c0b4028a93f1527d011d"]
+"uritemplate.py" = ["a0c459569e80678c473175666e0d1b3af5bc9a13f84463ec74f808f3dd12ca47", "e0cdeb0f55ec18e1580974e8017cd188549aacc2aba664ae756adb390b9d45b4"]
 urllib3 = ["2393a695cd12afedd0dcb26fe5d50d0cf248e5a66f75dbd89a3d4eb333a61af4", "a637e5fae88995b256e3409dc4d52c2e2e0ba32c42a6365fee8bbd2238de3cfb"]
 wcwidth = ["3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e", "f4ebe71925af7b40a864553f761ed559b43544f8f71746c2d756c7fe788ade7c"]
 websocket-client = ["1151d5fb3a62dc129164292e1227655e4bbc5dd5340a5165dfae61128ec50aa9", "1fd5520878b68b84b5748bb30e592b10d0a91529d5383f74f4964e72b297fd3a"]
 werkzeug = ["0a73e8bb2ff2feecfc5d56e6f458f5b99290ef34f565ffb2665801ff7de6af7a", "7fad9770a8778f9576693f0cc29c7dcc36964df916b83734f4431c0e612a7fbc"]
+whelk = ["d109d270a72678949bfb51f384bb32a601875fe4fe016ebb48e9d7f6dd7564bc"]
 "zc.lockfile" = ["95a8e3846937ab2991b61703d6e0251d5abb9604e18412e2714e1b90db173253"]

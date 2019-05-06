@@ -17,14 +17,14 @@ import numpy as np
 
 DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.\n Helper to check the last job that you started.'
 
-def main():
 
+def main():
     with open(os.path.expanduser('~/.cache/dvc_cc/secrets.yml')) as f:
         secrets = yaml.load(f)
 
     auth = (secrets['agency_username'], secrets['agency_password'])
 
-    experiment_ids = ['']
+    experiment_ids= ['']
 
     for i in range(len(experiment_ids)):
         r = requests.get(
@@ -34,7 +34,14 @@ def main():
         r.raise_for_status()
         data = r.json()
 
-        print(Counter([batch['state'] for batch in data]))
+        for batch in data:
+            if batch['state'] != 'cancelled' and batch['state'] != 'failed' and batch['state'] != 'succeeded':
+                print('DELETE Job: https://agency.f4.htw-berlin.de/cc/batches/'+batch['_id'])
+                r = requests.delete(
+                    'https://agency.f4.htw-berlin.de/cc/batches/'+batch['_id'],
+                    auth=auth
+                )
+                r.raise_for_status()
 
 
 

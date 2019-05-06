@@ -14,12 +14,13 @@ cc-faice = "^6.1"
 dvc = "^0.35.7"
 paramiko = "^2.4"
 numpy = "^1.16"
+hub = "^2.0"
 
 [tool.poetry.dev-dependencies]
 
+[tool.poetry.scripts]
+dvc-cc = 'dvc_cc.main:main'
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
-[tool.poetry.scripts]
-dvc-cc = 'dvc_cc.main:main'
