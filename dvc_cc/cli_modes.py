@@ -1,6 +1,5 @@
 import sys
 from argparse import ArgumentParser
-import argcomplete
 
 def cli_modes(script_name, title, description, modes, version=None):
     sys.argv[0] = script_name
@@ -19,7 +18,7 @@ def cli_modes(script_name, title, description, modes, version=None):
     if len(sys.argv) < 2:
         parser.print_help()
         exit()
-    argcomplete.autocomplete(parser)
+
     _ = parser.parse_known_args()
     sub_args = sub_parser.parse_known_args()
 

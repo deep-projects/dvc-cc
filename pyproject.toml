@@ -16,6 +16,8 @@ dvc = "^0.35.7"
 paramiko = "^2.4"
 numpy = "^1.16"
 hub = "^2.0"
+jsonschema = "^3.0"
+"ruamel.yaml" = "^0.15.94"
 
 [tool.poetry.dev-dependencies]
 
