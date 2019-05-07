@@ -1,4 +1,6 @@
-cc-faice<7.0,>=6.1
+cc-faice@ git+https://github.com/curious-containers/cc-faice.git@7.0
 dvc<0.36.0,>=0.35.7
+hub<3.0,>=2.0
+keyring<20.0,>=19.0
 numpy<2.0,>=1.16
 paramiko<3.0,>=2.4

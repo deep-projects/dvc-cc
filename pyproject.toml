@@ -10,7 +10,8 @@ homepage = "https://github.com/mastaer/dvc-cc.git"
 
 [tool.poetry.dependencies]
 python = "^3.6"
-cc-faice = "^6.1"
+keyring = "^19.0"
+#cc-faice = { git = "https://github.com/curious-containers/cc-faice.git", branch = "7.0" }
 dvc = "^0.35.7"
 paramiko = "^2.4"
 numpy = "^1.16"

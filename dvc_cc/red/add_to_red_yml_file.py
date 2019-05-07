@@ -3,11 +3,20 @@
 import os
 from subprocess import check_output
 import configparser
+from argparse import ArgumentParser
 
 DESCRIPTION = 'This script must be run at a git repro and creates for the current batch a new job for cc. To start the job you need to "call dvc_cc job run"'
 
 def main():
-    run_every_dvc_file_in_own_docker = True
+    parser = ArgumentParser()
+    parser.add_argument('-m','--multiple_jobs', help='For each dvc file this command will create a own job. If this is not set, it will run "dvc repro -P" to run all dvc files in the same experiment and push it ones.',default=False, action='store_true')
+    parser.add_argument('-r','--ram', help='The ram that you need.',default=131072)
+    parser.add_argument('-T','--test', help='Run at cctest.',default=False, action='store_true')
+    parser.add_argument('-g','--num_of_gpus', help='The number of gpus that you need to ',default=1)
+    
+    args = parser.parse_args()
+
+    run_every_dvc_file_in_own_docker = args.multiple_jobs
     
     out = check_output(["git", "config", "--get", "remote.origin.url"]).decode("utf8")
     _,_, gitrepo,gitowner,gitname = out.split('/')
@@ -59,7 +68,8 @@ def main():
         os.mkdir(os.path.expanduser('~/.cache'))
     if os.path.isdir(os.path.expanduser('~/.cache/dvc_cc')) == False:
         os.mkdir(os.path.expanduser('~/.cache/dvc_cc'))
-    path = os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml')
+####
+    path = os.path.expanduser('~/.cache/dvc_cc/job_description_gpus_'+str(args.num_of_gpus)+'_ram_'+str(args.ram)+'_cctest_'+str(args.test)+'.red.yml')
     file_exist = os.path.isfile(path)
 
     if os.path.exists('_data.ini'):
@@ -99,8 +109,6 @@ def main():
     if len(dvc_files) == 0:
         print('There exist no job to execute!')
     else:
-        
-
         with open(path,"w") as f:
           print("batches:", file=f)
           
@@ -186,25 +194,28 @@ def main():
             print("    dvc_data_dir:", file=f)
             print("      doc: 'SOMETHING'", file=f)
             print("      inputBinding: {prefix: --data_dir}", file=f)
-            print("      type: Directory", file=f)
+            print("      type: Directory?", file=f)
             print("    dvc_file_to_execute:", file=f)
             print("      doc: 'SOMETHING'", file=f)
             print("      inputBinding: {prefix: --dvc_file_to_execute}", file=f)
-            print("      type: string", file=f)
+            print("      type: string?", file=f)
 
             print("  outputs: {}", file=f)
             print("container:", file=f)
             print("  engine: nvidia-docker", file=f)
             print("  settings:", file=f)
-            print("    gpus: {count: 1}", file=f)
+            print("    gpus: {count: "+str(args.num_of_gpus)+"}", file=f)
             print("    image: {url: 'dckr.f4.htw-berlin.de/annusch/dvc_repro_starter_tf2.alpha:dev', auth: {password: '{{cbmi_password}}', username: '{{cbmi_username}}'}}", file=f)
-            print("    ram: 131072", file=f)
+            print("    ram: "+str(args.ram), file=f)
             print("execution:", file=f)
             print("  engine: ccagency", file=f)
             print("  settings:", file=f)
             print("    access:", file=f)
             print("      auth: {password: '{{agency_password}}', username: '{{agency_username}}'}", file=f)
-            print("      url: https://agency.f4.htw-berlin.de/cc", file=f)
+            if args.test:
+                print("      url: https://agency.f4.htw-berlin.de/cctest", file=f)
+            else:
+                print("      url: https://agency.f4.htw-berlin.de/cc", file=f)
             print("    batchConcurrencyLimit: 9", file=f)
             print("    retryIfFailed: false", file=f)
             print("redVersion: '7'", file=f)

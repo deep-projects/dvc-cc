@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-# from dvc_cc.job.main_core import *
 
 import subprocess
 import os
@@ -7,20 +6,24 @@ import os
 DESCRIPTION = 'CC JOBS run: Start all jobs at your cc server.'
 
 def main():
-    
-    output = subprocess.check_output(('faice exec '+os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml')+ ' --variables ' + os.path.expanduser('~/.cache/dvc_cc/secrets.yml')).split())
-    cc_id = output.decode().split()[-1]
-    
-    os.remove(os.path.expanduser('~/.cache/dvc_cc/created_job_description.red.yml'))
+    dvc_cc_cache_folder = os.path.expanduser('~/.cache/dvc_cc/')
+    list_of_files = [f for f in os.listdir(dvc_cc_cache_folder) if f.endswith('.red.yml')]
 
-    filename = os.path.expanduser('~/.cache/dvc_cc/list_of_job_ids.csv')
-    if os.path.exists(filename):
-        append_write = 'a' # append if already exists
-    else:
-        append_write = 'w' # make a new file if not
+    for f in list_of_files:
+        print('### RUN faice exec ' + f)
+        f = dvc_cc_cache_folder + f
+        output = subprocess.check_output(('faice exec '+f)).split()
+        cc_id = output.decode().split()[-1]
+        os.remove(f)
 
-    cc_id_file = open(filename,append_write)
-    if append_write == 'a':
-        cc_id_file.write('\n')
-    cc_id_file.write(cc_id)
-    cc_id_file.close()
+        filename = os.path.expanduser('~/.cache/dvc_cc/list_of_job_ids.csv')
+        if os.path.exists(filename):
+            append_write = 'a' # append if already exists
+        else:
+            append_write = 'w' # make a new file if not
+
+        cc_id_file = open(filename,append_write)
+        if append_write == 'a':
+            cc_id_file.write('\n')
+        cc_id_file.write(cc_id)
+        cc_id_file.close()
