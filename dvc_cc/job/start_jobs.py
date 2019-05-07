@@ -12,7 +12,7 @@ def main():
     for f in list_of_files:
         print('### RUN faice exec ' + f)
         f = dvc_cc_cache_folder + f
-        output = subprocess.check_output(('faice exec '+f)).split()
+        output = subprocess.check_output(('faice exec '+f).split())
         cc_id = output.decode().split()[-1]
         os.remove(f)
 
