@@ -19,6 +19,9 @@ DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distribut
 
 
 def main():
+    parser = ArgumentParser(description=DESCRIPTION)
+    args = parser.parse_args()
+
     with open(os.path.expanduser('~/.cache/dvc_cc/secrets.yml')) as f:
         secrets = yaml.load(f)
 

@@ -19,7 +19,7 @@ DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distribut
 def main():
     print('Start executer-python [version 0.1]')
     
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('-s','--status_to_check', help='i.e.: failed, succeeded',default='failed')
     parser.add_argument('-m','--mode', type=int,help='0: everything get printed, 1 only one', default=1)
     parser.add_argument('-p','--position', type=int,help='the position to print more information', default=-1)

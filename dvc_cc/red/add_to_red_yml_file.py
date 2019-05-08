@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 DESCRIPTION = 'This script must be run at a git repro and creates for the current batch a new job for cc. To start the job you need to "call dvc_cc job run"'
 
 def main():
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('-m','--multiple_jobs', help='For each dvc file this command will create a own job. If this is not set, it will run "dvc repro -P" to run all dvc files in the same experiment and push it ones.',default=False, action='store_true')
     parser.add_argument('-r','--ram', help='The ram that you need.',default=131072)
     parser.add_argument('-T','--test', help='Run at cctest.',default=False, action='store_true')

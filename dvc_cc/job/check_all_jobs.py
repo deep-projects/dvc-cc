@@ -7,17 +7,17 @@ import datetime
 
 yaml = YAML(typ='safe')
 
-
 from argparse import ArgumentParser
 import json
 import subprocess
 import os
 import numpy as np
 
-
 DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.\n Helper to check the last job that you started.'
 
 def main():
+    parser = ArgumentParser(description=DESCRIPTION)
+    args = parser.parse_args()
 
     with open(os.path.expanduser('~/.cache/dvc_cc/secrets.yml')) as f:
         secrets = yaml.load(f)

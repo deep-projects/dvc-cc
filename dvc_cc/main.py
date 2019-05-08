@@ -19,7 +19,7 @@ DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed u
 MODES = OrderedDict([
     ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
     ('red', {'main': red_main, 'description': RED_DESCRIPTION}),
-    ('job', {'main': job_main, 'description': JOB_DESCRIPTION})
+    ('jobs', {'main': job_main, 'description': JOB_DESCRIPTION})
 ])
 
 

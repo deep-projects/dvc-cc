@@ -18,7 +18,7 @@ def get_name_of_branch():
 def main():
     git_name_of_branch = get_name_of_branch()
     
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('-m', '--message', help='The message to do the git commit.', default=None)
     args = parser.parse_args()
     commit_message = args.message

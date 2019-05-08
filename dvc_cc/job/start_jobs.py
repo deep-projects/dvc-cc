@@ -6,6 +6,9 @@ import os
 DESCRIPTION = 'CC JOBS run: Start all jobs at your cc server.'
 
 def main():
+    parser = ArgumentParser(description=DESCRIPTION)
+    args = parser.parse_args()
+
     dvc_cc_cache_folder = os.path.expanduser('~/.cache/dvc_cc/')
     list_of_files = [f for f in os.listdir(dvc_cc_cache_folder) if f.endswith('.red.yml')]
 

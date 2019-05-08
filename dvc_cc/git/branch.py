@@ -16,7 +16,7 @@ def get_name_of_branch():
 def main():
     git_name_of_branch = get_name_of_branch()
     
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('name_of_branch', help='The name of the branch', default=None)
     parser.add_argument('-l', '--last_prefix', help='Use the last prefix', default=False,action='store_true')
     parser.add_argument('-i', '--init_from_this_branch', help='The init branch is the current one.', default=False,action='store_true')

@@ -9,15 +9,18 @@ repository = "https://github.com/mastaer/dvc-cc.git"
 homepage = "https://github.com/mastaer/dvc-cc.git"
 
 [tool.poetry.dependencies]
+#pip = "^19.1"
+jsonschema = "^3.0"
 python = "^3.6"
 keyring = "^19.0"
+#cc-core = { git = "https://github.com/curious-containers/cc-core.git", branch = "7.0" }
 #cc-faice = { git = "https://github.com/curious-containers/cc-faice.git", branch = "7.0" }
+cc-faice = { file = "/home/j/Documents/github/dvc-cc/dep/cc_faice-7.0.0-py3-none-any.whl" }
+cc-core = { file = "/home/j/Documents/github/dvc-cc/dep/cc_core-7.0.0-py3-none-any.whl" }
 dvc = "^0.35.7"
 paramiko = "^2.4"
 numpy = "^1.16"
 hub = "^2.0"
-jsonschema = "^3.0"
-"ruamel.yaml" = "^0.15.94"
 
 [tool.poetry.dev-dependencies]
 
