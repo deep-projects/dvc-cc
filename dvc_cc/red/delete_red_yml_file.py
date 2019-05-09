@@ -1,7 +1,7 @@
 import os
 from argparse import ArgumentParser
 
-DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'This script delete all RED yml files.'
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)

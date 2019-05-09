@@ -15,7 +15,7 @@ from dvc_cc.red.delete_red_yml_file import DESCRIPTION as RED_DELETE_DESCRIPTION
 
 SCRIPT_NAME = 'dvc-cc red'
 TITLE = 'tools'
-DESCRIPTION = 'DVC-CC red (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.\n Helper to create the red yml file.'
+DESCRIPTION = 'Scripts to create the RED yml file and delete them.'
 MODES = OrderedDict([
     ('add_job', {'main': red_create_main, 'description': RED_CREATE_DESCRIPTION}),
     ('delete', {'main': red_delete_main, 'description': RED_DELETE_DESCRIPTION})
