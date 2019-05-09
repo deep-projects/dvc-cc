@@ -18,8 +18,8 @@ DESCRIPTION = '...'
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument('-d','--dvc_dummy_file', help = 'The dvc_dummy file with that you want to create a dvc file.',
-    parser.add_argument('-p','--params', help = 'The params with that you would call your programm', default=None) default=None)
+    parser.add_argument('-d','--dvc_dummy_file', help = 'The dvc_dummy file with that you want to create a dvc file.', default=None)
+    parser.add_argument('-p','--params', help = 'The params with that you would call your programm', default=None) 
     args = parser.parse_args()
     
     if args.params is not None:
