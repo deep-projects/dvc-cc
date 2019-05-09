@@ -8,7 +8,7 @@ import subprocess
 from subprocess import check_output
 from argparse import ArgumentParser
 
-DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'git add -A  +  git commit  +  git push  +  dvc push'
 
 def get_name_of_branch():
     out = check_output(["git", "branch"]).decode("utf8")

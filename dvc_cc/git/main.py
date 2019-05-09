@@ -16,7 +16,7 @@ from dvc_cc.git.commit_and_push import DESCRIPTION as COMMIT_AND_PUSH_DESCRIPTIO
 
 SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
-DESCRIPTION = 'DVC-CC git (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'Scripts to make working with git easier.'
 MODES = OrderedDict([
     ('commit_and_push', {'main': commit_and_push_main, 'description': COMMIT_AND_PUSH_DESCRIPTION}),
     ('branch', {'main': git_branch, 'description': GIT_BRANCH_DESCRIPTION}),

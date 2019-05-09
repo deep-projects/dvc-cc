@@ -6,7 +6,7 @@ from subprocess import check_output
 import numpy as np
 from argparse import ArgumentParser
 
-DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'Create a new git branch and handle prefix ids.'
 
 def get_name_of_branch():
     out = check_output(["git", "branch"]).decode("utf8")
@@ -17,10 +17,10 @@ def main():
     git_name_of_branch = get_name_of_branch()
     
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('name_of_branch', help='The name of the branch', default=None)
-    parser.add_argument('-l', '--last_prefix', help='Use the last prefix', default=False,action='store_true')
-    parser.add_argument('-i', '--init_from_this_branch', help='The init branch is the current one.', default=False,action='store_true')
-    parser.add_argument('-w', '--without_prefix', help='Create the branch name without prefix', default=False,action='store_true')
+    parser.add_argument('name_of_branch', help='The name of the branch you want to create.', default=None)
+    parser.add_argument('-l', '--last_prefix', help='Use the last prefix ID for this new branch.', default=False,action='store_true')
+    parser.add_argument('-i', '--init_from_this_branch', help='USe the current branch as init branch for the new branch. If this is not set, the init branch will be the "master" branch.', default=False,action='store_true')
+    parser.add_argument('-w', '--without_prefix', help='If this is used, there will be no prefix ID for the newly created branch.', default=False,action='store_true')
     args = parser.parse_args()
 
     name_of_branch = args.name_of_branch
@@ -53,7 +53,7 @@ def main():
     subprocess.call(['dvc', 'push'])
     
     subprocess.call(['git', 'commit','-m', '"Init '+prefix+name_of_branch+' from '+git_name_of_branch+'"'])
-    subprocess.call(['git', 'push', '--set-upstream', 'origin', prefix+name_of_branch])
+    subprocess.call(['git', 'push', '--set-upstream', 'origin', prefix + name_of_branch])
     #subprocess.call(['hub', 'sync'])
     
     
