@@ -12,13 +12,13 @@ pip install dvc-cc/dep/cc_core-7.0.0-py3-none-any.whl --ignore-installed   # soo
 pip install dvc-cc/dep/cc_faice-7.0.0-py3-none-any.whl --ignore-installed  # soon this will be:  pip install cc-faice
 pip install dvc-cc/dist/dvc_cc-0.1.0-py3-none-any.whl --ignore-installed
 
-# GO to github or gitlab and create a new project: i.e. the project name: dvc_demo
+# GO to github or gitlab and create a new project: i.e. the project name: demo_dvc
 
 # Clone the git: here is it the following link
-git clone https://git.tools.f4.htw-berlin.de/annusch/dvc_demo.git
+git clone https://git.tools.f4.htw-berlin.de/annusch/demo_dvc.git
 
 # Go the the project folder
-cd dvc_demo
+cd demo_dvc
 
 
 # CONVERT TO A DVC-Project,
