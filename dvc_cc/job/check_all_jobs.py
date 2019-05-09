@@ -13,7 +13,7 @@ import subprocess
 import os
 import numpy as np
 
-DESCRIPTION = 'list all started jobs'
+DESCRIPTION = 'This scripts checks all jobs that you already started.'
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)

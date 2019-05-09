@@ -14,15 +14,13 @@ import subprocess
 import os
 import numpy as np
 
-DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.\n Helper to check the last job that you started.'
+DESCRIPTION = 'This scripts checks one job in detail.'
 
 def main():
-    print('Start executer-python [version 0.1]')
-    
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('-s','--status_to_check', help='i.e.: failed, succeeded',default='failed')
-    parser.add_argument('-m','--mode', type=int,help='0: everything get printed, 1 only one', default=1)
-    parser.add_argument('-p','--position', type=int,help='the position to print more information', default=-1)
+    parser.add_argument('-s','--status_to_check', help='The mode that you want to check (i.e. failed or succeeded), default: failed', default='failed')
+    parser.add_argument('-m','--mode', type=int,help='0: everything get printed, 1 only one, default=1', default=1)
+    parser.add_argument('-p','--position', type=int,help='The jobs that match the state get into a array. With this parameter you can scroll to your jobs. Default=-1 := The last job.', default=-1)
     
     args = parser.parse_args()
     

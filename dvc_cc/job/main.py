@@ -24,7 +24,7 @@ from dvc_cc.job.remove_all_processing_jobs import DESCRIPTION as REMOVE_ALL_JOBS
 
 SCRIPT_NAME = 'dvc-cc job'
 TITLE = 'tools'
-DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.\n Helper to work with cc.'
+DESCRIPTION = 'Scripts to work with Curious Containers (CC) and start, cancel and check running jobs.'
 MODES = OrderedDict([
     ('run', {'main': start_jobs_main, 'description': START_JOBS_DESCRIPTION}),
     ('check', {'main': check_last_main, 'description': CHECK_LAST_DESCRIPTION}),

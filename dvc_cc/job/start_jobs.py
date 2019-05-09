@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import subprocess
 import os
 
-DESCRIPTION = 'CC JOBS run: Start all jobs at your cc server.'
+DESCRIPTION = 'This script start all jobs for that you define your red-yml-file.'
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
