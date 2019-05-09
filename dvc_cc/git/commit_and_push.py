@@ -12,8 +12,11 @@ DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed u
 
 def get_name_of_branch():
     out = check_output(["git", "branch"]).decode("utf8")
-    current = next(line for line in out.split("\n") if line.startswith("*"))
-    return current.strip("*").strip()
+    if out == '':
+        return 'master'
+    else:
+        current = next(line for line in out.split("\n") if line.startswith("*"))
+        return current.strip("*").strip()
 
 def main():
     git_name_of_branch = get_name_of_branch()

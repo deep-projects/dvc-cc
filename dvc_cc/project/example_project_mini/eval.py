@@ -3,7 +3,7 @@ import os
 import json
 import helper as json_encoder
 
-print(' !!! RUN AN EXPERIMENT with the name !!!')
+print(' !!! RUN AN eval.py !!!')
 
 
 # load your test data
