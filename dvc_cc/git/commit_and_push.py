@@ -32,6 +32,7 @@ def main():
         subprocess.call(['git','add','-A'])
         subprocess.call(['git','commit','-m', '"'+commit_message+'"'])
         subprocess.call(['git','push','--set-upstream', 'origin',git_name_of_branch])
-        subprocess.call(['hub','sync'])
+        subprocess.call(['dvc','push'])
+        #subprocess.call(['hub','sync'])
     
     

@@ -1,0 +1,18 @@
+cmd: python code/train.py <<param>>
+deps:
+-  path: code/train.py
+-  path: data/mydata.npy
+outs:
+- cache: true
+  metric: false
+  path: result/train_<<name_of_experiment>>.npy
+  persist: false
+- cache: true
+  metric: false
+  path: model/train_<<name_of_experiment>>.npy
+  persist: false
+- cache: false
+  metric: true
+  path: metrics/train_<<name_of_experiment>>.json
+  persist: false
+wdir: .

@@ -29,4 +29,5 @@ def main():
         if append_write == 'a':
             cc_id_file.write('\n')
         cc_id_file.write(cc_id)
+        print(cc_id)
         cc_id_file.close()

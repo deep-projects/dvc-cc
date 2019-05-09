@@ -1,0 +1,15 @@
+cmd: python code/eval.py <<param>>
+deps:
+-  path: code/eval.py
+-  path: data/mydata.npy
+-  path: model/train_<<name_of_experiment>>.npy
+outs:
+- cache: true
+  metric: false
+  path: result/eval_<<name_of_experiment>>.npy
+  persist: false
+- cache: false
+  metric: true
+  path: metrics/eval_<<name_of_experiment>>.json
+  persist: false
+wdir: .

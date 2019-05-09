@@ -13,13 +13,17 @@ from dvc_cc.red.main import DESCRIPTION as RED_DESCRIPTION
 from dvc_cc.job.main import main as job_main
 from dvc_cc.job.main import DESCRIPTION as JOB_DESCRIPTION
 
+from dvc_cc.project.main import main as project_main
+from dvc_cc.project.main import DESCRIPTION as PROJECT_DESCRIPTION
+
 SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 MODES = OrderedDict([
     ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
     ('red', {'main': red_main, 'description': RED_DESCRIPTION}),
-    ('jobs', {'main': job_main, 'description': JOB_DESCRIPTION})
+    ('jobs', {'main': job_main, 'description': JOB_DESCRIPTION}),
+    ('project', {'main': project_main, 'description': PROJECT_DESCRIPTION})
 ])
 
 

@@ -15,12 +15,12 @@ python = "^3.6"
 keyring = "^19.0"
 #cc-core = { git = "https://github.com/curious-containers/cc-core.git", branch = "7.0" }
 #cc-faice = { git = "https://github.com/curious-containers/cc-faice.git", branch = "7.0" }
-cc-faice = { file = "/home/j/Documents/github/dvc-cc/dep/cc_faice-7.0.0-py3-none-any.whl" }
-cc-core = { file = "/home/j/Documents/github/dvc-cc/dep/cc_core-7.0.0-py3-none-any.whl" }
 dvc = "^0.35.7"
 paramiko = "^2.4"
 numpy = "^1.16"
-hub = "^2.0"
+#hub = "^2.0"
+#cc-faice = { file = "/home/j/Documents/github/dvc-cc/dep/cc_faice-7.0.0-py3-none-any.whl" }
+#cc-core = { file = "/home/j/Documents/github/dvc-cc/dep/cc_core-7.0.0-py3-none-any.whl" }
 
 [tool.poetry.dev-dependencies]
 

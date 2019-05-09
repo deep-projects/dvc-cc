@@ -45,15 +45,15 @@ def main():
             
         prefix = '%0.3d_'%last_pos
     
-    subprocess.call(['hub', 'sync'])
+    #subprocess.call(['hub', 'sync'])
     subprocess.call(['git', 'checkout', initbranch])
     subprocess.call(['dvc', 'pull'])
     subprocess.call(['git', 'branch', prefix + name_of_branch])
     subprocess.call(['git', 'checkout', prefix + name_of_branch])
-    subprocess.call(['dvc', 'pull'])
+    subprocess.call(['dvc', 'push'])
     
     subprocess.call(['git', 'commit','-m', '"Init '+prefix+name_of_branch+' from '+git_name_of_branch+'"'])
     subprocess.call(['git', 'push', '--set-upstream', 'origin', prefix+name_of_branch])
-    subprocess.call(['hub', 'sync'])
+    #subprocess.call(['hub', 'sync'])
     
     
