@@ -17,7 +17,7 @@ from dvc_cc.project.dummy_to_dvc import DESCRIPTION as DUMMY_TO_DVC_JOBS_DESCRIP
 
 SCRIPT_NAME = 'dvc-cc job'
 TITLE = 'tools'
-DESCRIPTION = 'DVC-CC job (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.\n Helper to work with cc.'
+DESCRIPTION = 'Scripts to create a new DVC-CC project and convert dummy files to .dvc files.'
 MODES = OrderedDict([
     ('create', {'main': create_jobs_main, 'description': CREATE_JOBS_DESCRIPTION}),
     ('dummy', {'main': dummy_to_dvc_jobs_main, 'description': DUMMY_TO_DVC_JOBS_DESCRIPTION})

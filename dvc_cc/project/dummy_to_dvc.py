@@ -14,7 +14,7 @@ import os
 import numpy as np
 import dvc_cc
 
-DESCRIPTION = '...'
+DESCRIPTION = 'This scripts convert a dummy file to a .dvc file. You can create a dummy file by just using dvc run and use <<p>> and <<noe>>. Than rename the file to .dvc_dummy and use this script to build the experiments'
 
 def main():
     parser = ArgumentParser()

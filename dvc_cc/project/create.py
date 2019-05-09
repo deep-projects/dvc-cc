@@ -15,7 +15,7 @@ import os
 import numpy as np
 import dvc_cc
 
-DESCRIPTION = 'list all started jobs'
+DESCRIPTION = 'Create a simple project. You can use this project to test DVC and DVC-CC or to have a structered starting project.'
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
