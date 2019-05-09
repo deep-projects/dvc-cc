@@ -1,11 +1,13 @@
 import numpy as np
 import os
+import json
+import helper as json_encoder
 
 print(' !!! RUN AN EXPERIMENT with the name !!!')
 
 
 # load your test data
-data = np.load('data/mydata.npy')[:-500]
+data = np.load('mydata.npy')[:-500]
 
 # build your model and set the weights
 num_of_samples = 10
