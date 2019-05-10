@@ -43,6 +43,7 @@ dvc_cc/project/example_project/q_and_a/q_and_a.json
 dvc_cc/project/example_project/q_and_a/q_and_a.json.dvc
 dvc_cc/project/example_project_mini/create_some_data.py
 dvc_cc/project/example_project_mini/eval.py
+dvc_cc/project/example_project_mini/helper.py
 dvc_cc/project/example_project_mini/train.py
 dvc_cc/red/__init__.py
 dvc_cc/red/__main__.py

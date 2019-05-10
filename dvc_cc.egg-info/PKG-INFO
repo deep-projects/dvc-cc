@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: dvc-cc
-Version: 0.1.0
+Version: 0.2.0
 Summary: This connector is used to combine the work of CC (www.curious-containers.cc) and DVC (Open-source Version Control System for Machine Learning Projects).
 Home-page: https://github.com/mastaer/dvc-cc.git
 Author: Jonas Annuscheit
