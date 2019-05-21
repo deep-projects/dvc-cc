@@ -60,7 +60,7 @@ def main():
     git_path_to_working_repository = gitrepo
     git_working_repository_owner = gitowner
     git_working_repository_name = gitname
-    git_name_of_branch = get_name_of_branch()
+    git_name_of_tag = get_name_of_branch() # TODO !!!!
     dvc_servername = dvc_server
     dvc_path_to_working_repository = dvc_path
 
@@ -123,7 +123,7 @@ def main():
               print("      git_path_to_working_repository: \""+git_path_to_working_repository+"\"", file=f)
               print("      git_working_repository_owner: \""+git_working_repository_owner+"\"", file=f)
               print("      git_working_repository_name: \""+git_working_repository_name+"\"", file=f)
-              print("      git_name_of_branch: \""+git_name_of_branch+"\"", file=f)
+              print("      git_name_of_tag: \""+git_name_of_tag+"\"", file=f)
               print("      dvc_authentication_json:", file=f)
               print("        class: File", file=f)
               print("        connector:", file=f)
@@ -175,7 +175,7 @@ def main():
             print("      doc: 'SOMETHING'", file=f)
             print("      inputBinding: {position: 3}", file=f)
             print("      type: string", file=f)
-            print("    git_name_of_branch:", file=f)
+            print("    git_name_of_tag:", file=f)
             print("      doc: 'SOMETHING'", file=f)
             print("      inputBinding: {position: 4}", file=f)
             print("      type: string", file=f)
@@ -221,7 +221,7 @@ def main():
             print("redVersion: '7'", file=f)
             print("", file=f)
 
-        print('Added new job: ' + git_path_to_working_repository + ' / ' + git_working_repository_owner + ' / ' + git_working_repository_name + ' ; Branch: ' + git_name_of_branch)
+        print('Added new job: ' + git_path_to_working_repository + ' / ' + git_working_repository_owner + ' / ' + git_working_repository_name + ' ; Branch: ' + git_name_of_tag)
 
 
 #
