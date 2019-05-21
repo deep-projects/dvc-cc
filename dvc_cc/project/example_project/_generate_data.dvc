@@ -1,9 +1,0 @@
-cmd: python code/create_some_data.py
-deps:
--  path: code/create_some_data.py
-outs:
-- cache: true
-  metric: false
-  path: data/mydata.npy
-  persist: false
-wdir: .

@@ -7,14 +7,8 @@ from dvc_cc.cli_modes import cli_modes
 from dvc_cc.git.main import main as git_main
 from dvc_cc.git.main import DESCRIPTION as GIT_DESCRIPTION
 
-from dvc_cc.red.main import main as red_main
-from dvc_cc.red.main import DESCRIPTION as RED_DESCRIPTION
-
-from dvc_cc.job.main import main as job_main
-from dvc_cc.job.main import DESCRIPTION as JOB_DESCRIPTION
-
-from dvc_cc.project.main import main as project_main
-from dvc_cc.project.main import DESCRIPTION as PROJECT_DESCRIPTION
+from dvc_cc.jobs.main import main as jobs_main
+from dvc_cc.jobs.main import DESCRIPTION as JOBS_DESCRIPTION
 
 from dvc_cc.init.main import main as init_main
 from dvc_cc.init.main import DESCRIPTION as INIT_DESCRIPTION
@@ -24,9 +18,7 @@ TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 MODES = OrderedDict([
     ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
-    ('red', {'main': red_main, 'description': RED_DESCRIPTION}),
-    ('jobs', {'main': job_main, 'description': JOB_DESCRIPTION}),
-    ('project', {'main': project_main, 'description': PROJECT_DESCRIPTION}),
+    ('jobs', {'main': jobs_main, 'description': JOBS_DESCRIPTION}),
     ('init', {'main': init_main, 'description': INIT_DESCRIPTION})
 ])
 

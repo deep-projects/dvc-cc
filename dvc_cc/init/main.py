@@ -15,34 +15,45 @@ DESCRIPTION = 'Scripts to initial a dvc-cc repository. It throws an exception, i
 from dvc.repo import Repo
 from git import Repo
 
+def get_main_git_directory_path():
+    gitrepo = Repo('.')
+    git_path = gitrepo.common_dir.split('/.git')[0]
+    return git_path
+
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('-ms', '--mini-sample', help='Creates a mini sample project.', default=False,action='store_true')
-    parser.add_argument('-ls', '--large-sample', help='Creates a large sample project.', default=False,action='store_true')
     parser.add_argument('-r','--ram', help='The ram that you need.',default=131072)
     parser.add_argument('-T','--test', help='Run at cctest.',default=False, action='store_true')
     parser.add_argument('-g','--num_of_gpus', help='The number of gpus that you need to ',default=1)
+    parser.add_argument('-ms', '--mini-sample', help='Creates a mini sample project.', default=False,action='store_true')
+    parser.add_argument('-ls', '--large-sample', help='Creates a large sample project.', default=False,action='store_true')
     args = parser.parse_args()
     
-    gitrepo = Repo('.')
-    git_path = gitrepo.common_dir.split('/.git')[0]
-    os.chdir(git_path)
+    # Change the directory to the main git directory.
+    os.chdir(get_main_git_directory_path())
     
     gitrepo = Repo('.')
-    dvcrepo = Repo(".")
+    dvcrepo = Repo('.')
     
-    dvcrepo.init()
+    # init the dvc repo, if it is not already a dvc repo.
+    if not os.path.exists('.dvc'):
+        dvcrepo.init()
     
-    # create dir folder
-    os.mkdir('.red')
+    # create the main folder of the dvc_cc software package.
+    if not os.path.exists('.dvc_cc'):
+        os.mkdir('.dvc_cc')
     
-    create_cc_config_file(args)
+    # create the config file.    
+    if not os.path.exists('.dvc_cc/cc_config.yml'):
+        create_cc_config_file(args)
     
     #TODO: CREATE THE SAMPLE PROJECTS !!!
 
 
 def create_cc_config_file(args):
-    with open('.red/cc_config.yml',"w") as f:
+    #TODO: Allow interactive sessions.
+    #TODO: Allow more parameters to set in the config.
+    with open('.dvc_cc/cc_config.yml',"w") as f:
         print("cli:", file=f)
         print("  baseCommand: [executepy]", file=f)
         print("  class: CommandLineTool", file=f)
