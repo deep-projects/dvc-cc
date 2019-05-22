@@ -134,11 +134,11 @@ def main():
     new_tag = create_new_tag() + '_' + args.experimentname
     
     data_username, data_server, data_path = get_mount_values_for_a_direcotry(project_dir+'/data')
-    data_password = '<<'+data_server+'_password>>'
+    data_password = '{{'+data_server+'_password}}'
     use_external_data_dir = data_server is not None
 
     if args.dvc_file is None:
-        dvc_files = helper.getListOfFiles(add_only_files_that_ends_with='.dvc')
+        dvc_files = [f[2:] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
     elif args.dvc_file.endswith('.dvc'):
         dvc_files = [args.dvc_file]
     else:
@@ -153,7 +153,7 @@ def main():
         os.mkdir('.dvc_cc/' + new_tag)
     
         for i in range(len(dvc_files) if run_every_dvc_file_in_own_docker else 1):
-            path = '.dvc_cc/' + new_tag + '/' +  os.path.basename(dvc_files[i]) + '.yml'
+            path = '.dvc_cc/' + new_tag + '/' +  dvc_files[i].replace('/','___') + '.yml'
             paths.append(path)
 
             with open(path,"w") as f:
@@ -188,7 +188,7 @@ def main():
                     print("              auth:", file=f)
                     print("                username: '"+data_username+"'", file=f)
                     print("                password: '"+data_password+"'", file=f)
-                    print("              dirName: '"+data_path+"'", file=f)
+                    print("              dirPath: '"+data_path+"'", file=f)
                 if run_every_dvc_file_in_own_docker:
                     print("      dvc_file_to_execute: '" + dvc_files[i] + "'", file=f)
                 print("    outputs: {}", file=f)
