@@ -1,4 +1,4 @@
-from dvc_cc.job.main import main
+from dvc_cc.run.main import main
 
 
 if __name__ == '__main__':
