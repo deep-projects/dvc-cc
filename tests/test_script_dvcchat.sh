@@ -3,60 +3,34 @@
 mkdir ~/test_repo
 cd ~/test_repo
 
+mkdir repo storage_dvc storage_git data_sshfs
+
+cd repo
+
+git init 
+dvc init
+
 
 ##################################
 # 1. Step:                       #
 # GIT with LOCAL (remote) server #
 ##################################
-#git init --bare ~/test_repo/storage_git/myproject.git
+git init --bare ~/test_repo/storage_git/myproject.git
 
-#git remote add origin ~/test_repo/storage_git/myproject.git
-
-echo -e "\n
-\n
-import gitlab\n
-import time\n
-gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/', private_token='TA5fBL-ypdtqrL9nUF3N')\n
-gl.auth()\n
-\n
-try:\n
-    gl_id = gl.projects.get('annusch/project1').get_id()\n
-    gl.projects.delete(gl_id)\n
-    time.sleep(2)
-except:\n
-    print('Fine')\n
-\n
-project = gl.projects.create({'name': 'project1'})\n" >> ~/test_repo/create_git_repo.py
-python ~/test_repo/create_git_repo.py
+git remote add origin ~/test_repo/storage_git/myproject.git
 
 git config --global credential.helper 'cache --timeout 7200'
-
-git clone https://git.tools.f4.htw-berlin.de/annusch/project1.git repo
-
-cd repo
-
-dvc init
 
 git add -A
 git commit -m 'init project'
 
-git push --set-upstream origin master
-
-mkdir ~/test_repo/avocado/
-sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/ ~/test_repo/avocado/
-
-rm -R ~/test_repo/avocado/_testproject_DVC
-rm -R ~/test_repo/avocado/_testproject_DATA
-
-mkdir ~/test_repo/avocado/_testproject_DVC
-mkdir ~/test_repo/avocado/_testproject_DATA
+git push origin master
 
 ##################################
 # 2. Step:                       #
 # DVC with LOCAL (remote) server #
 ##################################
-dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/_testproject_DVC
-dvc remote modify dvc_connection ask_password true
+dvc remote add -d local_dvccache ~/test_repo/storage_dvc
 dvc push
 
 ###################################
@@ -67,8 +41,7 @@ dvc push
 mkdir data
 
 # maybe need to install: sudo apt-get install openssh-server
-sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/_testproject_DATA ~/test_repo/repo/data/
-#sshfs $(id -un)@$(hostname -f):${HOME}/test_repo/data_sshfs/ data/
+sshfs $(id -un)@$(hostname -f):${HOME}/test_repo/data_sshfs/ data/
 
 #########################################
 # 4. Step:                              #
@@ -79,11 +52,25 @@ sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/_testproject_DATA ~/te
 # or I don't want them multiple times   #
 # in different repos in my computer     #
 #########################################
+cp .git/config .git/config_tmp
+
 git submodule add https://github.com/mastaer/create_mnist_data.git create_dataset
+
+cp .git/config_tmp .git/config
+rm .git/config_tmp
+
+
+rm .gitmodules
+git add .gitmodules
+git rm --cached create_dataset
+rm -rf .git/modules/create_dataset
+
+rm create_dataset/.git
+
 
 dvc repro -P
 
-#echo -e "data\ncreate_dataset\ndata/*\ncreate_dataset/*\n" >> .dvcignore
+echo -e "data\ncreate_dataset\ndata/*\ncreate_dataset/*\n" >> .dvcignore
 
 
 #########################################
@@ -121,18 +108,9 @@ git tag -a 002_secondexperiment -m 'Second message!'
 git push origin --tags
 
 
-
-
-
-
-
-
-
-
-
 cd ..
 
-git clone --recurse-submodules https://git.tools.f4.htw-berlin.de/annusch/project1.git myproject1
+git clone ~/test_repo/storage_git/myproject.git myproject1
 cd myproject1
 
 git checkout tags/001_firstexperiment -b result_001_firstexperiment
@@ -145,7 +123,7 @@ dvc push
 
 cd ..
 
-git clone --recurse-submodules https://git.tools.f4.htw-berlin.de/annusch/project1.git myproject2
+git clone ~/test_repo/storage_git/myproject.git myproject2
 cd myproject2
 
 git checkout tags/002_secondexperiment -b result_002_secondexperiment
@@ -175,7 +153,6 @@ dvc metrics show -a
 # 7. Step:                              #
 # Remove the dummy project              #
 #########################################
-cd ~
-fusermount -u -z ${HOME}/test_repo/avocado
-fusermount -u -z ${HOME}/test_repo/repo/data
-rm -rf ~/test_repo
+#cd ~
+#fusermount -u -z ${HOME}/test_repo/repo/data
+#rm -rf ~/test_repo```

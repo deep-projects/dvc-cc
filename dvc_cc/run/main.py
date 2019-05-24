@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import dvc_cc.jobs.helper as helper
+import dvc_cc.run.helper as helper
 from argparse import ArgumentParser
 from dvc.repo import Repo
 from git import Repo
@@ -112,7 +112,7 @@ def main():
     parser.add_argument('-ne','--no-exec', help='If true the experiment get defined, but it will not run at a server.', default=False, action='store_true')
     # TODO: parser.add_argument('-l','--local', help='Run the experiment locally!', default=False, action='store_true')
     # TODO: parser.add_argument('-q','--question', help='A question that you want to answer with that experiment.')
-    parser.add_argument('-f','--dvc-file', help='The DVC file that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. use the command ')
+    parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
     args = parser.parse_args()
     
@@ -137,23 +137,31 @@ def main():
     data_password = '{{'+data_server+'_password}}'
     use_external_data_dir = data_server is not None
 
-    if args.dvc_file is None:
-        dvc_files = [f[2:] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
-    elif args.dvc_file.endswith('.dvc'):
-        dvc_files = [args.dvc_file]
+    if args.dvc_files is None:
+        dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
     else:
-        print('Error: You define with -f which file you want to exec. But this is not a dvc file.')
-        exit(1)
+        dvc_files = []
+        dvc_files_tmp = args.dvc_files.replace(' ', '').split(',')
+        for dvc_files_branch in dvc_files_tmp:
+            dvc_files.append([])
+            dvc_files_file = dvc_files_branch.split('|')
+            for i in range(len(dvc_files_file)):
+                dvc_files[-1].append(dvc_files_file[i])
+                if not dvc_files_file[i].endswith('.dvc'):
+                    print('Error: You define with -f which dvc files you want to exec. One or more files does not ends with .dvc. Please use only DVC files.')
+                    exit(1)
+    print(dvc_files)
+         
 
     if len(dvc_files) == 0:
         print('Error: There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
     else:
-        run_every_dvc_file_in_own_docker = True
         paths = []
         os.mkdir('.dvc_cc/' + new_tag)
     
-        for i in range(len(dvc_files) if run_every_dvc_file_in_own_docker else 1):
-            path = '.dvc_cc/' + new_tag + '/' +  dvc_files[i].replace('/','___') + '.yml'
+        for i in range(len(dvc_files)):
+            dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'","").replace('"','').replace(' ','')
+            path = '.dvc_cc/' + new_tag + '/' +  dvcfiles_to_execute.replace(",","_").replace('/','___') + '.yml'
             paths.append(path)
 
             with open(path,"w") as f:
@@ -189,16 +197,25 @@ def main():
                     print("                username: '"+data_username+"'", file=f)
                     print("                password: '"+data_password+"'", file=f)
                     print("              dirPath: '"+data_path+"'", file=f)
-                if run_every_dvc_file_in_own_docker:
-                    print("      dvc_file_to_execute: '" + dvc_files[i] + "'", file=f)
+                print("      dvc_file_to_execute: '" + dvcfiles_to_execute + "'", file=f)
                 print("    outputs: {}", file=f)
         for path in paths:
             subprocess.call(['git', 'add', path])
+        subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
+        subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
         subprocess.call(['git', 'commit', '-m', '\'Build new Pipeline: ' + path + '\''])
-        subprocess.call(['git', 'push'])
         subprocess.call(['git', 'tag', '-a', new_tag, '-m', '\'automatic tagging of the experiment.\''])
-        subprocess.call(['git', 'push', 'origin', '--tags'])
         print('Added new job: ' + new_tag)
+        try: 
+            subprocess.call(['git', 'push'])
+            subprocess.call(['git', 'push', 'origin', '--tags'])
+        except:
+            if args.no_exec:
+                print('Warning: The project could not pushed to the remote repository. You can ignore this, because you run this command with: --no-exec.')
+            else:
+                print('ERROR: The project could not pushed to the remote repository and could not started. Maybe you do not have access to the internet? The job is now defined, but you need to call "dvc-cc run-all-defined" to run this job.')
+                args.no_exec = True
+                
 
         # Execute the job.
         if args.no_exec == False:
@@ -214,7 +231,7 @@ def main():
             output = subprocess.check_output(('faice exec .dvc_cc/tmp.red.yml').split())
             cc_id = output.decode().split()[-1]
             print('The experiment ID is: ' + cc_id)
-            os.remove('.dvc_cc/tmp.red.yml')
+            #os.remove('.dvc_cc/tmp.red.yml')
         else:
             cc_id = None
 
@@ -231,7 +248,13 @@ def main():
         with open('.dvc_cc/cc_agency_experiments.yml', 'w') as outfile:
             yaml.dump(data, outfile, default_flow_style=False)
 
-
+        subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
+        subprocess.call(['git', 'commit', '-m', '\'Update cc_agency_experiments.yml: ' + path + '\''])
+        try:
+            subprocess.call(['git', 'push'])
+        except:
+            if args.no_exec == False:
+                print('ERROR: It could not pushed to git!')
 
 
 check_output(["git", "status"]).decode("utf8")

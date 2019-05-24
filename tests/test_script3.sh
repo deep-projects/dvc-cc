@@ -79,7 +79,20 @@ sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/_testproject_DATA ~/te
 # or I don't want them multiple times   #
 # in different repos in my computer     #
 #########################################
+cp .git/config .git/config_tmp
+
 git submodule add https://github.com/mastaer/create_mnist_data.git create_dataset
+
+cp .git/config_tmp .git/config
+rm .git/config_tmp
+
+
+rm .gitmodules
+git add .gitmodules
+git rm --cached create_dataset
+rm -rf .git/modules/create_dataset
+
+rm create_dataset/.git
 
 dvc repro -P
 
@@ -120,14 +133,25 @@ git push
 #   DVC-CC INIT                         #
 #########################################
 dvc-cc init
-dvc-cc jobs run just_an_experimentname
+dvc-cc run "ONE_FILE" -f "test_acc2.json.dvc"
+dvc-cc run "ONE_FILE_IN_DIRECTORY" -f "create_dataset/create_dataset.dvc"
+dvc-cc run "MULTIPLE_FILES_IN_2_PIPELINES" -f "test_acc.json.dvc,test_acc2.json.dvc|train_acc2.json.dvc"
+dvc-cc run "just_an_experimentname"
+
+dvc-cc run "MULTIPLE_FILES_IN_2_PIPELINES" -f "test_acc.json.dvc,test_acc2.json.dvc|train_acc2.json.dvc" --no-exec
+
+
+#cd ~/test_repo/repo
+git pull
 
 
 #########################################
 # 7. Step:                              #
 # Remove the dummy project              #
 #########################################
-cd ~
-fusermount -u -z ${HOME}/test_repo/avocado
-fusermount -u -z ${HOME}/test_repo/repo/data
-rm -rf ~/test_repo
+#cd ~
+#fusermount -u -z ${HOME}/test_repo/avocado
+#fusermount -u -z ${HOME}/test_repo/repo/data
+#rm -rf ~/test_repo
+#cd ~/Documents/github/dvc-cc-NEW/tests/
+#./test_script3.sh

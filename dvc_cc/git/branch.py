@@ -17,10 +17,10 @@ def main():
     git_name_of_branch = get_name_of_branch()
     
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('name_of_branch', help='The name of the branch you want to create.', default=None)
-    parser.add_argument('-l', '--last_prefix', help='Use the last prefix ID for this new branch.', default=False,action='store_true')
-    parser.add_argument('-i', '--init_from_this_branch', help='USe the current branch as init branch for the new branch. If this is not set, the init branch will be the "master" branch.', default=False,action='store_true')
-    parser.add_argument('-w', '--without_prefix', help='If this is used, there will be no prefix ID for the newly created branch.', default=False,action='store_true')
+    parser.add_argument('name-of-branch', help='The name of the branch you want to create.', default=None)
+    parser.add_argument('-l', '--last-prefix', help='Use the last prefix ID for this new branch.', default=False,action='store_true')
+    parser.add_argument('-i', '--init-from-this-branch', help='USe the current branch as init branch for the new branch. If this is not set, the init branch will be the "master" branch.', default=False,action='store_true')
+    parser.add_argument('-w', '--without-prefix', help='If this is used, there will be no prefix ID for the newly created branch.', default=False,action='store-true')
     args = parser.parse_args()
 
     name_of_branch = args.name_of_branch

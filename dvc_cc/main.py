@@ -10,6 +10,12 @@ from dvc_cc.git.main import DESCRIPTION as GIT_DESCRIPTION
 from dvc_cc.run.main import main as run_main
 from dvc_cc.run.main import DESCRIPTION as run_DESCRIPTION
 
+from dvc_cc.run_all_defined.main import main as run_all_defined_main
+from dvc_cc.run_all_defined.main import DESCRIPTION as RUN_ALL_DEFINED_DESCRIPTION
+
+from dvc_cc.output_to_tmp.main import main as output_to_tmp_main
+from dvc_cc.output_to_tmp.main import DESCRIPTION as output_to_tmp_DESCRIPTION
+
 from dvc_cc.init.main import main as init_main
 from dvc_cc.init.main import DESCRIPTION as INIT_DESCRIPTION
 
@@ -19,6 +25,8 @@ DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed u
 MODES = OrderedDict([
     ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
     ('run', {'main': run_main, 'description': run_DESCRIPTION}),
+    ('run-all-defined', {'main': run_all_defined_main, 'description': RUN_ALL_DEFINED_DESCRIPTION}),
+    ('output-to-tmp', {'main': output_to_tmp_main, 'description': output_to_tmp_DESCRIPTION}),
     ('init', {'main': init_main, 'description': INIT_DESCRIPTION})
 ])
 
