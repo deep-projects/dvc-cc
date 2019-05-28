@@ -114,6 +114,7 @@ def main():
     # TODO: parser.add_argument('-q','--question', help='A question that you want to answer with that experiment.')
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
+    parser.add_argument('-r','--num_of_repeats', help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
     args = parser.parse_args()
     
     project_dir = get_main_git_directory_path()
@@ -162,7 +163,8 @@ def main():
         for i in range(len(dvc_files)):
             dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'","").replace('"','').replace(' ','')
             path = '.dvc_cc/' + new_tag + '/' +  dvcfiles_to_execute.replace(",","_").replace('/','___') + '.yml'
-            paths.append(path)
+            for i in range(args.num_of_repeats):
+                paths.append(path)
 
             with open(path,"w") as f:
                 #print("batches:", file=f)
