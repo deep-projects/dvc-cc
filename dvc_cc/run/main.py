@@ -106,6 +106,42 @@ def check_git_repo(args):
     """
     return
 
+def get_leafs_that_need_to_reproduce():
+    from dvc.repo import Repo
+    dvcrepo = Repo('.')
+
+    G = dvcrepo.pipelines()[0]
+    # Get all leaf files.
+    leafs = [[x] for x in G.nodes() if G.in_degree(x) == 0]
+    status_of_leafs = [dvcrepo.status(target=f[0], with_deps=True) for f in leafs]
+
+    # check if the leafs need to reproduce:
+    leafs_to_reproduce = [len(status_of_leafs) > 0 for s in status_of_leafs]
+    leafs = [leafs[i] for i in range(len(leafs)) if leafs_to_reproduce[i]]
+    status_of_leafs = [status_of_leafs[i] for i in range(len(leafs)) if leafs_to_reproduce[i]]
+
+    # check if there two leafs need both to reproduce the same stages.
+    move_leafs = []
+    for i in range(len(leafs) -1):
+        move_leaf = None
+        for j in range(i+1, len(leafs)):
+            for k in status_of_leafs[i].keys():
+                if k in status_of_leafs[j]:
+                    # both leafs need to reproduce same stage
+                    move_leaf = j
+        move_leafs.append(move_leaf)
+
+    move_leafs.append(None)
+
+    leafs_need_to_reproduce = []
+    for i in range(len(move_leafs)):
+        if move_leafs[i] is not None:
+            leafs[move_leafs[i]].extend(leafs[i])
+        else:
+            leafs_need_to_reproduce.append(leafs[i])
+    return leafs_need_to_reproduce
+
+
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('experimentname', help='The name of the experiment that should be used. This can help you to search between all files.')
@@ -139,7 +175,8 @@ def main():
     use_external_data_dir = data_server is not None
 
     if args.dvc_files is None:
-        dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
+        #dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
+        dvc_files = get_leafs_that_need_to_reproduce()
     else:
         dvc_files = []
         dvc_files_tmp = args.dvc_files.replace(' ', '').split(',')
