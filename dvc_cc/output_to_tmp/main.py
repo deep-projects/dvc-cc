@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 import re
 import random
 import dvc
-from dvc.repo import Repo
+from dvc.repo import Repo as DVCRepo
 from git import Git
 import subprocess
 import time
@@ -106,7 +106,7 @@ def main():
                         help='If true, it will not print warning if a file is not created or not in the local cache.')
     args = parser.parse_args()
 
-    repo = Repo()
+    repo = DVCRepo()
     g = Git()
     starting_branch = g.branch().split('*')[1].split('\n')[0][1:]
 

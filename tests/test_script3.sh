@@ -121,8 +121,10 @@ dvc run -d data/mnist2.npz -d train_acc.json -m test_acc.json --no-exec python t
 
 echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist3.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train2.py
 echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test2.py
+echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc3.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test3.py
 dvc run -d data/mnist3.npz -m train_acc2.json --no-exec python train2.py 
 dvc run -d data/mnist1.npz -d train_acc2.json -m test_acc2.json --no-exec python test2.py 
+dvc run -d data/mnist1.npz -d train_acc2.json -m test_acc3.json --no-exec python test3.py 
 
 git add -A
 git commit -m 'build pipeline'

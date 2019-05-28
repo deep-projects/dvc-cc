@@ -2,8 +2,8 @@
 
 import dvc_cc.run.helper as helper
 from argparse import ArgumentParser
-from dvc.repo import Repo
-from git import Repo
+from dvc.repo import Repo as DVCRepo
+from git import Repo as GITRepo
 import yaml
 import os
 from subprocess import check_output
@@ -15,7 +15,7 @@ import subprocess
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker.'
 
 def get_main_git_directory_path():
-    gitrepo = Repo('.')
+    gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
 
@@ -79,7 +79,7 @@ def get_dvcurl():
     return dvc_url, dvc_server, dvc_path
 
 def check_git_repo(args):
-    gitrepo = Repo('.')
+    gitrepo = GITRepo('.')
     if args.yes == False:
         files_are_not_commited = False        
         untracked_files = [f for f in gitrepo.untracked_files if not f.startswith('.dvc_cc')]
@@ -107,8 +107,8 @@ def check_git_repo(args):
     return
 
 def get_leafs_that_need_to_reproduce():
-    from dvc.repo import Repo
-    dvcrepo = Repo('.')
+    from dvc.repo import Repo as DVCRepo
+    dvcrepo = DVCRepo('.')
 
     G = dvcrepo.pipelines()[0]
     # Get all leaf files.
@@ -150,15 +150,15 @@ def main():
     # TODO: parser.add_argument('-q','--question', help='A question that you want to answer with that experiment.')
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
-    parser.add_argument('-r','--num_of_repeats', help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
+    parser.add_argument('-r','--num_of_repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
     args = parser.parse_args()
     
     project_dir = get_main_git_directory_path()
 
     os.chdir(project_dir)
     
-    gitrepo = Repo('.')
-    dvcrepo = Repo('.')
+    gitrepo = GITRepo('.')
+    dvcrepo = DVCRepo('.')
 
     # Check if all files are checked and pushed.
     check_git_repo(args)

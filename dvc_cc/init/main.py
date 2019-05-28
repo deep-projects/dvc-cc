@@ -12,19 +12,19 @@ SCRIPT_NAME = 'dvc-cc init'
 TITLE = 'tools'
 DESCRIPTION = 'Scripts to initial a dvc-cc repository. It throws an exception, if the current project is not a git repository.'
 
-from dvc.repo import Repo
-from git import Repo
-
+from dvc.repo import Repo as DVCRepo
+from git import Repo as GITRepo
+ 
 def get_main_git_directory_path():
-    gitrepo = Repo('.')
+    gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('-r','--ram', help='The ram that you need.',default=131072)
+    parser.add_argument('-r','--ram', help='The ram that you need.',type=int,default=131072)
     parser.add_argument('-T','--test', help='Run at cctest.',default=False, action='store_true')
-    parser.add_argument('-g','--num-of-gpus', help='The number of gpus that you need to ',default=1)
+    parser.add_argument('-g','--num-of-gpus', help='The number of gpus that you need to ',type=int,default=1)
     parser.add_argument('-ms', '--mini-sample', help='Creates a mini sample project.', default=False,action='store_true')
     parser.add_argument('-ls', '--large-sample', help='Creates a large sample project.', default=False,action='store_true')
     args = parser.parse_args()
@@ -32,8 +32,8 @@ def main():
     # Change the directory to the main git directory.
     os.chdir(get_main_git_directory_path())
     
-    gitrepo = Repo('.')
-    dvcrepo = Repo('.')
+    gitrepo = GITRepo('.')
+    dvcrepo = DVCRepo('.')
     
     # init the dvc repo, if it is not already a dvc repo.
     if not os.path.exists('.dvc'):

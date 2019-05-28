@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
-from dvc.repo import Repo
-from git import Repo
+from dvc.repo import Repo as DVCRepo
+from git import Repo as GITRepo
 import yaml
 import os
 from subprocess import check_output
@@ -14,7 +14,7 @@ import subprocess
 DESCRIPTION = 'This script starts the jobs that are already defined with "dvc-cc run" but run with the parameter "--no-exec".'
 
 def get_main_git_directory_path():
-    gitrepo = Repo('.')
+    gitrepo = DVCRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
 
@@ -26,8 +26,8 @@ def main():
 
     os.chdir(project_dir)
     
-    gitrepo = Repo('.')
-    dvcrepo = Repo('.')
+    gitrepo = GITRepo('.')
+    dvcrepo = DVCRepo('.')
 
     subprocess.call(['git', 'push'])
     subprocess.call(['git', 'push', 'origin', '--tags'])
