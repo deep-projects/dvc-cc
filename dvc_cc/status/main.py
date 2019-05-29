@@ -149,6 +149,10 @@ def main():
 
                 if args.list_of_position_of_the_subprojects is not None:
                     data_tmp = []
+                    for i in range(len(data)):
+                        if i in args.list_of_position_of_the_subprojects:
+                            data_tmp.append(data[i])
+                    data = data_tmp
 
                 if not args.only_failed:
                     experiments[k]['sub_experiment'] = data
