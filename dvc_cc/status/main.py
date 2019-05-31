@@ -94,10 +94,10 @@ def print_detail(experiments, show_ids = False):
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('-a','--all', help='Show all experiments.', default=False, action='store_true')
+    parser.add_argument('-a','--all', help='Show all experiments of this project.', default=False, action='store_true')
     parser.add_argument('-n','--number_of_experiments', help='Number of the last experiments that should be displayed. Default is 1. Is the parameter --all is set, this parameter have no effect.', type=int, default=1)
-    parser.add_argument('-id','--show_ids', help='Show the curious containers id of the experiment and sub-experiments.', default=False, action='store_true')
-    parser.add_argument('-d','--detail', help='Show all details for the sub experiments.', default=False, action='store_true')
+    parser.add_argument('-id','--show_ids', help='Show the curious containers id of the experiment and curious containers id of the sub-experiments.', default=False, action='store_true')
+    parser.add_argument('-d','--detail', help='Show all details and outputs for the sub experiments.', default=False, action='store_true')
     parser.add_argument('-e','--list_of_experimentids', help='A list of experiment ids that you want include in the display.', nargs="+", type=int)
     parser.add_argument('-p','--list_of_position_of_the_subprojects', help='A list of positions of the subproject that you want include in the display.', nargs="+", type=int)
     parser.add_argument('-f','--only_failed', help='Show only failed experiments.', default=False, action='store_true')

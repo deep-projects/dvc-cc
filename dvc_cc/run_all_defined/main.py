@@ -14,7 +14,7 @@ import subprocess
 DESCRIPTION = 'This script starts the jobs that are already defined with "dvc-cc run" but run with the parameter "--no-exec".'
 
 def get_main_git_directory_path():
-    gitrepo = DVCRepo('.')
+    gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
 
