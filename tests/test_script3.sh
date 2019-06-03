@@ -12,21 +12,19 @@ cd ~/test_repo
 
 #git remote add origin ~/test_repo/storage_git/myproject.git
 
-echo -e "\n
-\n
-import gitlab\n
-import time\n
-gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/', private_token='1oxzXp1MyJ1Yz6KEnxyS')\n
-gl.auth()\n
-\n
-try:\n
-    gl_id = gl.projects.get('annusch/project1').get_id()\n
-    gl.projects.delete(gl_id)\n
+echo "import gitlab
+import time
+gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/', private_token='1oxzXp1MyJ1Yz6KEnxyS')
+gl.auth()
+
+try:
+    gl_id = gl.projects.get('annusch/project1').get_id()
+    gl.projects.delete(gl_id)
     time.sleep(2)
-except:\n
-    print('Fine')\n
-\n
-project = gl.projects.create({'name': 'project1'})\n" >> ~/test_repo/create_git_repo.py
+except:
+    print('Fine')
+
+project = gl.projects.create({'name': 'project1'})" >> ~/test_repo/create_git_repo.py
 python ~/test_repo/create_git_repo.py
 
 git config --global credential.helper 'cache --timeout 1000'
@@ -114,14 +112,14 @@ dvc push
 # 5- Step:                              #
 # SETUP A PROJECT                       #
 #########################################
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train.py
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist2.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test.py
+echo "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train.py
+echo "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist2.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test.py
 dvc run -d data/mnist1.npz -m train_acc.json --no-exec python train.py 
 dvc run -d data/mnist2.npz -d train_acc.json -m test_acc.json --no-exec python test.py 
 
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist3.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train2.py
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test2.py
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc3.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test3.py
+echo "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist3.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train2.py
+echo "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test2.py
+echo "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc3.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test3.py
 dvc run -d data/mnist3.npz -m train_acc2.json --no-exec python train2.py 
 dvc run -d data/mnist1.npz -d train_acc2.json -m test_acc2.json --no-exec python test2.py 
 dvc run -d data/mnist1.npz -d train_acc2.json -m test_acc3.json --no-exec python test3.py 

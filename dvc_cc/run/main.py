@@ -267,8 +267,8 @@ def main():
                 with open('.dvc_cc/cc_config.yml',"r") as r:
                     print(r.read(), file=f)
             
-            output = subprocess.check_output(('faice exec .dvc_cc/tmp.red.yml').split())
-            cc_id = output.decode().split()[-1]
+            output = subprocess.Popen(('faice exec .dvc_cc/tmp.red.yml').split(), stdout=subprocess.PIPE)
+            cc_id = output.communicate()[0].decode().split()[-1]
             print('The experiment ID is: ' + cc_id)
             #os.remove('.dvc_cc/tmp.red.yml')
         else:
