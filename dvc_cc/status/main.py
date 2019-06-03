@@ -73,24 +73,83 @@ def print_detail(experiments, show_ids = False):
                 print(bcolors.OKGREEN+'Time (' + h['state'] + '):  '+bcolors.ENDC + datetime.datetime.fromtimestamp(h['time']).strftime('%Y-%m-%d %H:%M:%S'))
             if sub['state'] == 'failed' or sub['state'] == 'succeeded' or sub['state'] == 'canceled':
                 print(bcolors.OKGREEN+'Used server node: '+bcolors.ENDC + str(sub['node']))
-                if len(sub['detail']['usedGPUs']) == 1:
-                    print(bcolors.OKGREEN+'Used GPUs: '+bcolors.ENDC + str(sub['detail']['usedGPUs'][0]))
+                if 'usedGPUs' in sub['detail'] and sub['detail']['usedGPUs'] is not None:
+                    if len(sub['detail']['usedGPUs']) == 1:
+                        print(bcolors.OKGREEN+'Used GPUs: '+bcolors.ENDC + str(sub['detail']['usedGPUs'][0]))
+                    else:
+                        print(bcolors.OKGREEN+'Used GPUs: ' +bcolors.ENDC+ str(sub['detail']['usedGPUs']))
+                if sub['detail']['history'][-1]['ccagent'] is not None:
+                    c = sub['detail']['history'][-1]['ccagent']['command']
+                    if len(c) == 13:
+                        print(bcolors.OKGREEN +'Files: '+bcolors.ENDC + str(c[-1]))                    
+                    else:
+                        print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
+                    print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(sub['detail']['history'][-1]['ccagent']['process']['returnCode']))
+                    print()
+                    print(bcolors.OKGREEN + 'stdOut: ' + bcolors.ENDC)
+                    print('\n'.join(sub['detail']['history'][-1]['ccagent']['process']['stdOut']))
+                    print()
+                    print(bcolors.WARNING + 'stdErr: ' + bcolors.ENDC)
+                    print('\n'.join(sub['detail']['history'][-1]['ccagent']['process']['stdErr']))
+                    print()
                 else:
-                    print(bcolors.OKGREEN+'Used GPUs: ' +bcolors.ENDC+ str(sub['detail']['usedGPUs']))
-                c = sub['detail']['history'][-1]['ccagent']['command']
-                if len(c) == 13:
-                    print(bcolors.OKGREEN +'Files: '+bcolors.ENDC + str(c[-1]))                    
-                else:
-                    print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
-                print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(sub['detail']['history'][-1]['ccagent']['process']['returnCode']))
-                print()
-                print(bcolors.OKGREEN + 'stdOut: ' + bcolors.ENDC)
-                print('\n'.join(sub['detail']['history'][-1]['ccagent']['process']['stdOut']))
-                print()
-                print(bcolors.WARNING + 'stdErr: ' + bcolors.ENDC)
-                print('\n'.join(sub['detail']['history'][-1]['ccagent']['process']['stdErr']))
-                print()
+                    print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
             print()
+
+def show_nodes(auth):
+    r = requests.get(
+        'https://agency.f4.htw-berlin.de/cc/nodes',
+        auth=auth
+    )
+    r.raise_for_status()
+    nodes = r.json()
+    nodes.sort(key=lambda n: n['nodeName'])
+    for n in nodes:
+        if n['state'] == 'online':
+            state = bcolors.OKGREEN + 'online' + bcolors.ENDC
+        else:
+            state = bcolors.FAIL + n['state'] + bcolors.FAIL
+
+        #if 'gpus' in n:
+        #    # its a gpu server
+        #else:
+        #    # its not a gpu server
+
+        used_ram = 0
+        for i in n['currentBatches']:
+            used_ram += i['ram']
+
+        used_ram = used_ram / 1000.
+        n['ram'] = n['ram'] / 1000.
+
+        if used_ram / 0.9 + 0.1 > n['ram']:
+            ram = bcolors.FAIL + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
+        elif used_ram / 0.75 + 0.1 > n['ram']:
+            ram = bcolors.WARNING + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
+        else:
+            ram = bcolors.OKGREEN + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram'])) 
+
+        if 'gpus' in n:
+            gpus = []
+            for gpu in n['gpus']:
+                gpus.append(str(int(gpu['vram']/1000.)) + 'GB')
+
+
+
+
+            print(('%30s   '+bcolors.BOLD+'RAM:'+bcolors.ENDC+'%20s GB    '+bcolors.BOLD+'Num of Jobs:'+bcolors.ENDC+'%5s    '+bcolors.BOLD+'Num of GPUs:'+bcolors.ENDC + ' %s %s') % (n['nodeName'] + ' (' + state + ')',
+                            ram,
+                            len(n['currentBatches']),
+                            len(gpus),
+                            str(gpus)
+                        ))
+        else:
+
+            print(('%30s   '+bcolors.BOLD+'RAM:'+bcolors.ENDC+'%20s GB    '+bcolors.BOLD+'Num of Jobs:'+bcolors.ENDC+'%5s') % (n['nodeName'] + ' (' + state + ')',
+                            ram,
+                            len(n['currentBatches'])
+                        ))
+
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
@@ -102,6 +161,7 @@ def main():
     parser.add_argument('-p','--list_of_position_of_the_subprojects', help='A list of positions of the subproject that you want include in the display.', nargs="+", type=int)
     parser.add_argument('-f','--only_failed', help='Show only failed experiments.', default=False, action='store_true')
     parser.add_argument('-ne','--only_not_executed', help='Show only not executed experiments.', default=False, action='store_true')
+    parser.add_argument('--node', help='Show all nodes in the cluster. If you run this command, it will ignore all other paramters!', default=False, action='store_true')
     args = parser.parse_args()
     
     # Change the directory to the main git directory.
@@ -110,6 +170,10 @@ def main():
     pw = keyring.get_password('red', 'agency_password')
     uname = keyring.get_password('red', 'agency_username')
     auth = (uname, pw)
+
+    if args.node:
+        show_nodes(auth)
+        exit(0)
 
     if os.path.exists('.dvc_cc/cc_agency_experiments.yml'):
         with open(".dvc_cc/cc_agency_experiments.yml", 'r') as stream:
