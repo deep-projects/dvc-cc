@@ -22,6 +22,9 @@ from dvc_cc.init.main import DESCRIPTION as INIT_DESCRIPTION
 from dvc_cc.status.main import main as status_main
 from dvc_cc.status.main import DESCRIPTION as STATUS_DESCRIPTION
 
+from dvc_cc.cancel.main import main as cancel_main
+from dvc_cc.cancel.main import DESCRIPTION as CANCEL_DESCRIPTION
+
 SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
@@ -31,7 +34,8 @@ MODES = OrderedDict([
     ('run-all-defined', {'main': run_all_defined_main, 'description': RUN_ALL_DEFINED_DESCRIPTION}),
     ('output-to-tmp', {'main': output_to_tmp_main, 'description': output_to_tmp_DESCRIPTION}),
     ('init', {'main': init_main, 'description': INIT_DESCRIPTION}),
-    ('status', {'main': status_main, 'description': STATUS_DESCRIPTION})
+    ('status', {'main': status_main, 'description': STATUS_DESCRIPTION}),
+    ('cancel', {'main': cancel_main, 'description': CANCEL_DESCRIPTION})
 ])
 
 
