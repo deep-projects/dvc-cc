@@ -146,7 +146,6 @@ with open('test_acc.json', 'w') as outfile:
       json.dump(data, outfile)" >> test.py
 
 
-
 dvc run -d data/mnist1.npz -m train_acc.json --no-exec python train.py 
 dvc run -d data/mnist2.npz -d train_acc.json -m test_acc.json --no-exec python test.py 
 
