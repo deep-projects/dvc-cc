@@ -29,7 +29,7 @@ DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed u
 MODES = OrderedDict([
     ('new', {'main': new_main, 'description': NEW_DESCRIPTION}),
     #('stage', {'main': stage_main, 'description': STAGE_DESCRIPTION}),
-    #('variable', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
+    ('variable', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
     #('command', {'main': command_main, 'description': COMMAND_DESCRIPTION})
 ])
 

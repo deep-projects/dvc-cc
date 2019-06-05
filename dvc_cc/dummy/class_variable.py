@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 class Variable:
     original_value = None
@@ -19,7 +20,8 @@ class Variable:
 
 
     def set_constant_value(self, value):
-        if self.varvalue != '' and self.varvalue != 'None':
+        print(value)
+        if value == None or value == '' or value.lower() == 'none':
             self.varvalue = None
         elif self.vartype == 'file':
             self.varvalue = str(value)
@@ -29,6 +31,7 @@ class Variable:
                 raise ValueError('Only positive values are allowed for the datatype \'ufloat\'.')
         else:
             self.varvalue = np.cast[self.vartype](value)
+        print(self.varvalue)
        
 
     def set_type_of_variable(self):
@@ -59,7 +62,9 @@ class Variable:
         self.vartype = type_of_variable
 
 
-
+    def __pretty_str__(self):
+        tmp = str(self)[3:-3].split(':')
+        return '%25s%8s%6s'%(tmp[0],tmp[1],tmp[2])
 
     def __str__(self):
         if self.vartype == 'file' or self.vartype == 'ufloat':
@@ -73,11 +78,10 @@ class Variable:
     
         return '<<<' + self.varname+':'+ vartype +':'+ str(self.varvalue) + '>>>'
 
-    def find_all_variables(text):
+    def find_all_variables(text, variables = {}):
         if type(text) is not list:
             text = [text]
 
-        variables = []
         for subc in text:
             start_pos = 0
             while start_pos >= 0:
@@ -85,7 +89,10 @@ class Variable:
                 if start_pos is not -1:
                     end_pos = subc.find('>>>', start_pos)
                     start_pos += 3
-                    variables.append(Variable(subc[start_pos:end_pos]))
+                    varvalue = subc[start_pos:end_pos]
+                    varname = varvalue.split(':')[0]
+                    if varname not in variables:
+                        variables[varname] = Variable(varvalue)
                     
         return variables
 
@@ -97,7 +104,8 @@ class Variable:
 
         result = []
         for subc in text:
-            for v in variables:
+            for v_key in variables:
+                v = variables[v_key]
                 subc = subc.replace('<<<'+v.original_value+'>>>', str(v))
             result.append(subc)
 
@@ -105,7 +113,18 @@ class Variable:
             return result[0]
         else:
             return result
-    
+
+    def get_all_already_defined_variables():
+        # find and read all dummy files.
+        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+        
+        # search for all variables
+        variables = {}
+        for f in dummy_files:
+            with open(f, 'r') as filepath:
+                text = filepath.read()
+            variables = Variable.find_all_variables([text], variables)
+        return variables
 
 def test_the_variable_class():
     command = "<<<pre:i>>> <<<pre>>>Hallo meine liebe<<<r_or_not>>> <<<name:FI>>>, I have<<<not_or_not>>>asdsad asdsa asdsad<<<post>>> asd<<<first:ui>>>asdsad<<<second:fl>>>asdads <<<post2>>>".split(' ')
@@ -113,7 +132,7 @@ def test_the_variable_class():
     variables = Variable.find_all_variables(command)
 
     for v in variables:
-        print(v)
+        print(variables[v].__pretty_str__())
 
     print()
     print(command)

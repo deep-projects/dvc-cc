@@ -46,9 +46,12 @@ def main():
     if not os.path.exists('dvc/.dummy'):
         os.mkdir('dvc/.dummy')
     
+    # get all existent variables
+    variables = Variable.get_all_already_defined_variables()
+
     # search for parameters
     args.command = args.command.split(' ')
-    variables = Variable.find_all_variables(args.command)
+    variables = Variable.find_all_variables(args.command, variables)
     args.command = Variable.update_variables_in_text(args.command, variables)
 
     # search for -f option!
@@ -61,6 +64,15 @@ def main():
             filename = args.command[filename_pos]
         if args.command[i] == '-o' or args.command[i] == '-O' or args.command[i] == '-m' or args.command[i] == '-M':
             firstoutputname = args.command[i + 1]
+
+    # remove variable names in firstoutputname
+    variable_start = firstoutputname.find('<<<')
+    while variable_start >= 0:
+        variable_end = firstoutputname.find('>>>')
+        if firstoutputname[variable_start - 1] == '_':
+            variable_start = variable_start - 1
+        firstoutputname = firstoutputname[:variable_start] + firstoutputname[variable_end+3:]
+        variable_start = firstoutputname.find('<<<')
 
     # make sure that the filename is in the dvc folder
     if filename is None:
@@ -91,10 +103,17 @@ def main():
     subprocess.call(command)
 
     # move the dvc file to dvc/.dummy/....dvc.dummy
-    os.rename('dvc/'+filename,'dvc/.dummy/'+filename+'.dummy')
+    index = ''
+    while os.path.exists('dvc/.dummy/'+filename+'.dummy'+index):
+        if index == '':
+            index = '.2'
+        else:
+            index = int(index[1:]) + 1
+            index = '.' + str(index)
+    os.rename('dvc/'+filename,'dvc/.dummy/'+filename+'.dummy'+index)
 
 
-    subprocess.call(['git', 'add', 'dvc/.dummy/'+filename+'.dummy'])
+    subprocess.call(['git', 'add', 'dvc/.dummy/'+filename+'.dummy'+index])
 
 
 
