@@ -16,11 +16,10 @@ class Variable:
             self.vartype = tmp[1]
         self.set_type_of_variable()
         if len(tmp) > 2:
-            self.varvalue = self.set_constant_value(tmp[2])
+            self.set_constant_value(tmp[2])
 
 
     def set_constant_value(self, value):
-        print(value)
         if value == None or value == '' or value.lower() == 'none':
             self.varvalue = None
         elif self.vartype == 'file':
@@ -28,10 +27,17 @@ class Variable:
         elif self.vartype == 'ufloat':
             self.varvalue = np.cast[np.float](value)
             if self.varvalue < 0.0:
-                raise ValueError('Only positive values are allowed for the datatype \'ufloat\'.')
+                print('Error: Only positive values are allowed for the datatype \'ufloat\'.')
+        elif self.vartype == np.uint:
+            if np.int(value) < 0.0:
+                print('Error: Only positive values are allowed for the datatype \'uint\'.')
+            else:
+                self.varvalue = np.uint(value)
         else:
-            self.varvalue = np.cast[self.vartype](value)
-        print(self.varvalue)
+            try:
+                self.varvalue = np.cast[self.vartype](value)
+            except:
+                print('Error: The value and the type does not match.')
        
 
     def set_type_of_variable(self):
@@ -106,7 +112,13 @@ class Variable:
         for subc in text:
             for v_key in variables:
                 v = variables[v_key]
-                subc = subc.replace('<<<'+v.original_value+'>>>', str(v))
+
+                varstart_pos = subc.find('<<<')
+                while varstart_pos > -1:
+                    varend_pos = subc.find('>>>', varstart_pos)
+                    if subc[varstart_pos+3:varend_pos].split(':')[0] == v.varname:
+                        subc = subc[:varstart_pos] + str(v) + subc[varend_pos+3:]
+                    varstart_pos = subc.find('<<<', varstart_pos+3)
             result.append(subc)
 
         if convert_to_string:
@@ -125,6 +137,18 @@ class Variable:
                 text = filepath.read()
             variables = Variable.find_all_variables([text], variables)
         return variables
+
+    def update_all_dummyfiles(variables_to_update):
+        # find and read all dummy files.
+        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+        
+        # search for all variables
+        for f in dummy_files:
+            with open(f, 'r') as filepath:
+                text = filepath.read()
+            text = Variable.update_variables_in_text(text,variables_to_update)
+            with open(f, 'w') as filepath:
+                print(text,file=filepath)
 
 def test_the_variable_class():
     command = "<<<pre:i>>> <<<pre>>>Hallo meine liebe<<<r_or_not>>> <<<name:FI>>>, I have<<<not_or_not>>>asdsad asdsa asdsad<<<post>>> asd<<<first:ui>>>asdsad<<<second:fl>>>asdads <<<post2>>>".split(' ')

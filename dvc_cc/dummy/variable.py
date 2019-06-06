@@ -58,8 +58,12 @@ def main():
         if args.set_type is not None:
             variables[args.name_of_variable].vartype = args.set_type
             variables[args.name_of_variable].set_type_of_variable()
+            variables[args.name_of_variable].set_constant_value(None)
         if args.set is not None:
             variables[args.name_of_variable].set_constant_value(args.set)
+        if args.set_type is not None or args.set is not None:
+            Variable.update_all_dummyfiles(variables)
+            
         print('%25s%8s%6s'%('Varname','type',
 'value'))
         print(variables[args.name_of_variable].__pretty_str__())
