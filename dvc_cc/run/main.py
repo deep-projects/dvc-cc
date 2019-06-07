@@ -11,6 +11,7 @@ import configparser
 
 import numpy as np
 import subprocess
+import dvc_cc.dummy.dummy_to_dvc as dummy_to_dvc
 
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker.'
 
@@ -160,8 +161,12 @@ def main():
     gitrepo = GITRepo('.')
     dvcrepo = DVCRepo('.')
 
+
     # Check if all files are checked and pushed.
     check_git_repo(args)
+
+    # create dvc files from dummy files
+    dummy_to_dvc.dummy_to_dvc()
 
 
     git_path,git_owner,git_name = get_gitinformation()
