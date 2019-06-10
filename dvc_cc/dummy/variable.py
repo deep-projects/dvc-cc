@@ -10,7 +10,7 @@ from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
-from dvc_cc.dummy.class_variable import Variable
+from dvc_cc.dummy.class_variable import *
 import subprocess
 
 class bcolors:
@@ -48,7 +48,7 @@ def main():
         os.mkdir('dvc/.dummy')
 
     # find and read all dummy files and search for all variables
-    variables = Variable.get_all_already_defined_variables()
+    variables = get_all_already_defined_variables()
     
     if args.name_of_variable.lower() == 'all':
         print('%25s%8s%6s'%('Varname','type','value'))
@@ -62,7 +62,7 @@ def main():
         if args.set is not None:
             variables[args.name_of_variable].set_constant_value(args.set)
         if args.set_type is not None or args.set is not None:
-            Variable.update_all_dummyfiles(variables)
+            update_all_dummyfiles(variables)
             
         print('%25s%8s%6s'%('Varname','type',
 'value'))

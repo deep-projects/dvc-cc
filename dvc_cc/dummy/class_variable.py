@@ -8,16 +8,19 @@ class Variable:
     varvalue = None
 
 
-    def __init__(self, original_value):
+    def __init__(self, original_value, variables=None):
         self.original_value = original_value
         tmp = self.original_value.split(':')
         self.varname = tmp[0]
+
         if len(tmp) > 1:
             self.vartype = tmp[1]
         self.set_type_of_variable()
         if len(tmp) > 2:
             self.set_constant_value(tmp[2])
 
+        if variables is not None and  self.varname in variables:
+            return variables[self.varname]
 
     def set_constant_value(self, value):
         if value == None or value == '' or value.lower() == 'none':
@@ -84,76 +87,93 @@ class Variable:
     
         return '<<<' + self.varname+':'+ vartype +':'+ str(self.varvalue) + '>>>'
 
-    def find_all_variables(text, variables = {}):
-        if type(text) is not list:
-            text = [text]
-
-        for subc in text:
-            start_pos = 0
-            while start_pos >= 0:
-                start_pos = subc.find('<<<', start_pos)
-                if start_pos is not -1:
-                    end_pos = subc.find('>>>', start_pos)
-                    start_pos += 3
-                    varvalue = subc[start_pos:end_pos]
-                    varname = varvalue.split(':')[0]
-                    if varname not in variables:
-                        variables[varname] = Variable(varvalue)
-                    
+def find_all_variables(text, variables = {}, return_founded_variables=False):
+    if type(text) is not list:
+        text = [text]
+    founded_var = {}
+    for subc in text:
+        start_pos = 0
+        while start_pos >= 0:
+            start_pos = subc.find('<<<', start_pos)
+            if start_pos is not -1:
+                end_pos = subc.find('>>>', start_pos)
+                start_pos += 3
+                varvalue = subc[start_pos:end_pos]
+                varname = varvalue.split(':')[0]
+                if varname not in variables:
+                    variables[varname] = Variable(varvalue)
+                founded_var[varname] = variables[varname]
+    if return_founded_variables:
+        return variables, founded_var
+    else:
         return variables
 
-    def update_variables_in_text(text, variables):
-        convert_to_string = False
-        if type(text) is not list:
-            convert_to_string = True
-            text = [text]
 
-        result = []
-        for subc in text:
-            for v_key in variables:
-                v = variables[v_key]
+def update_variables_in_text(text, variables, only_varvalue = False, return_var_used = False):
+    convert_to_string = False
+    if type(text) is not list:
+        convert_to_string = True
+        text = [text]
 
-                varstart_pos = subc.find('<<<')
-                while varstart_pos > -1:
-                    varend_pos = subc.find('>>>', varstart_pos)
-                    if subc[varstart_pos+3:varend_pos].split(':')[0] == v.varname:
+    result = []
+    var_used = []
+    for subc in text:
+        for v_key in variables:
+            this_var_not_used = True
+            v = variables[v_key]
+
+            varstart_pos = subc.find('<<<')
+            while varstart_pos > -1:
+                varend_pos = subc.find('>>>', varstart_pos)
+                if subc[varstart_pos+3:varend_pos].split(':')[0] == v.varname:
+                    if only_varvalue:
+                        subc = subc[:varstart_pos] + str(v.varvalue) + subc[varend_pos+3:]
+                        if this_var_not_used:
+                            var_used.append(str(v.varvalue))
+                            this_var_not_used = False
+                    else:
                         subc = subc[:varstart_pos] + str(v) + subc[varend_pos+3:]
-                    varstart_pos = subc.find('<<<', varstart_pos+3)
-            result.append(subc)
+                        if this_var_not_used:
+                            var_used.append(str(v))
+                            this_var_not_used = False
+                varstart_pos = subc.find('<<<', varstart_pos+3)
+        result.append(subc)
 
-        if convert_to_string:
-            return result[0]
-        else:
-            return result
+    if convert_to_string:
+        result =  result[0]
+    if return_var_used:
+        return result, var_used
+    else:
+        return result
 
-    def get_all_already_defined_variables():
-        # find and read all dummy files.
-        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
-        
-        # search for all variables
-        variables = {}
-        for f in dummy_files:
-            with open(f, 'r') as filepath:
-                text = filepath.read()
-            variables = Variable.find_all_variables([text], variables)
-        return variables
+def get_all_already_defined_variables():
+    # find and read all dummy files.
+    dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    
+    # search for all variables
+    variables = {}
+    for f in dummy_files:
+        with open(f, 'r') as filepath:
+            text = filepath.read()
+        variables = find_all_variables([text], variables)
+    return variables
 
-    def update_all_dummyfiles(variables_to_update):
-        # find and read all dummy files.
-        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
-        
-        # search for all variables
-        for f in dummy_files:
-            with open(f, 'r') as filepath:
-                text = filepath.read()
-            text = Variable.update_variables_in_text(text,variables_to_update)
-            with open(f, 'w') as filepath:
-                print(text,file=filepath)
+def update_all_dummyfiles(variables_to_update):
+    # find and read all dummy files.
+    dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    
+    # search for all variables
+    for f in dummy_files:
+        with open(f, 'r') as filepath:
+            text = filepath.read()
+        text = update_variables_in_text(text,variables_to_update)
+        with open(f, 'w') as filepath:
+            print(text,file=filepath)
 
 def test_the_variable_class():
     command = "<<<pre:i>>> <<<pre>>>Hallo meine liebe<<<r_or_not>>> <<<name:FI>>>, I have<<<not_or_not>>>asdsad asdsa asdsad<<<post>>> asd<<<first:ui>>>asdsad<<<second:fl>>>asdads <<<post2>>>".split(' ')
 
-    variables = Variable.find_all_variables(command)
+    variables = find_all_variables(command)
 
     for v in variables:
         print(variables[v].__pretty_str__())
@@ -161,10 +181,10 @@ def test_the_variable_class():
     print()
     print(command)
     print()
-    updated_command = Variable.update_variables_in_text(command, variables)
+    updated_command = update_variables_in_text(command, variables)
     print(updated_command)
     print()
-    variables2 = Variable.find_all_variables(updated_command)
-    updated_command2 = Variable.update_variables_in_text(updated_command, variables2)
+    variables2 = find_all_variables(updated_command)
+    updated_command2 = update_variables_in_text(updated_command, variables2)
     print(updated_command2)
 

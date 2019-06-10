@@ -10,7 +10,7 @@ from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
-from dvc_cc.dummy.class_variable import Variable
+from dvc_cc.dummy.class_variable import *
 import subprocess
 
 class bcolors:
@@ -47,23 +47,31 @@ def main():
         os.mkdir('dvc/.dummy')
     
     # get all existent variables
-    variables = Variable.get_all_already_defined_variables()
+    variables = get_all_already_defined_variables()
 
     # search for parameters
     args.command = args.command.split(' ')
-    variables = Variable.find_all_variables(args.command, variables)
-    args.command = Variable.update_variables_in_text(args.command, variables)
+    variables, founded_vars = find_all_variables(args.command, variables,return_founded_variables=True)
+    args.command = update_variables_in_text(args.command, variables)
 
     # search for -f option!
     filename = None
     filename_pos = -1
-    firstoutputname = None
+    outputnames = []
     for i in range(len(args.command)):
         if args.command[i] == '-f':
             filename_pos = i+1
             filename = args.command[filename_pos]
         if args.command[i] == '-o' or args.command[i] == '-O' or args.command[i] == '-m' or args.command[i] == '-M':
-            firstoutputname = args.command[i + 1]
+            outputnames.append(args.command[i + 1])
+            var = find_all_variables(args.command[i + 1])
+            for v in founded_vars:
+                if v not in var:
+                    print('ERROR: You need to define all parameters to all output and metric files!')
+                    print('       '+str(v)+' was not found in ' + args.command[i + 1])
+                    exit(1)
+
+    firstoutputname = outputnames[0]
 
     # remove variable names in firstoutputname
     variable_start = firstoutputname.find('<<<')

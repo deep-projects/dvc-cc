@@ -166,8 +166,10 @@ def main():
     check_git_repo(args)
 
     # create dvc files from dummy files
-    dummy_to_dvc.dummy_to_dvc()
+    created_dvc_files_from_dummy = dummy_to_dvc.dummy_to_dvc(project_dir)
 
+    for f in created_dvc_files_from_dummy:
+        subprocess.call(['git', 'add', f])
 
     git_path,git_owner,git_name = get_gitinformation()
 
@@ -176,7 +178,7 @@ def main():
     new_tag = create_new_tag() + '_' + args.experimentname
     
     data_username, data_server, data_path = get_mount_values_for_a_direcotry(project_dir+'/data')
-    data_password = '{{'+data_server+'_password}}'
+    data_password = '{{'+str(data_server)+'_password}}'
     use_external_data_dir = data_server is not None
 
     if args.dvc_files is None:
@@ -291,6 +293,10 @@ def main():
         data[new_tag] = {'id': cc_id,'files': paths}
         with open('.dvc_cc/cc_agency_experiments.yml', 'w') as outfile:
             yaml.dump(data, outfile, default_flow_style=False)
+
+        for f in created_dvc_files_from_dummy:
+            os.remove(f)
+            subprocess.call(['git', 'add', f])
 
         subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
         subprocess.call(['git', 'commit', '-m', '\'Update cc_agency_experiments.yml: ' + path + '\''])
