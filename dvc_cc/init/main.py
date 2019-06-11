@@ -25,19 +25,24 @@ def main():
     parser.add_argument('-r','--ram', help='The ram that you need.',type=int,default=131072)
     parser.add_argument('-T','--test', help='Run at cctest.',default=False, action='store_true')
     parser.add_argument('-g','--num-of-gpus', help='The number of gpus that you need to ',type=int,default=1)
-    parser.add_argument('-ms', '--mini-sample', help='Creates a mini sample project.', default=False,action='store_true')
-    parser.add_argument('-ls', '--large-sample', help='Creates a large sample project.', default=False,action='store_true')
+    #TODO: implement sample projects?
+    #parser.add_argument('-ms', '--mini-sample', help='Creates a mini sample project.', default=False,action='store_true')
+    #parser.add_argument('-ls', '--large-sample', help='Creates a large sample project.', default=False,action='store_true')
     args = parser.parse_args()
     
     # Change the directory to the main git directory.
     os.chdir(get_main_git_directory_path())
     
     gitrepo = GITRepo('.')
-    dvcrepo = DVCRepo('.')
-    
-    # init the dvc repo, if it is not already a dvc repo.
-    if not os.path.exists('.dvc'):
-        dvcrepo.init()
+    try:
+        dvcrepo = DVCRepo('.')
+
+        #TODO: this can be removed!?
+        if not os.path.exists('.dvc'):
+            dvcrepo.init()
+    except:
+        subprocess.call(['dvc', 'init'])
+        dvcrepo = DVCRepo('.')
     
     # create the main folder of the dvc_cc software package.
     if not os.path.exists('.dvc_cc'):
