@@ -142,6 +142,46 @@ def get_leafs_that_need_to_reproduce():
             leafs_need_to_reproduce.append(leafs[i])
     return leafs_need_to_reproduce
 
+def all_jupyter_notebook_to_py_files():
+    created_files = []
+    if args.jupyter_notebook_to_py:
+        for root, dirs, files in os.walk(project_dir, topdown=True):
+            for f in files:
+                if files.endswith('ipynb'):
+                    created_files.append(jupyter_notebook_to_py_file(root, f))
+    return created_files
+
+def jupyter_notebook_to_py_file(root, file_name):
+    with open(root+'/'+file_name) as f:
+        notebook = json.load(f)
+
+    cells = notebook["cells"]
+    cleared_cells = []
+    for i in range(len(cells)):
+        c = cells[i]
+        use_this_cell = True
+        if c['cell_type'] == 'code':
+            if 'pycharm' in c['metadata']:
+                if c['metadata']['pycharm']['name'].replace(' ', '').startswith('#%%dvc-cc-h'):
+                    use_this_cell = False
+                if c['metadata']['pycharm']['name'].replace(' ', '').startswith('#%%dch'):
+                    use_this_cell = False
+            if 'outputs' in c:
+                c['outputs'] = []
+        if use_this_cell:
+            print('I am Here!!')
+            cleared_cells.append(c)
+    notebook["cells"] = cleared_cells
+
+    nb = nbformat.reads(json.dumps(notebook), nbformat.NO_CONVERT)
+    exporter = PythonExporter()
+    source, meta = exporter.from_notebook_node(nb)
+
+    output_name = root+'/'+file_name[:-5]+'.py'
+    with open(output_name, 'w') as fh:
+        print(source, file=fh)
+
+    return output_name
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
@@ -152,6 +192,7 @@ def main():
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
     parser.add_argument('-r','--num_of_repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
+    parser.add_argument('-nb','--jupyter-notebook-to-py', help='If this paramer is set, than it will convert all jupyter notebook files to py files.', default=False, action='store_true')
     args = parser.parse_args()
     
     project_dir = get_main_git_directory_path()
@@ -165,11 +206,16 @@ def main():
     # Check if all files are checked and pushed.
     check_git_repo(args)
 
+    # convert jupyter notebooks to py-files.
+    created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files()
+    for f in created_pyfiles_from_jupyter:
+        subprocess.call(['git', 'add', f])
+
     # create dvc files from dummy files
     created_dvc_files_from_dummy = dummy_to_dvc.dummy_to_dvc(project_dir)
-
     for f in created_dvc_files_from_dummy:
         subprocess.call(['git', 'add', f])
+
 
     git_path,git_owner,git_name = get_gitinformation()
 
@@ -295,6 +341,10 @@ def main():
             yaml.dump(data, outfile, default_flow_style=False)
 
         for f in created_dvc_files_from_dummy:
+            os.remove(f)
+            subprocess.call(['git', 'add', f])
+
+        for f in created_pyfiles_from_jupyter:
             os.remove(f)
             subprocess.call(['git', 'add', f])
 

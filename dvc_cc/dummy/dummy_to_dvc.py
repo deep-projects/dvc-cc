@@ -153,19 +153,15 @@ class RegexFileSearch(VariableOptimizerBase):
             regex = input('Set regex value that describes the Files: ')
 
             matched_files = []
-            print(self.root_dir)
             for root, dirs, files in os.walk(self.root_dir, topdown=True):
                 root = self.root_dir[len(self.root_dir):]
-                print(root)
+
                 for f in files:
-                    print(re.match(regex, f), regex, f)
                     if root == '':
-                        print(re.match(regex, f), regex, f)
                         if re.match(regex, f):
                             matched_files.append(f)
                     else:
                         f = root[len(self.root_dir):] + '/' + f
-                        print(re.match(regex, f), regex, f)
                         if re.match(regex, f):
                             matched_files.append(f)
             if len(matched_files) == 0:
