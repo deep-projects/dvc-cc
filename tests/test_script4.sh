@@ -1,159 +1,191 @@
 #!/bin/bash
 
-mkdir ~/test_repo
-cd ~/test_repo
+echo "			####################################"
+echo "			# -1. Step:                        #"
+echo "			# Remove the project               #"
+echo "			####################################"
+cd ~
+
+if [ -d "$HOME/test_pcam" ]
+then
+    echo 'Remove the directory ~/test_pcam.'
+    rm -rf ~/test_pcam
+fi
+
+#cd ~/Documents/github/dvc-cc-NEW/tests/
+#./test_script4.sh
 
 
-##################################
-# 1. Step:                       #
-# GIT with LOCAL (remote) server #
-##################################
-#git init --bare ~/test_repo/storage_git/myproject.git
 
-#git remote add origin ~/test_repo/storage_git/myproject.git
+mkdir ~/test_pcam
+cd ~/test_pcam
 
-echo -e "\n
-\n
-import gitlab\n
-import time\n
-gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/', private_token='1oxzXp1MyJ1Yz6KEnxyS')\n
-gl.auth()\n
-\n
-try:\n
-    gl_id = gl.projects.get('annusch/project1').get_id()\n
-    gl.projects.delete(gl_id)\n
-    time.sleep(2)
-except:\n
-    print('Fine')\n
-\n
-project = gl.projects.create({'name': 'project1'})\n" >> ~/test_repo/create_git_repo.py
-python ~/test_repo/create_git_repo.py
 
+echo "			#########################"
+echo "			# 1. Step:              #"
+echo "			# Create GIT Repository #"
+echo "			#########################"
+
+echo "import gitlab
+import time
+gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/',private_token='1oxzXp1MyJ1Yz6KEnxyS')
+gl.auth()
+
+try:
+    gl_id = gl.projects.get('annusch/test_pcam').get_id()
+    gl.projects.delete(gl_id)
+    time.sleep(5)
+    print('Deleted the git repo: test_pcam')
+except:
+    print('No git repo found.')
+
+project = gl.projects.create({'name': 'test_pcam'})" >> ~/test_pcam/create_git_repo.py
+
+python ~/test_pcam/create_git_repo.py
+
+# Save the git credential
 git config --global credential.helper 'cache --timeout 1000'
 
-git clone https://git.tools.f4.htw-berlin.de/annusch/project1.git repo
+# clone empty git repository
+git clone https://git.tools.f4.htw-berlin.de/annusch/test_pcam.git repo
 
 cd repo
 
-dvc init
+echo "			###############"
+echo "			# 2. Step:    #"
+echo "			# Init DVC-CC #"
+echo "			###############"
+dvc-cc init
 
 git add -A
 git commit -m 'init project'
 
 git push --set-upstream origin master
 
-mkdir ~/test_repo/avocado/
-sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/ ~/test_repo/avocado/
-
-rm -R ~/test_repo/avocado/_testproject_DVC
-rm -R ~/test_repo/avocado/_testproject_DATA
-
-mkdir ~/test_repo/avocado/_testproject_DVC
-mkdir ~/test_repo/avocado/_testproject_DATA
-
-##################################
-# 2. Step:                       #
-# DVC with LOCAL (remote) server #
-##################################
-dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/_testproject_DVC
+echo "			##################"
+echo "			# 3. Step:       #"
+echo "			# SET DVC-CC-URL #"
+echo "			##################"
+dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/test_pcam
 dvc remote modify dvc_connection ask_password true
 dvc push
+dvc pull
 
-###################################
-# 3. Step:                        #
-# Create SSHFS to an empty folder #
-###################################
+echo "			######################################"
+echo "			# 4. Step:                           #"
+echo "			# Download Script for PCAM-Datensatz #"
+echo "			######################################"
 
-mkdir data
+mkdir dvc
+mkdir code
+mkdir mkdir data
+echo "
+cd data
 
-# maybe need to install: sudo apt-get install openssh-server
-sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/_testproject_DATA ~/test_repo/repo/data/
-#sshfs $(id -un)@$(hostname -f):${HOME}/test_repo/data_sshfs/ data/
+## for download from google per command line we need gdown
+# pip install gdown
 
-#########################################
-# 4. Step:                              #
-# Download the submodule                #
-# and creates the data in the sshfs-dir #
-# the data can be that large that I do  #
-# not want them in my computer          #
-# or I don't want them multiple times   #
-# in different repos in my computer     #
-#########################################
-cp .git/config .git/config_tmp
+# Trainings-Data
+gdown https://drive.google.com/uc?id=1Ka0XfEMiwgCYPdTI-vv6eUElOBnKFKQ2
+gdown https://drive.google.com/uc?id=1269yhu3pZDP8UYFQs-NYs3FPwuK-nGSG
 
-git submodule add https://github.com/mastaer/create_mnist_data.git create_dataset
+# Validation-Data
+gdown https://drive.google.com/uc?id=1hgshYGWK8V-eGRy8LToWJJgDU_rXWVJ3
+gdown https://drive.google.com/uc?id=1bH8ZRbhSVAhScTS0p9-ZzGnX91cHT3uO
 
-cp .git/config_tmp .git/config
-rm .git/config_tmp
+# Test-Data
+gdown https://drive.google.com/uc?id=1qV65ZqZvWzuIVthK8eVDhIwrbnsJdbg_
+gdown https://drive.google.com/uc?id=17BHrSrwWKjYsOgTMmoqrIjDy6Fa2o_gP
+
+# Meta-Files
+gdown https://drive.google.com/uc?id=1XoaGG3ek26YLFvGzmkKeOz54INW0fruR
+gdown https://drive.google.com/uc?id=16hJfGFCZEcvR3lr38v3XCaD5iH1Bnclg
+gdown https://drive.google.com/uc?id=19tj7fBlQQrd4DapCjhZrom_fA4QlHqN4
+
+# unzip all files and remove all .gz files
+gzip -d *.gz" > code/download_pcam_dataset.sh
+
+echo "			###########################"
+echo "			# 4.1 Step:               #"
+echo "			# Download PCAM-Datensatz #"
+echo "			###########################"
+
+DOWNLOAD=0
+
+if [ "$DOWNLOAD" -eq 1 ]
+then
+    dvc run -d code/download_pcam_dataset.sh -o data/camelyonpatch_level_2_split_test_meta.csv -o data/camelyonpatch_level_2_split_train_meta.csv -o data/camelyonpatch_level_2_split_valid_meta.csv -o data/camelyonpatch_level_2_split_test_x.h5 -o data/camelyonpatch_level_2_split_train_x.h5 -o data/camelyonpatch_level_2_split_valid_x.h5 -o data/camelyonpatch_level_2_split_test_y.h5 -o data/camelyonpatch_level_2_split_train_y.h5 -o data/camelyonpatch_level_2_split_valid_y.h5 -f dvc/download_pcam_dataset.dvc --no-exec sh code/download_pcam_dataset.sh
+
+    dvc repro -P
+    dvc push
+fi
+
+echo "			####################################################"
+echo "			# 4.2 Step:                                        #"
+echo "			# Cheat: Use the DVC-File that was created earlier #"
+echo "			####################################################"
+
+if [ "$DOWNLOAD" -eq 0 ]
+then
+    echo "PULL DATASET from DVC"
+    echo "cmd: sh code/download_pcam_dataset.sh
+wdir: ..
+deps:
+- path: code/download_pcam_dataset.sh
+  md5: 5bc12eddeda6dcf151cb45ae39d6cc2b
+outs:
+- path: data/camelyonpatch_level_2_split_test_meta.csv
+  cache: true
+  metric: false
+  persist: false
+  md5: 3455fd69135b66734e1008f3af684566
+- path: data/camelyonpatch_level_2_split_train_meta.csv
+  cache: true
+  metric: false
+  persist: false
+  md5: 5a3dd671e465cfd74b5b822125e65b0a
+- path: data/camelyonpatch_level_2_split_valid_meta.csv
+  cache: true
+  metric: false
+  persist: false
+  md5: 67589e00a4a37ec317f2d1932c7502ca
+- path: data/camelyonpatch_level_2_split_test_x.h5
+  cache: true
+  metric: false
+  persist: false
+  md5: 2614b2e6717d6356be141d9d6dbfcb7e
+- path: data/camelyonpatch_level_2_split_train_x.h5
+  cache: true
+  metric: false
+  persist: false
+  md5: 01844da899645b4d6f84946d417ba453
+- path: data/camelyonpatch_level_2_split_valid_x.h5
+  cache: true
+  metric: false
+  persist: false
+  md5: 81cf9680f1724c40673f10dc88e909b1
+- path: data/camelyonpatch_level_2_split_test_y.h5
+  cache: true
+  metric: false
+  persist: false
+  md5: 11ed647efe9fe457a4eb45df1dba19ba
+- path: data/camelyonpatch_level_2_split_train_y.h5
+  cache: true
+  metric: false
+  persist: false
+  md5: 0781386bf6c2fb62d58ff18891466aca
+- path: data/camelyonpatch_level_2_split_valid_y.h5
+  cache: true
+  metric: false
+  persist: false
+  md5: 94d8aacc249253159ce2a2e78a86e658
+md5: be8e94a1e0938d84c07e510cd822bdb7" > dvc/download_pcam_dataset.dvc
+    dvc pull
+fi
+
+exit 0
 
 
-rm .gitmodules
-git add .gitmodules
-git rm --cached create_dataset
-rm -rf .git/modules/create_dataset
-
-rm create_dataset/.git
-
-dvc repro -P
-
-#echo -e "data\ncreate_dataset\ndata/*\ncreate_dataset/*\n" >> .dvcignore
-
-
-#########################################
-# 4. Step:                              #
-# Push Everything                       #
-#########################################
-git add -A
-git commit -m 'create the dataset'
-git push --set-upstream origin master
-dvc push
 
 
 
-#########################################
-# 5- Step:                              #
-# SETUP A PROJECT                       #
-#########################################
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train.py
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist2.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test.py
-dvc run -d data/mnist1.npz -m train_acc.json --no-exec python train.py 
-dvc run -d data/mnist2.npz -d train_acc.json -m test_acc.json --no-exec python test.py 
-
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist3.npz')\nx = train_data['x_train']\ny = train_data['y_train']\n\nx_pred = np.array(train_data['x_train'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc+np.random.random()/100.\n\nwith open('train_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> train2.py
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc2.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test2.py
-echo -e "import numpy as np\nimport json\n\ntrain_data = np.load('data/mnist1.npz')\nx = train_data['x_test']\ny = train_data['y_test']\n\nx_pred = np.array(train_data['x_test'].mean(axis=(1,2)) / 15.0, dtype=int)\n\nacc = (y==x_pred).sum() / float(y.shape[0])\n\ndata = {}  \ndata['acc'] = acc +np.random.random()/100.\n\nwith open('test_acc3.json', 'w') as outfile:\n      json.dump(data, outfile)" >> test3.py
-dvc run -d data/mnist3.npz -m train_acc2.json --no-exec python train2.py 
-dvc run -d data/mnist1.npz -d train_acc2.json -m test_acc2.json --no-exec python test2.py 
-dvc run -d data/mnist1.npz -d train_acc2.json -m test_acc3.json --no-exec python test3.py 
-
-git add -A
-git commit -m 'build pipeline'
-git push
-
-#########################################
-# 6. Step:                              #
-#   DVC-CC INIT                         #
-#########################################
-dvc-cc init
-dvc-cc run "ONE_FILE" -f "test_acc2.json.dvc"
-dvc-cc run "ONE_FILE_IN_DIRECTORY" -f "create_dataset/create_dataset.dvc"
-dvc-cc run "MULTIPLE_FILES_IN_2_PIPELINES" -f "test_acc.json.dvc,test_acc2.json.dvc|train_acc2.json.dvc"
-dvc-cc run "just_an_experimentname"
-
-dvc-cc run "MULTIPLE_FILES_IN_2_PIPELINES" -f "test_acc.json.dvc,test_acc2.json.dvc|train_acc2.json.dvc" --no-exec
-
-
-#cd ~/test_repo/repo
-git pull
-
-
-#########################################
-# 7. Step:                              #
-# Remove the dummy project              #
-#########################################
-#cd ~
-#fusermount -u -z ${HOME}/test_repo/avocado
-#fusermount -u -z ${HOME}/test_repo/repo/data
-#rm -rf ~/test_repo
-#cd ~/Documents/github/dvc-cc-NEW/tests/
-#./test_script3.sh
