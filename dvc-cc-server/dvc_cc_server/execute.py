@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from argparse import ArgumentParser
 import json
 import subprocess
@@ -280,30 +278,6 @@ if __name__ == '__main__':
                 num_of_tries += 1
             else:
                 raise ValueError('It was tried 1000 times to push to the remote. This was not possible.')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

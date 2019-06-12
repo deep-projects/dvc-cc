@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from argparse import ArgumentParser
 import json
 import getpass
@@ -22,7 +20,7 @@ def receive_file_validate(access):
 def cli_version():
     print('0.1')
 
-if __name__ == '__main__':
+def main():
     
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(dest='subparser')
