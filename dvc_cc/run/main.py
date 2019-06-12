@@ -28,7 +28,6 @@ def get_gitinformation():
     if out.startswith('https://'):
         _,_, gitrepo,gitowner,gitname = out.split('/')
     else:
-        out = 'git@git.tools.f4.htw-berlin.de:annusch/test_pcam.git'
         gitrepo = out[4:out.find(':')]
         gitowner = out[out.find(':')+1:out.find('/')]
         gitname = out[out.find('/')+1:]
