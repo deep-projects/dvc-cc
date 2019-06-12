@@ -60,7 +60,7 @@ def create_cc_config_file(args):
     #TODO: Allow more parameters to set in the config.
     with open('.dvc_cc/cc_config.yml',"w") as f:
         print("cli:", file=f)
-        print("  baseCommand: [executepy]", file=f)
+        print("  baseCommand: [dvc-cc-execute]", file=f)
         print("  class: CommandLineTool", file=f)
         print("  cwlVersion: v1.0", file=f)
         print("  doc: some descriptions of the package...", file=f)
