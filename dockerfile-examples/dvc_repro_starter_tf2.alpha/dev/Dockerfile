@@ -66,14 +66,8 @@ RUN pip --no-cache-dir install \
 
 RUN echo 'START HERE 3'
 
-RUN git clone https://github.com/mastaer/dvc-cc.git /home/cc/.local/dvc-cc
+RUN pip install https://github.com/mastaer/dvc-cc/releases/download/cc-connector-variable-to-file-0.1.0/cc_connector_variable_to_file-0.1.0-py3-none-any.whl
 
-RUN chmod -R 777 /home/cc/.local/dvc-cc
-
-RUN rm -R /home/cc/.local/dvc-cc/.git
-
-ENV PATH=$PATH:/home/cc/.local/dvc-cc/docker/executer
-
-# RUN rm -rf /var/lib/apt/lists/*
+RUN pip install https://github.com/mastaer/dvc-cc/releases/download/dvc-cc-server-0.1.0/dvc_cc_server-0.1.0-py3-none-any.whl
 
 WORKDIR home/cc/
