@@ -80,10 +80,16 @@ mkdir dvc
 mkdir code
 mkdir mkdir data
 echo "
+set -eu
+
+mkdir -p data
+
 cd data
 
+
+
 ## for download from google per command line we need gdown
-# pip install gdown
+pip install gdown
 
 # Trainings-Data
 gdown https://drive.google.com/uc?id=1Ka0XfEMiwgCYPdTI-vv6eUElOBnKFKQ2
@@ -181,10 +187,12 @@ outs:
   md5: 94d8aacc249253159ce2a2e78a86e658
 md5: be8e94a1e0938d84c07e510cd822bdb7" > dvc/download_pcam_dataset.dvc
     dvc pull
+    echo "data
+.idea" > .gitignore
 fi
 
 cd `dirname $0`
-cp script_for_test4_train.py ~/test_pcam/repo/code/train.py
+cp data_for_testscript4/script_for_test4_train.py ~/test_pcam/repo/code/train.py
 
 exit 0
 

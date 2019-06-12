@@ -25,7 +25,14 @@ def get_main_git_directory_path():
 def get_gitinformation():
     # TODO: use the intern python-git for this.
     out = check_output(["git", "config", "--get", "remote.origin.url"]).decode("utf8")
-    _,_, gitrepo,gitowner,gitname = out.split('/')
+    if out.startswith('https://'):
+        _,_, gitrepo,gitowner,gitname = out.split('/')
+    else:
+        out = 'git@git.tools.f4.htw-berlin.de:annusch/test_pcam.git'
+        gitrepo = out[4:out.find(':')]
+        gitowner = out[out.find(':')+1:out.find('/')]
+        gitname = out[out.find('/')+1:]
+
     gitname = gitname[:gitname.find('.git')+4]
     return gitrepo,gitowner,gitname
 
