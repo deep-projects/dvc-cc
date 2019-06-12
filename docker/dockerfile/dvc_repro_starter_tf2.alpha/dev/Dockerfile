@@ -64,7 +64,7 @@ RUN pip --no-cache-dir install \
 
 #RUN mkdir /home/cc/.local
 
-RUN echo 'START HERE'
+RUN echo 'START HERE 3'
 
 RUN git clone https://github.com/mastaer/dvc-cc.git /home/cc/.local/dvc-cc
 

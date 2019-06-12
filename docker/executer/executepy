@@ -251,7 +251,7 @@ if __name__ == '__main__':
     print(subprocess.check_output(command, shell=True).decode())
 
     print('COMMIT AT DVC   ' + get_time())
-    command = "dvc commit"
+    command = "dvc commit --force"
     print(subprocess.check_output(command, shell=True).decode())
 
     print('PUSH TO DVC   ' + get_time())

@@ -29,7 +29,7 @@ parser = argparse.ArgumentParser()
 # define the training
 parser.add_argument('-lr', '--learning-rate', type=float, help='', default = 0.1)
 parser.add_argument('-b','--batch-size', type=int, help='', default = 64)
-parser.add_argument('--num-of-epochs', type=int, help='', default = 2)
+parser.add_argument('--num-of-epochs', type=int, help='', default = 5)
 
 # define the model structure
 parser.add_argument('--activation-function', type=str, help='', default = 'relu')
