@@ -8,10 +8,12 @@ import yaml
 import os
 from subprocess import check_output
 import configparser
-
+import json
 import numpy as np
 import subprocess
 import dvc_cc.dummy.dummy_to_dvc as dummy_to_dvc
+import nbformat
+from nbconvert import PythonExporter
 
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker.'
 
@@ -142,13 +144,12 @@ def get_leafs_that_need_to_reproduce():
             leafs_need_to_reproduce.append(leafs[i])
     return leafs_need_to_reproduce
 
-def all_jupyter_notebook_to_py_files():
+def all_jupyter_notebook_to_py_files(project_dir):
     created_files = []
-    if args.jupyter_notebook_to_py:
-        for root, dirs, files in os.walk(project_dir, topdown=True):
-            for f in files:
-                if files.endswith('ipynb'):
-                    created_files.append(jupyter_notebook_to_py_file(root, f))
+    for root, dirs, files in os.walk(project_dir, topdown=True):
+        for f in files:
+            if f.endswith('ipynb'):
+                created_files.append(jupyter_notebook_to_py_file(root, f))
     return created_files
 
 def jupyter_notebook_to_py_file(root, file_name):
@@ -169,7 +170,6 @@ def jupyter_notebook_to_py_file(root, file_name):
             if 'outputs' in c:
                 c['outputs'] = []
         if use_this_cell:
-            print('I am Here!!')
             cleared_cells.append(c)
     notebook["cells"] = cleared_cells
 
@@ -177,7 +177,7 @@ def jupyter_notebook_to_py_file(root, file_name):
     exporter = PythonExporter()
     source, meta = exporter.from_notebook_node(nb)
 
-    output_name = root+'/'+file_name[:-5]+'.py'
+    output_name = root+'/'+file_name[:-6]+'.py'
     with open(output_name, 'w') as fh:
         print(source, file=fh)
 
@@ -207,7 +207,10 @@ def main():
     check_git_repo(args)
 
     # convert jupyter notebooks to py-files.
-    created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files()
+    if args.jupyter_notebook_to_py:
+        created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(project_dir)
+    else:
+        created_pyfiles_from_jupyter = []
     for f in created_pyfiles_from_jupyter:
         subprocess.call(['git', 'add', f])
 

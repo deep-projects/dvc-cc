@@ -183,6 +183,9 @@ md5: be8e94a1e0938d84c07e510cd822bdb7" > dvc/download_pcam_dataset.dvc
     dvc pull
 fi
 
+cd `dirname $0`
+cp script_for_test4_train.py ~/test_pcam/repo/code/train.py
+
 exit 0
 
 

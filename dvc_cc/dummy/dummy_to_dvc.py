@@ -240,6 +240,7 @@ def dummy_to_dvc(current_path):
             hyperparameterclass.append(selected_hyper)
         else:
             m = Constant()
+            m.variable = v
             m.set_data(v.varvalue)
             hyperparameterclass.append(m)
 
@@ -248,7 +249,10 @@ def dummy_to_dvc(current_path):
     all_variants = list(itertools.product(*all_variants))
 
     # find and read all dummy files.
-    dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    if os.path.exists('dvc/.dummy'):
+        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    else:
+        dummy_files = []
 
     variables = {h.variable.varname: h.variable for h in hyperparameterclass}
 

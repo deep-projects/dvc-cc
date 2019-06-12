@@ -1,8 +1,9 @@
 #%% md
 # this script can train a network on the pcam dataset.
 Imports
-#%% dch
 
+#%%
+import json
 import os
 import tensorflow as tf
 import numpy as np
@@ -13,21 +14,22 @@ from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D,
 from tensorflow.keras.layers import GlobalAveragePooling2D
 import argparse
 
-#%%
-
+#%% dch
+import os
 if os.getcwd().endswith('code'):
     os.chdir('..')
 print(os.getcwd())
 
 #%% md
 build arparser
+
 #%%
 parser = argparse.ArgumentParser()
 
 # define the training
 parser.add_argument('-lr', '--learning-rate', type=float, help='', default = 0.1)
 parser.add_argument('-b','--batch-size', type=int, help='', default = 64)
-parser.add_argument('--num-of-epochs', type=int, help='', default = 100)
+parser.add_argument('--num-of-epochs', type=int, help='', default = 2)
 
 # define the model structure
 parser.add_argument('--activation-function', type=str, help='', default = 'relu')
@@ -45,11 +47,11 @@ parser.add_argument('--flip-input', action='store_true')
 parser.add_argument('--normalize-input', action='store_true')
 parser.add_argument('--use-cropping', action='store_true')
 
-#%%
-args = parser.parse_args()
-
 validation_steps=20
 steps_per_epoch=100
+
+#%%
+args = parser.parse_args()
 
 #%% dvc-cc-hide
 class Args:
@@ -60,7 +62,7 @@ args = Args()
 
 args.learning_rate = 0.1
 args.batch_size = 64
-args.num_of_epochs = 2
+args.num_of_epochs = 1
 
 args.activation_function = 'relu' ##########
 args.use_same_padding = True ##############
@@ -79,6 +81,32 @@ args.use_cropping = True
 
 validation_steps=2
 steps_per_epoch=10
+#%%
+name_of_experiment = 'lr'+str(args.learning_rate)+'_' +\
+                     'bz'+str(args.batch_size)+'_' +\
+                     ''+str(args.activation_function)+'_' +\
+                     'same'+str(args.use_same_padding)+'_' +\
+                     'kw'+str(args.kernel_width)+'_' +\
+                     'ak'+str(args.average_kernels)+'_' +\
+                     'if'+str(args.kernel_increasing_factor)+'_' +\
+                     'n'+str(args.num_of_conv_layers)+'_' +\
+                     'dfc'+str(args.dropout_factor_after_conv)+'_' +\
+                     'dfm'+str(args.dropout_factor_after_maxp)+'_' +\
+                     'm'+str(args.maxpool_after_n_layer)+'_' +\
+                     'fl'+str(args.flip_input)+'_' +\
+                     'no'+str(args.normalize_input)+'_' +\
+                     'cr'+str(args.use_cropping)
+#%%
+name_of_experiment = 'lr'+str(args.learning_rate)+'_' +\
+                     'bz'+str(args.batch_size)+'_' +\
+                     'if'+str(args.kernel_increasing_factor)+'_' +\
+                     'n'+str(args.num_of_conv_layers)
+
+#  dvc-cc dummy new -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyonpatch_level_2_split_train_y.h5 -d data/camelyonpatch_level_2_split_valid_x.h5 -d data/camelyonpatch_level_2_split_valid_y.h5 -o tf_models/lr<<<learning_rate>>>_bz<<<batch_size>>>_<<<activation_function>>>_same<<<use_same_padding>>>_kw<<<kernel_width>>>_ak<<<average_kernels>>>_if<<<kernel_increasing_factor>>>_n<<<num_of_conv_layers>>>_dfc<<<dropout_factor_after_conv>>>_dfm<<<dropout_factor_after_maxp>>>_m<<<maxpool_after_n_layer>>>_fl<<<flip_input>>>_no<<<normalize_input>>>_cr<<<use_cropping>>>.h5 -o tensorboards/lr<<<learning_rate>>>_bz<<<batch_size>>>_<<<activation_function>>>_same<<<use_same_padding>>>_kw<<<kernel_width>>>_ak<<<average_kernels>>>_if<<<kernel_increasing_factor>>>_n<<<num_of_conv_layers>>>_dfc<<<dropout_factor_after_conv>>>_dfm<<<dropout_factor_after_maxp>>>_m<<<maxpool_after_n_layer>>>_fl<<<flip_input>>>_no<<<normalize_input>>>_cr<<<use_cropping>>> -f dvc/train.dvc --no-exec python code/train.py --lr <<<learning_rate>>> --b <<<batch_size>>> --activation-function <<<activation_function>>> --use-same-padding <<<use_same_padding>>> --kernel-width <<<kernel_width>>> --average-kernels <<<average_kernels>>> --kernel-increasing-factor <<<kernel_increasing_factor>>> --num-of-conv-layers <<<num_of_conv_layers>>> --dropout-factor-after-conv <<<dropout_factor_after_conv>>> --dropout-factor-after-maxp <<<dropout_factor_after_maxp>>> --maxpool-after-n-layer <<<maxpool_after_n_layer>>> --flip-input <<<flip_input>>> --normalize-input <<<normalize_input>>> --use-cropping <<<use_cropping>>>
+
+#  lr<<<learning_rate>>>_bz<<<batch_size>>>_<<<activation_function>>>_same<<<use_same_padding>>>_kw<<<kernel_width>>>_ak<<<average_kernels>>>_if<<<kernel_increasing_factor>>>_n<<<num_of_conv_layers>>>_dfc<<<dropout_factor_after_conv>>>_dfm<<<dropout_factor_after_maxp>>>_m<<<maxpool_after_n_layer>>>_fl<<<flip_input>>>_no<<<normalize_input>>>_cr<<<use_cropping>>>
+#  --lr <<<learning_rate>>> --b <<<batch_size>>> --activation-function <<<activation_function>>> --use-same-padding <<<use_same_padding>>> --kernel-width <<<kernel_width>>> --average-kernels <<<average_kernels>>> --kernel-increasing-factor <<<kernel_increasing_factor>>> --num-of-conv-layers <<<num_of_conv_layers>>> --dropout-factor-after-conv <<<dropout_factor_after_conv>>> --dropout-factor-after-maxp <<<dropout_factor_after_maxp>>> --maxpool-after-n-layer <<<maxpool_after_n_layer>>> --flip-input <<<flip_input>>> --normalize-input <<<normalize_input>>> --use-cropping <<<use_cropping>>>
+
 
 #%% md
 Load the dataset:
@@ -172,21 +200,39 @@ print(tmp[1].shape)
 train the model
 
 #%%
+if not os.path.exists('tensorboards'):
+    os.mkdir('tensorboards')
+
+#%%
 model.fit_generator(next_data_pcam(x_train, y_train),
                         validation_steps=validation_steps,
                         steps_per_epoch=steps_per_epoch,
                         epochs=args.num_of_epochs,
-                        validation_data=next_data_pcam(x_valid, y_valid),workers=1, verbose=2)
+                        validation_data=next_data_pcam(x_valid, y_valid),
+                        workers=1, verbose=2,
+                        callbacks=[tf.keras.callbacks.TensorBoard('tensorboards/'+name_of_experiment)])
 
 #%%
+if not os.path.exists('tf_models'):
+    os.mkdir('tf_models')
+model.save_weights('./tf_models/'+str(name_of_experiment)+'.h5')
 
 
+#%% md
+Just some pseudo output
+
 #%%
-#%%
+print('\n\t\tNAME OF THE EXPERIMENT IS '+str(name_of_experiment)+'\n')
+
 #%% dch
 import matplotlib.pyplot as plt
-import seaborn
 import numpy as np
-samples = np.random.beta(1,1,size=100)
-plt.hist(samples, bins=100);
-#%%
+size = 100000
+samples = np.random.beta(1,5,size=size)
+plt.hist(samples, bins=100, density=True)
+x1,x2,y1,y2 = plt.axis()
+plt.axis((0.0,1.0,y1,y2))
+#axes.set_ylim([ymin,ymax])
+
+#%% dch
+!pip install seaborn

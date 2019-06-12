@@ -1,0 +1,24 @@
+dvc-cc dummy new "-d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyonpatch_level_2_split_train_y.h5 -d data/camelyonpatch_level_2_split_valid_x.h5 -d data/camelyonpatch_level_2_split_valid_y.h5 -o tf_models/lr{{learning_rate}}_bz{{batch_size}}_{{activation_function}}_same{{use_same_padding}}_kw{{kernel_width}}_ak{{average_kernels}}_if{{kernel_increasing_factor}}_n{{num_of_conv_layers}}_dfc{{dropout_factor_after_conv}}_dfm{{dropout_factor_after_maxp}}_m{{maxpool_after_n_layer}}_fl{{flip_input}}_no{{normalize_input}}_cr{{use_cropping}}.h5 -o tensorboards/lr{{learning_rate}}_bz{{batch_size}}_{{activation_function}}_same{{use_same_padding}}_kw{{kernel_width}}_ak{{average_kernels}}_if{{kernel_increasing_factor}}_n{{num_of_conv_layers}}_dfc{{dropout_factor_after_conv}}_dfm{{dropout_factor_after_maxp}}_m{{maxpool_after_n_layer}}_fl{{flip_input}}_no{{normalize_input}}_cr{{use_cropping}} -f dvc/train.dvc --no-exec python code/train.py --lr {{learning_rate}} --b {{batch_size}} --activation-function {{activation_function}} {{use_same_padding}} --kernel-width {{kernel_width}} --average-kernels {{average_kernels}} --kernel-increasing-factor {{kernel_increasing_factor}} --num-of-conv-layers {{num_of_conv_layers}} --dropout-factor-after-conv {{dropout_factor_after_conv}} --dropout-factor-after-maxp {{dropout_factor_after_maxp}} --maxpool-after-n-layer {{maxpool_after_n_layer}}  {{flip_input}} {{normalize_input}} {{use_cropping}}"
+dvc-cc dummy variable use_cropping --set ' --use-cropping'
+dvc-cc dummy variable normalize_input --set ' --normalize-input'
+dvc-cc dummy variable flip_input --set ' --flip-input'
+dvc-cc dummy variable use_same_padding --set ' --use-same-padding'
+dvc-cc dummy variable activation_function --set 'relu'
+
+
+
+
+
+
+dvc-cc dummy new "-d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyonpatch_level_2_split_train_y.h5 -d data/camelyonpatch_level_2_split_valid_x.h5 -d data/camelyonpatch_level_2_split_valid_y.h5 -o tf_models/lr{{learning_rate}}_bz{{batch_size}}_{{activation_function}}_sameTrue_kw{{kernel_width}}_ak{{average_kernels}}_if{{kernel_increasing_factor}}_n{{num_of_conv_layers}}_dfc{{dropout_factor_after_conv}}_dfm{{dropout_factor_after_maxp}}_m{{maxpool_after_n_layer}}_flTrue_noTrue_crTrue.h5 -o tensorboards/lr{{learning_rate}}_bz{{batch_size}}_{{activation_function}}_sameTrue_kw{{kernel_width}}_ak{{average_kernels}}_if{{kernel_increasing_factor}}_n{{num_of_conv_layers}}_dfc{{dropout_factor_after_conv}}_dfm{{dropout_factor_after_maxp}}_m{{maxpool_after_n_layer}}_flTrue_noTrue_crTrue -f dvc/train.dvc --no-exec python code/train.py -lr {{learning_rate}} -b {{batch_size}} --activation-function {{activation_function}} --use-same-padding --kernel-width {{kernel_width}} --average-kernels {{average_kernels}} --kernel-increasing-factor {{kernel_increasing_factor}} --num-of-conv-layers {{num_of_conv_layers}} --dropout-factor-after-conv {{dropout_factor_after_conv}} --dropout-factor-after-maxp {{dropout_factor_after_maxp}} --maxpool-after-n-layer {{maxpool_after_n_layer}}  --flip-input --normalize-input --use-cropping"
+
+dvc-cc dummy variable activation_function --set 'relu'
+
+
+
+
+
+dvc-cc dummy new "-d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyonpatch_level_2_split_train_y.h5 -d data/camelyonpatch_level_2_split_valid_x.h5 -d data/camelyonpatch_level_2_split_valid_y.h5 -o tf_models/lr{{learning_rate}}_bz{{batch_size}}_if{{kernel_increasing_factor}}_n{{num_of_conv_layers}}.h5 -o tensorboards/lr{{learning_rate}}_bz{{batch_size}}_if{{kernel_increasing_factor}}_n{{num_of_conv_layers}} -f dvc/train.dvc --no-exec python code/train.py -lr {{learning_rate}} -b {{batch_size}} --kernel-increasing-factor {{kernel_increasing_factor}} --num-of-conv-layers {{num_of_conv_layers}}"
+
+dvc-cc dummy variable activation_function --set 'relu'
+

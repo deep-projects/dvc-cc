@@ -1,0 +1,18 @@
+cmd: python code/train.py -lr {{learning_rate:float:None}} -b {{batch_size:int:None}}
+  --kernel-increasing-factor {{kernel_increasing_factor:float:None}} --num-of-conv-layers
+  {{num_of_conv_layers:int:None}}
+wdir: ..
+deps:
+- path: data/camelyonpatch_level_2_split_train_x.h5
+- path: data/camelyonpatch_level_2_split_train_y.h5
+- path: data/camelyonpatch_level_2_split_valid_x.h5
+- path: data/camelyonpatch_level_2_split_valid_y.h5
+outs:
+- path: tf_models/lr{{learning_rate:float:None}}_bz{{batch_size:int:None}}_if{{kernel_increasing_factor:float:None}}_n{{num_of_conv_layers:int:None}}.h5
+  cache: true
+  metric: false
+  persist: false
+- path: tensorboards/lr{{learning_rate:float:None}}_bz{{batch_size:int:None}}_if{{kernel_increasing_factor:float:None}}_n{{num_of_conv_layers:int:None}}
+  cache: true
+  metric: false
+  persist: false

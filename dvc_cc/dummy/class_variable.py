@@ -72,7 +72,7 @@ class Variable:
 
 
     def __pretty_str__(self):
-        tmp = str(self)[3:-3].split(':')
+        tmp = str(self)[2:-2].split(':')
         return '%25s%8s%6s'%(tmp[0],tmp[1],tmp[2])
 
     def __str__(self):
@@ -85,7 +85,7 @@ class Variable:
         elif self.vartype is np.int:
             vartype = 'int'
     
-        return '<<<' + self.varname+':'+ vartype +':'+ str(self.varvalue) + '>>>'
+        return '{{' + self.varname+':'+ vartype +':'+ str(self.varvalue) + '}}'
 
 def find_all_variables(text, variables = {}, return_founded_variables=False):
     if type(text) is not list:
@@ -94,10 +94,10 @@ def find_all_variables(text, variables = {}, return_founded_variables=False):
     for subc in text:
         start_pos = 0
         while start_pos >= 0:
-            start_pos = subc.find('<<<', start_pos)
+            start_pos = subc.find('{{', start_pos)
             if start_pos is not -1:
-                end_pos = subc.find('>>>', start_pos)
-                start_pos += 3
+                end_pos = subc.find('}}', start_pos)
+                start_pos += 2
                 varvalue = subc[start_pos:end_pos]
                 varname = varvalue.split(':')[0]
                 if varname not in variables:
@@ -122,21 +122,21 @@ def update_variables_in_text(text, variables, only_varvalue = False, return_var_
             this_var_not_used = True
             v = variables[v_key]
 
-            varstart_pos = subc.find('<<<')
+            varstart_pos = subc.find('{{')
             while varstart_pos > -1:
-                varend_pos = subc.find('>>>', varstart_pos)
-                if subc[varstart_pos+3:varend_pos].split(':')[0] == v.varname:
+                varend_pos = subc.find('}}', varstart_pos)
+                if subc[varstart_pos+2:varend_pos].split(':')[0] == v.varname:
                     if only_varvalue:
-                        subc = subc[:varstart_pos] + str(v.varvalue) + subc[varend_pos+3:]
+                        subc = subc[:varstart_pos] + str(v.varvalue) + subc[varend_pos+2:]
                         if this_var_not_used:
                             var_used.append(str(v.varvalue))
                             this_var_not_used = False
                     else:
-                        subc = subc[:varstart_pos] + str(v) + subc[varend_pos+3:]
+                        subc = subc[:varstart_pos] + str(v) + subc[varend_pos+2:]
                         if this_var_not_used:
                             var_used.append(str(v))
                             this_var_not_used = False
-                varstart_pos = subc.find('<<<', varstart_pos+3)
+                varstart_pos = subc.find('{{', varstart_pos+2)
         result.append(subc)
 
     if convert_to_string:
@@ -148,7 +148,10 @@ def update_variables_in_text(text, variables, only_varvalue = False, return_var_
 
 def get_all_already_defined_variables():
     # find and read all dummy files.
-    dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    if os.path.exists('dvc/.dummy'):
+        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    else:
+        dummy_files = []
     
     # search for all variables
     variables = {}
@@ -160,7 +163,10 @@ def get_all_already_defined_variables():
 
 def update_all_dummyfiles(variables_to_update):
     # find and read all dummy files.
-    dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    if os.path.exists('dvc/.dummy'):
+        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
+    else:
+        dummy_files = []
     
     # search for all variables
     for f in dummy_files:
@@ -171,7 +177,7 @@ def update_all_dummyfiles(variables_to_update):
             print(text,file=filepath)
 
 def test_the_variable_class():
-    command = "<<<pre:i>>> <<<pre>>>Hallo meine liebe<<<r_or_not>>> <<<name:FI>>>, I have<<<not_or_not>>>asdsad asdsa asdsad<<<post>>> asd<<<first:ui>>>asdsad<<<second:fl>>>asdads <<<post2>>>".split(' ')
+    command = "{{pre:i}} {{pre}}Hallo meine liebe{{r_or_not}} {{name:FI}}, I have{{not_or_not}}asdsad asdsa asdsad{{post}} asd{{first:ui}}asdsad{{second:fl}}asdads {{post2}}".split(' ')
 
     variables = find_all_variables(command)
 
