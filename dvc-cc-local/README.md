@@ -1,4 +1,4 @@
-# DVC-CC-Project
+# DVC-CC
 
 DVC-CC was developed for machine learning projects with the main target of reproducibility, simplicity and **scalability**.
 
@@ -6,7 +6,7 @@ DVC-CC was developed for machine learning projects with the main target of repro
 - Scalability means that these scripts ensure that you can run them on your cluster system.
 - Simplicity means that it should not cause too much more workload.
 
-To archive this target, DVC-CC is based on the two softwares [Open-source Version Control System for Machine Learning Projects (DVC)]{https://dvc.org/} and [Curious Containers (CC)]{https://www.curious-containers.cc/}.
+To archive this target, DVC-CC is based on the two softwares [Open-source Version Control System for Machine Learning Projects (DVC)](https://dvc.org/) and [Curious Containers (CC)](https://www.curious-containers.cc/).
 - DVC allows you to define stages that describe which command line to call, what dependencies, output, and metrics exist for this command. With the defined stages, DVC knows the pipeline of executions and ensures that changed dependencies are executed again.
 - CC is used in the backend to run your scripts in a docker on your cluster system.
 
