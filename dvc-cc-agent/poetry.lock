@@ -1,0 +1,23 @@
+[[package]]
+category = "main"
+description = "Python command-line parsing library"
+name = "argparse"
+optional = false
+python-versions = "*"
+version = "1.4.0"
+
+[[package]]
+category = "main"
+description = "Compare the similarities between two JSONs."
+name = "pyjson"
+optional = false
+python-versions = "*"
+version = "1.3.0"
+
+[metadata]
+content-hash = "7d083919f2dbc4d14bf0dfee1d457ea3e287da4cabc40e407616e7f94bff9fcd"
+python-versions = "^3.7"
+
+[metadata.hashes]
+argparse = ["62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4", "c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314"]
+pyjson = ["343f336e766af2fbd138b11d6734bba8c1c40765c36d3c7b46ec4a9f589d9628", "fb20354b24ece45cd21dfb8defafd6278f026c28d1d37b3ad8a0c68374f26bfd"]

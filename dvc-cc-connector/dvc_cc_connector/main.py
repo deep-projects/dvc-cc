@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 import json
-import getpass
 import os
 from shutil import copyfile
 
@@ -18,7 +17,7 @@ def receive_file_validate(access):
         exit(1) # or: raise
 
 def cli_version():
-    print('0.1')
+    print('0.3')
 
 def main():
     
@@ -53,5 +52,5 @@ def main():
         cli_version()
     else:
         parser.print_help()
-        raise ValueError("You used the connector_variable_to_file with wrong parameters.")
+        raise ValueError("You used the dvc-cc-connector with wrong parameters.")
     

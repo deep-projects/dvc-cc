@@ -27,15 +27,7 @@ RUN pip install tensorflow-gpu==2.0.0-alpha0
 
 
 # Some common environmenta variables that Python uses
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
-
-# Install lower level dependencies
-#RUN apt-get update --fix-missing -y && apt-get upgrade -y && \
-#    apt-get install -y curl python3 python3-pip && \
-#    update-alternatives --install /usr/bin/python python /usr/bin/python3 10 && \
-#    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10 && \
-#    apt-get clean && \
-#    apt-get autoremove 
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 
 
 # Install a specific version of TensorFlow
 # You may also install anything else from pip like this
@@ -57,17 +49,11 @@ RUN pip --no-cache-dir install \
         dvc \
         paramiko
 
-#RUN apt-get install git  -y
-
-# switch user
-#RUN useradd -ms /bin/bash cc
-
-#RUN mkdir /home/cc/.local
-
-RUN echo 'START HERE 8'
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector!'
 
 RUN pip install https://github.com/mastaer/dvc-cc/releases/download/cc-connector-variable-to-file-0.1.0/cc_connector_variable_to_file-0.1.0-py3-none-any.whl
 
 RUN pip install https://github.com/mastaer/dvc-cc/releases/download/dvc-cc-server-0.1.0/dvc_cc_server-0.1.0-py3-none-any.whl
 
 WORKDIR home/cc/
+

@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "dvc-cc-agent"
+version = "0.3.0"
+description = "This script is the agent that should only be called in a docker. It executes scripts of github defined with dvc."                
+authors = ["Jonas <jonas.annuscheit@gmail.com>"]
+license = "AGPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyjson = "^1.3"
+argparse = "^1.4"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+dvc-cc-agent = 'dvc_cc_agent.main:main'
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+

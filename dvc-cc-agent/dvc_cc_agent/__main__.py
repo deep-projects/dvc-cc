@@ -1,4 +1,4 @@
-from dvc_cc_server.main import main
+from dvc_cc_agent.main import main
 
 
 if __name__ == '__main__':

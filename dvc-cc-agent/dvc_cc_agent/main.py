@@ -5,10 +5,6 @@ import os
 import datetime
 import time
 import shutil
-import tensorflow as tf
-
-
-
 
 def get_command_list_in_right_order():
     from dvc.repo import Repo as DVCRepo
@@ -23,8 +19,6 @@ def get_command_list_in_right_order():
         for node in next:
             G.remove_node(node)
     all_nodes
-
-
     stages = sorted(dvcrepo.stages(), key=lambda s: all_nodes.index(s.relpath))
 
     commandlist = ''
@@ -40,38 +34,40 @@ def collabs_text(title, text):
     posttext = '\n\n</p>\n</details>\n\n'
     return pretext+text+posttext
 
-def write_readme(dvc_status):
-    with open('README.md',"w") as f:
-        print('## DVC-Status before execution', file=f)
-        print('```', file=f)
-        print(collabs_text('DVC-STATUS', dvc_status),file=f)
-        print('```', file=f)
+def write_readme(dvc_status_before_execution, used_sshfs):
+    with open('README.md',"a+") as f:
         print('## About DVC-CC', file=f)
-        print('This branch was automated created with the Software DVC-CC. This Software allows you to use Data Version Control System for Machine Learning Projects (DVC) and Curious Containers (CC). DVC makes is possible to define a Machine Learning Pipeline, so that everybody can reproduce some results. Curious Containers make sure that the script is running in a docker container which was configurated to handle DVC projects.', file=f)
-        print()
+        print('This branch was automated created with the tool DVC-CC. This tool connects DVC (https://dvc.org/) to CC (www.curious-containers.cc) to run your defined stages with DVC in a docker on your cloud system with CC. [More information about DVC-CC](https://github.com/deep-projects/dvc-cc)', file=f)
+        print('',file=f)
+        print('## DVC-Status', file=f)
+        print(collabs_text('Before Execution', '```\n'+dvc_status_before_execution+'\n```'),file=f)
+        dvc_status = subprocess.check_output('dvc status -c', shell=True).decode()
+        print(collabs_text('After Execution', '```\n'+dvc_status+'\n```'),file=f)
 
-        print()
-        print('## Rerun this branch', file = f)
+        print('',file=f)
+        print('## How to rerun this experiment:', file = f)
+        print('The following sections describe how you can rerun the dvc stages yourself.',file=f)
+        if used_sshfs:
+            print('<span style="color:red">Warning: During execution a folder was included via sshfs.</span>', file = f)
 
-        print('### Pure command line', file = f)
+        print('### Pure command line (run the experiment local)', file = f)
         commands = get_command_list_in_right_order()
         print('```', file = f)
         print(commands, file = f)
         print('```', file = f)
 
-
-        print('### Using DVC', file = f)
+        print('### Using DVC (run the experiment local)', file = f)
         print('```', file = f)
         print('dvc repro -P', file = f)
         print('```', file = f)
 
-        print('### Using CC', file = f)
+        print('### Using CC (run the experiment on a server)', file = f)
         print('```', file = f)
         print('faice exec cc_execution_file.red.yml', file = f)
         print('```', file = f)
 
         print('## Executed System', file = f)
-        print('The scipt runned on the following system:', file = f)
+        print('The scipt ran on the following system:', file = f)
 
         # GPUs
         try:
@@ -246,7 +242,7 @@ def main():
     shutil.rmtree('.dvc_cc')
     
     print('WRITE README.md')
-    write_readme(dvc_status)
+    write_readme(dvc_status, data_dir is not None and len(data_dir) > 0 and data_dir[0] == '/')
     
     print('GIT-ADD ' + get_time())
     command = "git add -A"
