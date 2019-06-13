@@ -8,10 +8,10 @@ echo "			# Remove the project               #"
 echo "			####################################"
 cd ~
 
-if [ -d "$HOME/test_pcam" ]
+if [ -d "$HOME/pcam_with_dvc_cc" ]
 then
-    echo 'Remove the directory ~/test_pcam.'
-    rm -rf ~/test_pcam
+    echo 'Remove the directory ~/pcam_with_dvc_cc.'
+    rm -rf ~/pcam_with_dvc_cc
 fi
 
 #cd ~/Documents/github/dvc-cc-NEW/tests/
@@ -19,8 +19,8 @@ fi
 
 
 
-mkdir ~/test_pcam
-cd ~/test_pcam
+mkdir ~/pcam_with_dvc_cc
+cd ~/pcam_with_dvc_cc
 
 
 echo "			#########################"
@@ -34,22 +34,22 @@ gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/',private_token='1oxzXp1M
 gl.auth()
 
 try:
-    gl_id = gl.projects.get('annusch/test_pcam').get_id()
+    gl_id = gl.projects.get('annusch/pcam_with_dvc_cc').get_id()
     gl.projects.delete(gl_id)
     time.sleep(5)
-    print('Deleted the git repo: test_pcam')
+    print('Deleted the git repo: pcam_with_dvc_cc')
 except:
     print('No git repo found.')
 
-project = gl.projects.create({'name': 'test_pcam'})" >> ~/test_pcam/create_git_repo.py
+project = gl.projects.create({'name': 'pcam_with_dvc_cc'})" >> ~/pcam_with_dvc_cc/create_git_repo.py
 
-python ~/test_pcam/create_git_repo.py
+python ~/pcam_with_dvc_cc/create_git_repo.py
 
 # Save the git credential
 git config --global credential.helper 'cache --timeout 1000'
 
 # clone empty git repository
-git clone https://git.tools.f4.htw-berlin.de/annusch/test_pcam.git repo
+git clone https://git.tools.f4.htw-berlin.de/annusch/pcam_with_dvc_cc.git repo
 
 cd repo
 
@@ -68,7 +68,7 @@ echo "			##################"
 echo "			# 3. Step:       #"
 echo "			# SET DVC-CC-URL #"
 echo "			##################"
-dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/test_pcam
+dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/pcam_with_dvc_cc
 dvc remote modify dvc_connection ask_password true
 dvc push
 dvc pull
@@ -118,7 +118,7 @@ echo "			# 4.1 Step:               #"
 echo "			# Download PCAM-Datensatz #"
 echo "			###########################"
 
-DOWNLOAD=0
+DOWNLOAD=1
 
 if [ "$DOWNLOAD" -eq 1 ]
 then
@@ -195,10 +195,10 @@ fi
 
 # copy training file !
 cd $STARTINGDIR
-cp data_for_testscript4/train.ipynb ~/test_pcam/repo/code/train.ipynb
+cp data_for_testscript4/train.ipynb ~/pcam_with_dvc_cc/repo/code/train.ipynb
 
 # start some jobs
-cd ~/test_pcam/repo
+cd ~/pcam_with_dvc_cc/repo
 git add -A
 git commit -m 'add train.ipynb'
 

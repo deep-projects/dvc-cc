@@ -271,7 +271,7 @@ def main():
                 print("        class: File", file=f)
                 print("        connector:", file=f)
                 print("          access: {username: '{{"+git_path.replace('.', '_').replace('-','_')+"_username}}', password: '{{"+git_path.replace('.', '_').replace('-','_')+"_password}}', email: '{{"+git_path.replace('.', '_').replace('-','_')+"_email}}'}", file=f)
-                print("          command: cc-connector-variable-to-file", file=f)
+                print("          command: dvc-cc-connector", file=f)
                 print("      git_path_to_working_repository: \""+git_path+"\"", file=f)
                 print("      git_working_repository_owner: \""+git_owner+"\"", file=f)
                 print("      git_working_repository_name: \""+git_name+"\"", file=f)
@@ -280,7 +280,7 @@ def main():
                 print("        class: File", file=f)
                 print("        connector:", file=f)
                 print("          access: {username: '{{"+dvc_server.replace('.', '_').replace('-','_')+"_username}}', password: '{{"+dvc_server.replace('.', '_').replace('-','_')+"_password}}'}", file=f)
-                print("          command: cc-connector-variable-to-file", file=f)
+                print("          command: dvc-cc-connector", file=f)
                 print("      dvc_servername: \""+dvc_server+"\"", file=f)
                 print("      dvc_path_to_working_repository: \""+dvc_path+"\"", file=f)
     
