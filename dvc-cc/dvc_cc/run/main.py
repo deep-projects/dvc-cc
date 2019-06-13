@@ -7,12 +7,15 @@ from git import Repo as GITRepo
 import yaml
 import os
 from subprocess import check_output
+from subprocess import Popen, PIPE
 import json
 import numpy as np
 import subprocess
 import dvc_cc.dummy.dummy_to_dvc as dummy_to_dvc
 import nbformat
 from nbconvert import PythonExporter
+import keyring
+import requests
 
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker.'
 
@@ -188,6 +191,27 @@ def jupyter_notebook_to_py_file(root, file_name):
 
     return output_name
 
+def run_command(command):
+    process = Popen(command, stdout=PIPE, shell=True)
+    while True:
+        line = process.stdout.readline().rstrip()
+        if not line:
+            break
+        yield line
+
+def get_last_cc_experimentid():
+    pw = keyring.get_password('red', 'agency_password')
+    uname = keyring.get_password('red', 'agency_username')
+    auth = (uname, pw)
+
+    r = requests.get(
+        'https://agency.f4.htw-berlin.de/cc/experiments',
+        auth=auth
+    )
+    r.raise_for_status()
+    a = r.json()
+    return sorted(a,key=lambda x: x['registrationTime'])[-1]['_id']
+
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('experimentname', help='The name of the experiment that should be used. This can help you to search between all files.')
@@ -328,10 +352,11 @@ def main():
                 with open('.dvc_cc/cc_config.yml',"r") as r:
                     print(r.read(), file=f)
             
-            output = subprocess.Popen(('faice exec .dvc_cc/tmp.red.yml').split(), stdout=subprocess.PIPE)
-            cc_id = output.communicate()[0].decode().split()[-1]
+            p = 'faice exec .dvc_cc/tmp.red.yml'
+            subprocess.call(p.split(' '))
+            cc_id = get_last_cc_experimentid()
             print('The experiment ID is: ' + cc_id)
-            #os.remove('.dvc_cc/tmp.red.yml')
+            os.remove('.dvc_cc/tmp.red.yml')
         else:
             cc_id = None
 

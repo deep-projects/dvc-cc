@@ -48,7 +48,7 @@ def write_readme(dvc_status_before_execution, used_sshfs):
         print('## How to rerun this experiment:', file = f)
         print('The following sections describe how you can rerun the dvc stages yourself.',file=f)
         if used_sshfs:
-            print('<span style="color:red">Warning: During execution a folder was included via sshfs.</span>', file = f)
+            print('\n\n<span style="color:red">Warning: During execution a folder was included via sshfs.</span>\n\n', file = f)
 
         print('### Pure command line (run the experiment local)', file = f)
         commands = get_command_list_in_right_order()
@@ -203,6 +203,12 @@ def main():
         command = 'ln -s ' + data_dir + ' data'
         print('\t'+command)
         print(subprocess.check_output(command, shell=True).decode())
+        command = 'ls data'
+        print('\tls data:'+subprocess.check_output(command, shell=True).decode())
+        command = 'ls -i data'
+        print('\tls -i data:'+subprocess.check_output(command, shell=True).decode())
+        command = 'ls -il data'
+        print('\tls -il data:'+subprocess.check_output(command, shell=True).decode())
     
     # check dvc status
     command = 'dvc status -c'

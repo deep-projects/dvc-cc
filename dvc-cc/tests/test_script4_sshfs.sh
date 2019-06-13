@@ -7,11 +7,12 @@ echo "			# -1. Step:                        #"
 echo "			# Remove the project               #"
 echo "			####################################"
 cd ~
+fusermount -u -z ${HOME}/pcam_with_dvc_cc_sshfs/repo/data
 
-if [ -d "$HOME/pcam_with_dvc_cc" ]
+if [ -d "$HOME/pcam_with_dvc_cc_sshfs" ]
 then
-    echo 'Remove the directory ~/pcam_with_dvc_cc.'
-    rm -rf ~/pcam_with_dvc_cc
+    echo 'Remove the directory ~/pcam_with_dvc_cc_sshfs.'
+    rm -rf ~/pcam_with_dvc_cc_sshfs
 fi
 
 #cd ~/Documents/github/dvc-cc-NEW/tests/
@@ -19,8 +20,8 @@ fi
 
 
 
-mkdir ~/pcam_with_dvc_cc
-cd ~/pcam_with_dvc_cc
+mkdir ~/pcam_with_dvc_cc_sshfs
+cd ~/pcam_with_dvc_cc_sshfs
 
 
 echo "			#########################"
@@ -34,22 +35,22 @@ gl = gitlab.Gitlab('https://git.tools.f4.htw-berlin.de/',private_token='1oxzXp1M
 gl.auth()
 
 try:
-    gl_id = gl.projects.get('annusch/pcam_with_dvc_cc').get_id()
+    gl_id = gl.projects.get('annusch/pcam_with_dvc_cc_sshfs').get_id()
     gl.projects.delete(gl_id)
     time.sleep(5)
-    print('Deleted the git repo: pcam_with_dvc_cc')
+    print('Deleted the git repo: pcam_with_dvc_cc_sshfs')
 except:
     print('No git repo found.')
 
-project = gl.projects.create({'name': 'pcam_with_dvc_cc'})" >> ~/pcam_with_dvc_cc/create_git_repo.py
+project = gl.projects.create({'name': 'pcam_with_dvc_cc_sshfs'})" >> ~/pcam_with_dvc_cc_sshfs/create_git_repo.py
 
-python ~/pcam_with_dvc_cc/create_git_repo.py
+python ~/pcam_with_dvc_cc_sshfs/create_git_repo.py
 
 # Save the git credential
 git config --global credential.helper 'cache --timeout 1000'
 
 # clone empty git repository
-git clone https://git.tools.f4.htw-berlin.de/annusch/pcam_with_dvc_cc.git repo
+git clone https://git.tools.f4.htw-berlin.de/annusch/pcam_with_dvc_cc_sshfs.git repo
 
 cd repo
 
@@ -60,7 +61,7 @@ echo "			###############"
 dvc-cc init
 
 git add -A
-git commit -m 'init project'
+git commit -m 'init project, with "dvc-cc init"'
 
 git push --set-upstream origin master
 
@@ -68,7 +69,7 @@ echo "			##################"
 echo "			# 3. Step:       #"
 echo "			# SET DVC-CC-URL #"
 echo "			##################"
-dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/pcam_with_dvc_cc
+dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/pcam_with_dvc_cc_sshfs
 dvc remote modify dvc_connection ask_password true
 dvc push
 dvc pull
@@ -81,6 +82,9 @@ echo "			######################################"
 mkdir dvc
 mkdir code
 mkdir data
+
+sshfs annusch@avocado01.f4.htw-berlin.de:/data/ldap/jonas/pcam_with_dvc_cc_sshfs_DATA ~/pcam_with_dvc_cc_sshfs/repo/data/
+
 echo "
 set -eu
 
@@ -118,20 +122,13 @@ echo "			# 4.1 Step:               #"
 echo "			# Download PCAM-Datensatz #"
 echo "			###########################"
 
-DOWNLOAD=1
-
+DOWNLOAD=0
 if [ "$DOWNLOAD" -eq 1 ]
 then
-    dvc run -d code/download_pcam_dataset.sh -o data/camelyonpatch_level_2_split_test_meta.csv -o data/camelyonpatch_level_2_split_train_meta.csv -o data/camelyonpatch_level_2_split_valid_meta.csv -o data/camelyonpatch_level_2_split_test_x.h5 -o data/camelyonpatch_level_2_split_train_x.h5 -o data/camelyonpatch_level_2_split_valid_x.h5 -o data/camelyonpatch_level_2_split_test_y.h5 -o data/camelyonpatch_level_2_split_train_y.h5 -o data/camelyonpatch_level_2_split_valid_y.h5 -f dvc/download_pcam_dataset.dvc --no-exec sh code/download_pcam_dataset.sh
-
-    dvc repro -P
-    dvc push
+    dvc run -d code/download_pcam_dataset.sh -O data/camelyonpatch_level_2_split_test_meta.csv -O data/camelyonpatch_level_2_split_train_meta.csv -O data/camelyonpatch_level_2_split_valid_meta.csv -O data/camelyonpatch_level_2_split_test_x.h5 -O data/camelyonpatch_level_2_split_train_x.h5 -O data/camelyonpatch_level_2_split_valid_x.h5 -O data/camelyonpatch_level_2_split_test_y.h5 -O data/camelyonpatch_level_2_split_train_y.h5 -O data/camelyonpatch_level_2_split_valid_y.h5 -f dvc/download_pcam_dataset.dvc --no-exec sh code/download_pcam_dataset.sh
 fi
 
-echo "			####################################################"
-echo "			# 4.2 Step:                                        #"
-echo "			# Cheat: Use the DVC-File that was created earlier #"
-echo "			####################################################"
+
 
 if [ "$DOWNLOAD" -eq 0 ]
 then
@@ -140,74 +137,83 @@ then
 wdir: ..
 deps:
 - path: code/download_pcam_dataset.sh
-  md5: 5bc12eddeda6dcf151cb45ae39d6cc2b
+  md5: 0319785babf8e5321a2553d5c8fc39ef
 outs:
 - path: data/camelyonpatch_level_2_split_test_meta.csv
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 3455fd69135b66734e1008f3af684566
 - path: data/camelyonpatch_level_2_split_train_meta.csv
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 5a3dd671e465cfd74b5b822125e65b0a
 - path: data/camelyonpatch_level_2_split_valid_meta.csv
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 67589e00a4a37ec317f2d1932c7502ca
 - path: data/camelyonpatch_level_2_split_test_x.h5
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 2614b2e6717d6356be141d9d6dbfcb7e
 - path: data/camelyonpatch_level_2_split_train_x.h5
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 01844da899645b4d6f84946d417ba453
 - path: data/camelyonpatch_level_2_split_valid_x.h5
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 81cf9680f1724c40673f10dc88e909b1
 - path: data/camelyonpatch_level_2_split_test_y.h5
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 11ed647efe9fe457a4eb45df1dba19ba
 - path: data/camelyonpatch_level_2_split_train_y.h5
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 0781386bf6c2fb62d58ff18891466aca
 - path: data/camelyonpatch_level_2_split_valid_y.h5
-  cache: true
+  cache: false
   metric: false
   persist: false
   md5: 94d8aacc249253159ce2a2e78a86e658
-md5: be8e94a1e0938d84c07e510cd822bdb7" > dvc/download_pcam_dataset.dvc
+md5: 6c6f9823f5d28d2ec2175edcf7ce212a" > dvc/download_pcam_dataset.dvc
     dvc pull
-    echo "data
-.idea" > .gitignore
+    
 fi
+
+echo "data
+.idea" > .gitignore
+
+dvc repro -P
+dvc push
+
+
+
+
 
 # copy training file !
 cd $STARTINGDIR
-cp data_for_testscript4/train.ipynb ~/pcam_with_dvc_cc/repo/code/train.ipynb
+cp data_for_testscript4/train.ipynb ~/pcam_with_dvc_cc_sshfs/repo/code/train.ipynb
 
 # start some jobs
-cd ~/pcam_with_dvc_cc/repo
+cd ~/pcam_with_dvc_cc_sshfs/repo
 git add -A
-git commit -m 'add train.ipynb'
+git commit -m 'add code/train.py'
 
 # RUN ONE - WITHOUT HAVING THE DOWNLOADED DATA IN THE CACHE !!!
 dvc run --no-exec -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyonpatch_level_2_split_train_y.h5 -d data/camelyonpatch_level_2_split_valid_x.h5 -d data/camelyonpatch_level_2_split_valid_y.h5 -o tf_models/tf_model.h5 -o tensorboards/tb -o outputs/all-history.json -o outputs/history-summary.json -f dvc/train_network.dvc --overwrite-dvcfile python code/train.py -lr 0.1
 
 git add dvc/train_network.dvc
 
-dvc-cc run -nb 'learning_rate_0.1'
+dvc-cc run 'first_test'
 
 sleep 60
 
@@ -218,7 +224,7 @@ dvc run --no-exec -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyo
 
 git add dvc/train_network.dvc
 
-dvc-cc run -r 10 -nb 'try_learning_rate_0.2'
+dvc-cc run -r 2 -nb 'try_learning_rate_0.2'
 
 
 
@@ -228,7 +234,7 @@ dvc run --no-exec -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyo
 
 git add dvc/train_network.dvc
 
-dvc-cc run -r 10 -nb 'try_learning_rate_0.5'
+dvc-cc run -r 2 -nb 'try_learning_rate_0.5'
 
 
 
@@ -238,7 +244,7 @@ dvc run --no-exec -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyo
 
 git add dvc/train_network.dvc
 
-dvc-cc run -r 10 -nb 'try_learning_rate_0.1'
+dvc-cc run -r 2 -nb 'try_learning_rate_0.1'
 
 
 
@@ -250,7 +256,7 @@ dvc run --no-exec -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyo
 
 git add dvc/train_network.dvc
 
-dvc-cc run -r 10 -nb 'try_learning_rate_0.05'
+dvc-cc run -r 2 -nb 'try_learning_rate_0.05'
 
 
 
@@ -262,7 +268,7 @@ dvc run --no-exec -d data/camelyonpatch_level_2_split_train_x.h5 -d data/camelyo
 
 git add dvc/train_network.dvc
 
-dvc-cc run -r 10 -nb 'try_learning_rate_0.01'
+dvc-cc run -r 2 -nb 'try_learning_rate_0.01'
 
 
 
