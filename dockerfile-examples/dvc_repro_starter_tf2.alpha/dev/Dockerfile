@@ -49,11 +49,11 @@ RUN pip --no-cache-dir install \
         dvc \
         paramiko
 
-RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector!'
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector !'
 
-RUN pip install https://github.com/mastaer/dvc-cc/releases/download/cc-connector-variable-to-file-0.1.0/cc_connector_variable_to_file-0.1.0-py3-none-any.whl
+RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_agent-0.3.0-py3-none-any.whl
 
-RUN pip install https://github.com/mastaer/dvc-cc/releases/download/dvc-cc-server-0.1.0/dvc_cc_server-0.1.0-py3-none-any.whl
+RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_connector-0.3.0-py3-none-any.whl
 
 WORKDIR home/cc/
 
