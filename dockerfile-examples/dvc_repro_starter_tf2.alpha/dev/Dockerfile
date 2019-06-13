@@ -64,7 +64,7 @@ RUN pip --no-cache-dir install \
 
 #RUN mkdir /home/cc/.local
 
-RUN echo 'START HERE 5'
+RUN echo 'START HERE 6'
 
 RUN pip install https://github.com/mastaer/dvc-cc/releases/download/cc-connector-variable-to-file-0.1.0/cc_connector_variable_to_file-0.1.0-py3-none-any.whl
 

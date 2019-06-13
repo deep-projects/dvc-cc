@@ -116,7 +116,7 @@ def get_all_dvc_files_that_are_not_needed(dvc_filenames):
     return [s for s in all_stages if s not in descendants_stages]
 
 def main():
-    print('Start executer-python [version 0.2]')
+    print('Start executer-python [version 0.1]')
 
     parser = ArgumentParser()
 
