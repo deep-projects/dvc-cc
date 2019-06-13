@@ -124,16 +124,16 @@ def main():
     
     parser = ArgumentParser()
     
-    parser.add_argument('git_authentication_json', help='')
-    parser.add_argument('git_path_to_working_repository', help='')
-    parser.add_argument('git_working_repository_owner', help='')
-    parser.add_argument('git_working_repository_name', help='')
-    parser.add_argument('git_name_of_tag', help='')
-    parser.add_argument('dvc_authentication_json', help='')
-    parser.add_argument('dvc_servername', help='')
-    parser.add_argument('dvc_path_to_working_repository', help='')
-    parser.add_argument('--data_dir', default=None, help='')
-    parser.add_argument('--dvc_file_to_execute', default=None, help='')
+    parser.add_argument('git_authentication_json', help='A path to json file which contains the git authentication. This should include the keys: username. email and password.')
+    parser.add_argument('git_path_to_working_repository', help='The git working directory. With this you can specify what the main git root is.')
+    parser.add_argument('git_working_repository_owner', help='The name of the owner of the git repository which you want to execute.')
+    parser.add_argument('git_working_repository_name', help='The git repository name.')
+    parser.add_argument('git_name_of_tag', help='The source code jumps to this here defined git tag (with git checkout) and execute dvc repro there.')
+    parser.add_argument('dvc_authentication_json', help='A path to json file which contains the dvc authentication. This should include the keys: username and password.')
+    parser.add_argument('dvc_servername', help='The servername of the dvc directory.')
+    parser.add_argument('dvc_path_to_working_repository', help='The directory that is used for the dvc script.')
+    parser.add_argument('--data_dir', default=None, help='This is optional parameter. Here you can specify a sshfs folder for the \"data\" folder.')
+    parser.add_argument('--dvc_file_to_execute', default=None, help='This is optional parameter. If this parameter is given it will run \"dvc repro DVC_FILE_TO_EXECUTE\". Is this parameter is not set it will run \"dvc repro -P\"')
     
     
     args = parser.parse_args()
