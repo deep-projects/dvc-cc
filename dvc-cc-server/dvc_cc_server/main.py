@@ -43,7 +43,9 @@ def collabs_text(title, text):
 def write_readme(dvc_status):
     with open('README.md',"w") as f:
         print('## DVC-Status before execution', file=f)
+        print('```', file=f)
         print(collabs_text('DVC-STATUS', dvc_status),file=f)
+        print('```', file=f)
         print('## About DVC-CC', file=f)
         print('This branch was automated created with the Software DVC-CC. This Software allows you to use Data Version Control System for Machine Learning Projects (DVC) and Curious Containers (CC). DVC makes is possible to define a Machine Learning Pipeline, so that everybody can reproduce some results. Curious Containers make sure that the script is running in a docker container which was configurated to handle DVC projects.', file=f)
         print()

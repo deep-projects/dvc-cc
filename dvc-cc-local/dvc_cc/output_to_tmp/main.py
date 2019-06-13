@@ -60,7 +60,7 @@ def check_out_if_its_valid(out, regex_name_of_file=None, ex_regex_name_of_file=N
 
     # check if file does not match regex. If is_a_valid_file is still True, than this is a file of interest.
     if regex_name_of_file is not None:
-        if not re.match(args.regex_name_of_file, out.rel_path):
+        if not re.match(regex_name_of_file, out.rel_path):
             return possible_status_messages[1]
 
     if ex_regex_name_of_file is not None:
@@ -122,6 +122,7 @@ def main():
         file_counter = 0
         saved_files = {}
         for branch in repo.brancher(all_branches=True):
+            print('##########################################'+branch)
             if branch != 'Working Tree':
                 print(branch)
                 g.checkout(branch)
@@ -189,7 +190,10 @@ def main():
                                 for cache in out.dir_cache:
                                     dirfile_cache_path = repo.cache.local.get(cache['md5'])
                                     dirfile_outpath = os.path.join(out_filepath,cache['relpath'])
-                                    os.link(dirfile_cache_path, dirfile_outpath)
+                                    try:
+                                        os.link(dirfile_cache_path, dirfile_outpath)
+                                    except:
+                                        print('Could not make a link to this file. (Subfolders are not allowed.)')
 
                         file_counter += 1
         

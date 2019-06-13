@@ -10,6 +10,8 @@ from dvc_cc.git.branch import DESCRIPTION as GIT_BRANCH_DESCRIPTION
 
 from dvc_cc.git.commit_and_push import main as commit_and_push_main
 from dvc_cc.git.commit_and_push import DESCRIPTION as COMMIT_AND_PUSH_DESCRIPTION
+from dvc_cc.git.sync import main as sync_main
+from dvc_cc.git.sync import DESCRIPTION as SYNC_DESCRIPTION
 
 #from dvc_cc.job.main import main as job_main
 #from dvc_cc.job.main import DESCRIPTION as JOB_DESCRIPTION
@@ -20,6 +22,7 @@ DESCRIPTION = 'Scripts to make working with git easier.'
 MODES = OrderedDict([
     ('commit-and-push', {'main': commit_and_push_main, 'description': COMMIT_AND_PUSH_DESCRIPTION}),
     ('branch', {'main': git_branch, 'description': GIT_BRANCH_DESCRIPTION}),
+    ('sync', {'main': sync_main, 'description': SYNC_DESCRIPTION}),
     #('checkout', {'main': red_main, 'description': RED_DESCRIPTION})
 ])
 
