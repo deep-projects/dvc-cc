@@ -40,9 +40,11 @@ def collabs_text(title, text):
     posttext = '\n\n</p>\n</details>\n\n'
     return pretext+text+posttext
 
-def write_readme():
+def write_readme(dvc_status):
     with open('README.md',"w") as f:
-        print('## About DVC-CC')
+        print('## DVC-Status before execution', file=f)
+        print(collabs_text('DVC-STATUS', dvc_status),file=f)
+        print('## About DVC-CC', file=f)
         print('This branch was automated created with the Software DVC-CC. This Software allows you to use Data Version Control System for Machine Learning Projects (DVC) and Curious Containers (CC). DVC makes is possible to define a Machine Learning Pipeline, so that everybody can reproduce some results. Curious Containers make sure that the script is running in a docker container which was configurated to handle DVC projects.', file=f)
         print()
 
@@ -204,6 +206,10 @@ def main():
         print('\t'+command)
         print(subprocess.check_output(command, shell=True).decode())
     
+    # check dvc status
+    command = 'dvc status -c'
+    dvc_status = subprocess.check_output(command, shell=True).decode()
+
     if dvc_files_to_execute is not None:
         for f in dvc_files_to_execute:
             if f.endswith('.dvc'):
@@ -238,7 +244,7 @@ def main():
     shutil.rmtree('.dvc_cc')
     
     print('WRITE README.md')
-    write_readme()
+    write_readme(dvc_status)
     
     print('GIT-ADD ' + get_time())
     command = "git add -A"
