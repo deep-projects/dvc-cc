@@ -17,7 +17,7 @@ def receive_file_validate(access):
         exit(1) # or: raise
 
 def cli_version():
-    print('0.3')
+    print('0.1')
 
 def main():
     
