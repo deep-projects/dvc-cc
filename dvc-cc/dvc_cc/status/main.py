@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 import datetime
 import pandas
 import time
+import numpy as np
 
 class bcolors:
     HEADER = '\033[95m'
@@ -93,8 +94,9 @@ def main():
     parser.add_argument('-id','--show-ids', help='Show the curious containers id of the experiment and curious containers id of the sub-experiments.', default=False, action='store_true')
     parser.add_argument('-s','--summary', help='Summary the Output.', default=False, action='store_true')
     parser.add_argument('-d','--detail', help='Show all details and outputs for the sub experiments.', default=False, action='store_true')
-    parser.add_argument('-e','--list-of-experimentids', help='A list of experiment ids that you want include in the display.', nargs="+", type=int)
-    parser.add_argument('-p','--list-of-position-of-the-subprojects', help='A list of positions of the subproject that you want include in the display.', nargs="+", type=int)
+    parser.add_argument('-c','--list-of-cc-ids', help='A list of cc experiment ids that you want include in the display.', nargs="+", type=str)
+    parser.add_argument('-p','--list-of-pos', help='A list of cc experiment ids that you want include in the display.', nargs="+", type=int)
+    parser.add_argument('-sub_p','--list-of-position-of-the-subprojects', help='A list of positions of the subproject that you want include in the display.', nargs="+", type=int)
     parser.add_argument('-f','--only-failed', help='Show only failed experiments.', default=False, action='store_true')
     parser.add_argument('-ne','--only-not-executed', help='Show only not executed experiments.', default=False, action='store_true')
     parser.add_argument('--node', help='Show all nodes in the cluster. If you run this command, it will ignore all other paramters!', default=False, action='store_true')
@@ -103,11 +105,17 @@ def main():
     # Change the directory to the main git directory.
     os.chdir(get_main_git_directory_path())
 
-    # TODO CHECK IF THIS IS SAVED, ELSE ASK FOR IT !!!
-    pw = keyring.get_password('red', 'agency_password')
     uname = keyring.get_password('red', 'agency_username')
+    pw = keyring.get_password('red', 'agency_password')
+    if uname == None:
+        uname = input('Please specifiy the agency_username: ')
+        pw = input('Please specifiy the agency_password: ')
+        save = input('Do you want to save it? [y/n]')
+        if save.lower().startswith('y'):
+            keyring.get_password('red', 'agency_username', uname)
+            keyring.get_password('red', 'agency_password', pw)
     auth = (uname, pw)
-
+        
 
     execution_engine = read_execution_engine()
 
@@ -128,8 +136,6 @@ def main():
         experimentsIDS = [[e,experiments[e]['id']] for e in experiments if experiments[e]['id'] is None]
         print(pandas.DataFrame(experimentsIDS, columns=['experiment_name', 'ID']).to_string())
         exit(0)
-
-
 
 
     experimentsIDS = pandas.DataFrame([[e,experiments[e]['id']] for e in experiments if experiments[e]['id'] is not None], columns=['experiment_name','experimentId'])
@@ -159,8 +165,19 @@ def main():
     # TODO: SOMETHING IS WRONG WITH THE ORDER !!!
 
     if args.all == False:
-        if args.list_of_experimentids is not None:
-            experiments = experiments[experiments['experimentId'].isin(args.list_of_experimentids)]
+
+        if args.list_of_cc_ids is not None:
+            experiments = experiments[experiments['experimentId'].isin(args.list_of_cc_ids)]
+            if args.number_of_experiments is not None and args.number_of_experiments > 0 and len(args.list_of_cc_ids) > args.number_of_experiments:
+                args.number_of_experiments = len(args.list_of_cc_ids)
+
+        if args.list_of_pos is not None:
+            # convert negative values to count from back.
+            list_of_pos = np.array(args.list_of_pos)
+            list_of_pos[list_of_pos < 0] = 1 + np.array(experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]),axis=1).max()) + list_of_pos[list_of_pos < 0]
+            experiments = experiments[experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]) in list_of_pos, axis=1)]
+            if args.number_of_experiments is not None and args.number_of_experiments > 0 and len(args.list_of_pos) > args.number_of_experiments:
+                args.number_of_experiments = len(args.list_of_pos)
 
         grouped = experiments.groupby('experimentId')
 
