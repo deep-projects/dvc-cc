@@ -169,12 +169,18 @@ def main():
             grouped = list(grouped)
         if args.number_of_experiments is not None and args.number_of_experiments > 0:
             grouped = grouped[-args.number_of_experiments:]
-
+        if len(grouped) <= 0:
+            print(bcolors.WARNING+'Warning: No jobs matching your search were found.'+bcolors.ENDC)
+            exit(0)
         df = grouped[0][1]
         for i in range(1,len(grouped)):
             df = df.append(grouped[i][1])
     else:
         df = experiments
+
+    if len(df) <= 0:
+        print(bcolors.WARNING+'Warning: No jobs matching your search were found.'+bcolors.ENDC)
+        exit(0)
 
     # replace strings
     ids = df['_id'].copy()
@@ -205,10 +211,6 @@ def main():
             print(bcolors.OKGREEN+'# %59s #' % ('batch id: ' + d['_id']) +bcolors.ENDC)
             print(bcolors.OKGREEN+'#'*63+bcolors.ENDC)
         
-
-
-
-
             print(bcolors.OKGREEN+'State: '+bcolors.ENDC + d['state'])
 
             for h in detail['history']:
