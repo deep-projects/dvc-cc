@@ -134,9 +134,14 @@ def main():
 
     experimentsIDS = pandas.DataFrame([[e,experiments[e]['id']] for e in experiments if experiments[e]['id'] is not None], columns=['experiment_name','experimentId'])
 
+    if args.only_failed:
+        requesting_string = execution_engine+'/batches?state=failed'
+    else:
+        requesting_string = execution_engine+'/batches'
+
     # get all experiments:
     r = requests.get(
-        execution_engine+'/batches',
+        requesting_string,
         auth=auth
     )
     all_time_experiments = pandas.DataFrame(r.json())
@@ -150,6 +155,8 @@ def main():
         experiments = pandas.merge(experimentsIDS, all_time_experiments, how='inner')
 
     experiments = experiments
+
+    # TODO: SOMETHING IS WRONG WITH THE ORDER !!!
 
     if args.all == False:
         if args.list_of_experimentids is not None:
