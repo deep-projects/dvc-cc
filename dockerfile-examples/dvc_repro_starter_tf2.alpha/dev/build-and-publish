@@ -2,7 +2,7 @@
 
 set -eu
 
-IMAGE=docker.io/deepprojects/camelyon-cnns:dev
+IMAGE=docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev
 
 docker build --pull -t ${IMAGE} .
 docker push ${IMAGE}

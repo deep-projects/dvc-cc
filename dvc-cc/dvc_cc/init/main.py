@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from collections import OrderedDict
 from dvc_cc.version import VERSION
 from dvc_cc.cli_modes import cli_modes
-
+import yaml
 import subprocess
 import os
 
@@ -112,7 +112,7 @@ def create_cc_config_file(args):
         print("  settings:", file=f)
         print("    gpus: {count: "+str(args.num_of_gpus)+"}", file=f)
         # TODO: ASK FOR THIS!
-        print("    image: {url: 'dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev', auth: {password: '{{cbmi_password}}', username: '{{cbmi_username}}'}}", file=f)
+        print("    image: {url: 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'}", file=f)
         print("    ram: "+str(args.ram), file=f)
         print("execution:", file=f)
         print("  engine: ccagency", file=f)

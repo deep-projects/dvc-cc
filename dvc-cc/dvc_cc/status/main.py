@@ -96,9 +96,9 @@ def print_detail(experiments, show_ids = False):
                     print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
             print()
 
-def show_nodes(auth):
+def show_nodes(auth,execution_engine):
     r = requests.get(
-        'https://agency.f4.htw-berlin.de/cc/nodes',
+        execution_engine+'/nodes',
         auth=auth
     )
     r.raise_for_status()
@@ -145,10 +145,16 @@ def show_nodes(auth):
                         ))
         else:
 
+
             print(('%30s   '+bcolors.BOLD+'RAM:'+bcolors.ENDC+'%20s GB    '+bcolors.BOLD+'Num of Jobs:'+bcolors.ENDC+'%5s') % (n['nodeName'] + ' (' + state + ')',
                             ram,
                             len(n['currentBatches'])
-                        ))
+                            ))
+
+def read_execution_engine():
+    with open('.dvc_cc/cc_config.yml') as f:
+        y = yaml.safe_load(f.read())
+    return y['execution']['settings']['access']['url']
 
 
 def main():
@@ -171,8 +177,12 @@ def main():
     uname = keyring.get_password('red', 'agency_username')
     auth = (uname, pw)
 
+
+    execution_engine = read_execution_engine()
+
+
     if args.node:
-        show_nodes(auth)
+        show_nodes(auth,execution_engine)
         exit(0)
 
     if os.path.exists('.dvc_cc/cc_agency_experiments.yml'):
@@ -196,7 +206,7 @@ def main():
                 experiments.pop(k, None)
             else:
                 r = requests.get(
-                    'https://agency.f4.htw-berlin.de/cc/batches?experimentId={}'.format(id_of_experiment),
+                    execution_engine+'/batches?experimentId={}'.format(id_of_experiment),
                     auth=auth
                 )
                 r.raise_for_status()
@@ -204,7 +214,7 @@ def main():
 
                 for i in range(len(data)):
                     r = requests.get(
-                          'https://agency.f4.htw-berlin.de/cc/batches/{}'.format(data[i]['_id']),
+                          execution_engine+'/batches/{}'.format(data[i]['_id']),
                           auth=auth
                     )
                     r.raise_for_status()
