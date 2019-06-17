@@ -80,7 +80,6 @@ def check_out_if_its_valid(out, regex_name_of_file=None, ex_regex_name_of_file=N
 
 
 def main():
-
     parser = ArgumentParser(description='Process some integers.')
     parser.add_argument('-f','--regex-name-of-file', type=str, default = None,
                         help='A regex of the name of the files that you want to find.')
@@ -99,7 +98,7 @@ def main():
     parser.add_argument('-d', '--download-stages', dest='download_stages', action='store_true', default=False,
                         help='Download a stage if the file is not in the local cache.')
     parser.add_argument('--allow-dir', dest='allow_dir', action='store_true', default=False,
-                        help='If dir outputs should be included or not. This works only for flat folders. It will not work for sub directories!')
+                        help='If dir outputs should be included or not.')
     parser.add_argument('-ns','--no-save', dest='no_save', action='store_true', default=False,
                         help='If true, it will not create a folder or link the file. This parameter is helpfull if it is used with --debug to test your regular expressions.')
     parser.add_argument('-nw','--no-print-of-warnings', dest='no_warning', action='store_true', default=False,
@@ -190,10 +189,8 @@ def main():
                                 for cache in out.dir_cache:
                                     dirfile_cache_path = repo.cache.local.get(cache['md5'])
                                     dirfile_outpath = os.path.join(out_filepath,cache['relpath'])
-                                    try:
-                                        os.link(dirfile_cache_path, dirfile_outpath)
-                                    except:
-                                        print('Could not make a link to this file. (Subfolders are not allowed.)')
+                                    os.makedirs(os.path.dirname(dirfile_outpath), exist_ok=True)
+                                    os.link(dirfile_cache_path, dirfile_outpath)
 
                         file_counter += 1
         

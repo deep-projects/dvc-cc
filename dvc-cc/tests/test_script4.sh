@@ -60,7 +60,7 @@ echo "			###############"
 dvc-cc init
 
 git add -A
-git commit -m 'init project'
+git commit -m 'init project with "dvc-cc init"'
 
 git push --set-upstream origin master
 
