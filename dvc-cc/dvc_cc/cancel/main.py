@@ -4,8 +4,14 @@ import keyring
 import requests
 import json
 import numpy as np
+import yaml
 
 DESCRIPTION = 'This script can cancel running jobs. This script do not cancel jobs that are NOT pushed to run in the cloud.'
+
+def read_execution_engine():
+    with open('.dvc_cc/cc_config.yml') as f:
+        y = yaml.safe_load(f.read())
+    return y['execution']['settings']['access']['url']
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
@@ -20,12 +26,14 @@ def main():
     uname = keyring.get_password('red', 'agency_username')
     auth = (uname, pw)
 
+    execution_engine = read_execution_engine()
+
     if args.last or args.last_n is not None:
         if args.last_n is None:
             args.last_n = 1
 
         r = requests.get(
-            'https://agency.f4.htw-berlin.de/cc/experiments',
+            execution_engine+'/experiments',
             auth=auth
         )
         r.raise_for_status()
@@ -50,7 +58,7 @@ def main():
     if args.experiment_ids is not None and len(args.experiment_ids) > 0:
         for i in range(len(args.experiment_ids)):
             r = requests.get(
-                'https://agency.f4.htw-berlin.de/cc/batches?experimentId={}'.format(args.experiment_ids[i]),
+                execution_engine+'/batches?experimentId={}'.format(args.experiment_ids[i]),
                 auth=auth
             )
             r.raise_for_status()
@@ -62,7 +70,7 @@ def main():
 
     if args.all:
         r = requests.get(
-            'https://agency.f4.htw-berlin.de/cc/batches',
+            execution_engine+'/batches',
             auth=auth
         )
         r.raise_for_status()
@@ -73,9 +81,9 @@ def main():
         
 
     for sid in sids:
-        print('DELETE Job: https://agency.f4.htw-berlin.de/cc/batches/'+sid)
+        print('DELETE Job: '+execution_engine+'/batches/'+sid)
         r = requests.delete(
-            'https://agency.f4.htw-berlin.de/cc/batches/'+sid,
+            execution_engine+'/batches/'+sid,
             auth=auth
         )
         r.raise_for_status()

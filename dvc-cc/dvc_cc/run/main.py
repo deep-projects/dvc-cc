@@ -19,6 +19,11 @@ import requests
 
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker.'
 
+def read_execution_engine():
+    with open('.dvc_cc/cc_config.yml') as f:
+        y = yaml.safe_load(f.read())
+    return y['execution']['settings']['access']['url']
+
 def get_main_git_directory_path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
@@ -205,7 +210,7 @@ def get_last_cc_experimentid():
     auth = (uname, pw)
 
     r = requests.get(
-        'https://agency.f4.htw-berlin.de/cc/experiments',
+        read_execution_engine()+'/experiments',
         auth=auth
     )
     r.raise_for_status()
