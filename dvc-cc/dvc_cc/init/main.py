@@ -49,10 +49,10 @@ def main():
             else:
                 print('Warning: Did not understand your answer. Please use integer values i.e. 10,100,...')
                 ram = None
-        docker_image = input('docker_image default (dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev): ')
+        docker_image = input('docker_image default (docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev): ')
         # TODO check the input string...
         if docker_image == '':
-            docker_image = 'dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev'
+            docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'
             docker_image_needs_credentials = False
         else:
             docker_image_needs_credentials = None
@@ -77,10 +77,10 @@ def main():
                 print('Warning: Did not understand your answer. Please use integer values i.e. 1,4,12,...')
                 batch_concurrency_limit = None
 
-        engine = input('The engine you want to use (default: ccagency)')
+        engine = input('The engine you want to use (default: ccagency): ')
         if engine == '':
             engine = 'ccagency'
-        engine_url = input('The engine-url you want to use (default: https://agency.f4.htw-berlin.de/cc)')
+        engine_url = input('The engine-url you want to use (default: https://agency.f4.htw-berlin.de/cc): ')
         if engine_url == '':
             engine_url = 'https://agency.f4.htw-berlin.de/cc'
 
@@ -88,7 +88,7 @@ def main():
         # set default values
         num_of_gpus = 0 ##
         ram = 131072
-        docker_image = 'dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev'
+        docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'
         docker_image_needs_credentials = False
         batch_concurrency_limit = 12
         engine = 'ccagency'
