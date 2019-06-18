@@ -20,8 +20,8 @@ SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
 DESCRIPTION = 'Scripts to make working with git easier.'
 MODES = OrderedDict([
-    ('commit-and-push', {'main': commit_and_push_main, 'description': COMMIT_AND_PUSH_DESCRIPTION}),
-    ('branch', {'main': git_branch, 'description': GIT_BRANCH_DESCRIPTION}),
+    #('commit-and-push', {'main': commit_and_push_main, 'description': COMMIT_AND_PUSH_DESCRIPTION}),
+    #('branch', {'main': git_branch, 'description': GIT_BRANCH_DESCRIPTION}),
     ('sync', {'main': sync_main, 'description': SYNC_DESCRIPTION}),
     #('checkout', {'main': red_main, 'description': RED_DESCRIPTION})
 ])
