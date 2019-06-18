@@ -100,6 +100,7 @@ def main():
     parser.add_argument('-f','--only-failed', help='Show only failed experiments.', default=False, action='store_true')
     parser.add_argument('-ne','--only-not-executed', help='Show only not executed experiments.', default=False, action='store_true')
     parser.add_argument('--node', help='Show all nodes in the cluster. If you run this command, it will ignore all other paramters!', default=False, action='store_true')
+    parser.add_argument('--detail-unchanged', help='Print the orignal CC output', default=False, action='store_true')
     args = parser.parse_args()
     
     # Change the directory to the main git directory.
@@ -214,6 +215,9 @@ def main():
     df['registrationTime'] = df['registrationTime'].apply(lambda x: time.ctime(int(x)))
     df['state'] = df['state'].replace(['succeeded', 'cancelled','failed','processing'],[bcolors.OKGREEN+'succeeded'+bcolors.ENDC,bcolors.WARNING+'cancelled'+bcolors.ENDC,bcolors.FAIL+'failed'+bcolors.ENDC,bcolors.OKBLUE+'processing'+bcolors.ENDC])
 
+    if args.detail_unchanged:
+        args.detail = True
+
     # print everything    
     if args.detail == False:
         if args.summary:
@@ -238,7 +242,6 @@ def main():
             print(bcolors.OKGREEN+'State: '+bcolors.ENDC + d['state'])
 
             for h in detail['history']:
-
                 print(bcolors.OKGREEN+'Time (' + h['state'] + '):  '+bcolors.ENDC + datetime.datetime.fromtimestamp(h['time']).strftime('%Y-%m-%d %H:%M:%S'))
             if d['state'].find('failed') >= 0 or d['state'].find('succeeded') >= 0 or d['state'].find('canceled') >= 0:
                 print(bcolors.OKGREEN+'Used server node: '+bcolors.ENDC + str(d['node']))
@@ -247,24 +250,27 @@ def main():
                         print(bcolors.OKGREEN+'Used GPUs: '+bcolors.ENDC + str(detail['usedGPUs'][0]))
                     else:
                         print(bcolors.OKGREEN+'Used GPUs: ' +bcolors.ENDC+ str(detail['usedGPUs']))
-
-                if detail['history'][-1]['ccagent'] is not None:
-                    c = detail['history'][-1]['ccagent']['command']
-                    if len(c) == 13:
-                        print(bcolors.OKGREEN +'Files: '+bcolors.ENDC + str(c[-1]))                    
+                if args.detail_unchanged == False:
+                    if detail['history'][-1]['ccagent'] is not None:
+                        c = detail['history'][-1]['ccagent']['command']
+                        if len(c) == 13:
+                            print(bcolors.OKGREEN +'Files: '+bcolors.ENDC + str(c[-1]))                    
+                        else:
+                            print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
+                        print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(detail['history'][-1]['ccagent']['process']['returnCode']))
+                        if args.summary is False:
+                            print()
+                            print(bcolors.OKGREEN + 'stdOut: ' + bcolors.ENDC)
+                            print('\n'.join(detail['history'][-1]['ccagent']['process']['stdOut']))
+                            print()
+                            print(bcolors.WARNING + 'stdErr: ' + bcolors.ENDC)
+                            print('\n'.join(detail['history'][-1]['ccagent']['process']['stdErr']))
+                            print()
                     else:
-                        print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
-                    print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(detail['history'][-1]['ccagent']['process']['returnCode']))
-                    if args.summary is False:
-                        print()
-                        print(bcolors.OKGREEN + 'stdOut: ' + bcolors.ENDC)
-                        print('\n'.join(detail['history'][-1]['ccagent']['process']['stdOut']))
-                        print()
-                        print(bcolors.WARNING + 'stdErr: ' + bcolors.ENDC)
-                        print('\n'.join(detail['history'][-1]['ccagent']['process']['stdErr']))
-                        print()
+                        print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
                 else:
-                    print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
+                    import json
+                    print(json.dumps(detail, sort_keys=True, indent=4))
             print()
 
 
