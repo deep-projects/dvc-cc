@@ -43,9 +43,9 @@ def main():
         while ram is None:
             ram = input('RAM in GB (default 100): ')
             if ram == '':
-                ram = 100
+                ram = 100000 # 100 GB
             elif ram.isdigit():
-                ram = int(ram)
+                ram = int(ram)*1000
             else:
                 print('Warning: Did not understand your answer. Please use integer values i.e. 10,100,...')
                 ram = None
@@ -72,7 +72,7 @@ def main():
             if batch_concurrency_limit == '':
                 batch_concurrency_limit = 12
             elif batch_concurrency_limit.isdigit():
-                batch_concurrency_limit = int(number_of_gpus)
+                batch_concurrency_limit = int(batch_concurrency_limit)
             else:
                 print('Warning: Did not understand your answer. Please use integer values i.e. 1,4,12,...')
                 batch_concurrency_limit = None
