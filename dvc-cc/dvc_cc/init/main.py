@@ -22,14 +22,79 @@ def get_main_git_directory_path():
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('-r','--ram', help='The ram that you need.',type=int,default=131072)
-    parser.add_argument('-T','--test', help='Run at cctest.',default=False, action='store_true')
-    parser.add_argument('-g','--num-of-gpus', help='The number of gpus that you need to ',type=int,default=1)
-    #TODO: implement sample projects?
-    #parser.add_argument('-ms', '--mini-sample', help='Creates a mini sample project.', default=False,action='store_true')
-    #parser.add_argument('-ls', '--large-sample', help='Creates a large sample project.', default=False,action='store_true')
+    parser.add_argument('--not-interactive', help='If this parameter is set, it will not ask the user for the parameters. All parameters are set to default values.',default=False, action='store_true')
     args = parser.parse_args()
-    
+
+    if not args.not_interactive:
+        print('Define the settings for this project:')
+
+        num_of_gpus = None
+        while num_of_gpus is None:
+            num_of_gpus = input('Number of GPUs (default 0): ')
+            if num_of_gpus == '':
+                num_of_gpus = 0
+            elif num_of_gpus.isdigit():
+                num_of_gpus = int(num_of_gpus)
+            else:
+                print('Warning: Did not understand your answer. Please use integer values i.e. 0,1,2,3,...')
+                num_of_gpus = None
+
+        ram = None
+        while ram is None:
+            ram = input('RAM in GB (default 100): ')
+            if ram == '':
+                ram = 100
+            elif ram.isdigit():
+                ram = int(ram)
+            else:
+                print('Warning: Did not understand your answer. Please use integer values i.e. 10,100,...')
+                ram = None
+        docker_image = input('docker_image default (dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev): ')
+        # TODO check the input string...
+        if docker_image == '':
+            docker_image = 'dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev'
+            docker_image_needs_credentials = False
+        else:
+            docker_image_needs_credentials = None
+            while docker_image_needs_credentials is None:
+                docker_image_needs_credentials = input('Does this docker image needs credentials? [y,n]:')
+                if docker_image_needs_credentials.lower().startswith('y'):
+                    docker_image_needs_credentials = True
+                elif docker_image_needs_credentials.lower().startswith('n'):
+                    docker_image_needs_credentials = False
+                else:
+                    print('Warning: Did not understand your answer. Please use y or n.')
+                    docker_image_needs_credentials = None
+
+        batch_concurrency_limit = None
+        while batch_concurrency_limit is None:
+            batch_concurrency_limit = input('Batch concurrency limit (default 12): ')
+            if batch_concurrency_limit == '':
+                batch_concurrency_limit = 12
+            elif batch_concurrency_limit.isdigit():
+                batch_concurrency_limit = int(number_of_gpus)
+            else:
+                print('Warning: Did not understand your answer. Please use integer values i.e. 1,4,12,...')
+                batch_concurrency_limit = None
+
+        engine = input('The engine you want to use (default: ccagency)')
+        if engine == '':
+            engine = 'ccagency'
+        engine_url = input('The engine-url you want to use (default: https://agency.f4.htw-berlin.de/cc)')
+        if engine_url == '':
+            engine_url = 'https://agency.f4.htw-berlin.de/cc'
+
+    else:
+        # set default values
+        num_of_gpus = 0 ##
+        ram = 131072
+        docker_image = 'dckr.f4.htw-berlin.de/deepprojects/dvc_repro_starter_tf2.alpha:dev'
+        docker_image_needs_credentials = False
+        batch_concurrency_limit = 12
+        engine = 'ccagency'
+        engine_url = 'https://agency.f4.htw-berlin.de/cc'
+
+
     # Change the directory to the main git directory.
     os.chdir(get_main_git_directory_path())
     
@@ -49,13 +114,15 @@ def main():
         os.mkdir('.dvc_cc')
     
     # create the config file.    
-    if not os.path.exists('.dvc_cc/cc_config.yml'):
-        create_cc_config_file(args)
-        subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
+    if os.path.exists('.dvc_cc/cc_config.yml'):
+        os.remove('.dvc_cc/cc_config.yml')
+
+    create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url)
+    subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
     #TODO: CREATE THE SAMPLE PROJECTS !!!
 
 
-def create_cc_config_file(args):
+def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url):
     #TODO: Allow interactive sessions.
     #TODO: Allow more parameters to set in the config.
     with open('.dvc_cc/cc_config.yml',"w") as f:
@@ -108,22 +175,28 @@ def create_cc_config_file(args):
     
         print("  outputs: {}", file=f)
         print("container:", file=f)
-        print("  engine: nvidia-docker", file=f)
+        if num_of_gpus == 0:
+            print("  engine: docker", file=f)
+        else:
+            print("  engine: nvidia-docker", file=f)
         print("  settings:", file=f)
-        print("    gpus: {count: "+str(args.num_of_gpus)+"}", file=f)
+        if num_of_gpus > 0:
+            print("    gpus: {count: "+str(num_of_gpus)+"}", file=f)
         # TODO: ASK FOR THIS!
-        print("    image: {url: 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'}", file=f)
-        print("    ram: "+str(args.ram), file=f)
+        print("    image:", file=f)
+        print("      url: '"+docker_image+"'", file=f)
+        if docker_image_needs_credentials:
+            print("      auth:", file=f)
+            print("        password: '{{docker_image_password}}'", file=f)
+            print("        username: '{{docker_image_username}}'", file=f)
+        print("    ram: "+str(ram), file=f)
         print("execution:", file=f)
-        print("  engine: ccagency", file=f)
+        print("  engine: " + engine, file=f)
         print("  settings:", file=f)
         print("    access:", file=f)
         print("      auth: {password: '{{agency_password}}', username: '{{agency_username}}'}", file=f)    
-        if args.test:
-            print("      url: https://agency.f4.htw-berlin.de/cctest", file=f)
-        else:
-            print("      url: https://agency.f4.htw-berlin.de/cc", file=f)
-        print("    batchConcurrencyLimit: 12", file=f)
+        print("      url: " + engine_url, file=f)
+        print("    batchConcurrencyLimit: "+str(batch_concurrency_limit), file=f)
         print("    retryIfFailed: false", file=f)
         print("redVersion: '7'", file=f)
         
