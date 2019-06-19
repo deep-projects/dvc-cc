@@ -9,6 +9,7 @@ from dvc.repo import Repo as DVCRepo
 from git import Git
 import subprocess
 import time
+import numpy as np
 
 DESCRIPTION = 'This script gives you the possibility to get all output files that match some regex over different branches and saves them in a tmp folder.'
 
@@ -89,6 +90,9 @@ def main():
                         help='A regex of the name of the branches to be included in the search.')
     parser.add_argument('-eb','--exclude-regex-name-of-branch', type=str, default = None,
                         help='A regex of the name of the branch that are excluded.')
+    parser.add_argument('-p', '--list-of-pos',
+                        help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.',
+                        nargs="+", type=str)
     parser.add_argument('-o','--path-to-output', type=str, default = None,
                         help='The path where you want save the files.')
     parser.add_argument('-r', '--rename-file', dest='rename_file', action='store_true', default=False,
@@ -117,6 +121,29 @@ def main():
     else:
         path_to_output = 'NONE'
 
+    list_of_allowed_dvccc_ids = None
+
+    if args.list_of_pos is not None:
+
+        list_of_allowed_dvccc_ids = []
+        for pos in args.list_of_pos:
+            try:
+                if pos.find(':') > -1:
+                    pos = np.array(pos.split(':'), dtype=int)
+                    list_of_allowed_dvccc_ids.extend(np.arange(*pos))
+                else:
+                    pos = int(pos)
+                    if pos >= 0:
+                        list_of_allowed_dvccc_ids.append(pos)
+                    else:
+                        raise ValueError('ERROR: The parameters ' + str(
+                            pos) + ' from --list-of-pos must be positive.')
+            except:
+                raise ValueError('ERROR: The parameters ' + str(
+                    pos) + ' from --list-of-pos must be an integer or a slicings. i.e.1: 12 14    i.e.2: 12:15:2')
+
+        list_of_allowed_dvccc_ids = np.array(list_of_allowed_dvccc_ids)
+
     try:
         file_counter = 0
         saved_files = {}
@@ -129,10 +156,19 @@ def main():
                 outs = []
                 branch_names = []
 
+                # check if this is a result branch:
+                is_dvccc_result_branch = branch.startswith('bcc_')
+
                 # search for all output files in the current branch
                 is_branch_of_interest1 = args.regex_name_of_branch is None or re.match(args.regex_name_of_branch, branch)
                 is_branch_of_interest2 = args.exclude_regex_name_of_branch is None or not re.match(args.exclude_regex_name_of_branch, branch)
-                if is_branch_of_interest1 and is_branch_of_interest2:
+
+                is_allowed_dvccc_id = True
+                if list_of_allowed_dvccc_ids is not None and is_dvccc_result_branch:
+                    if not int(branch.split('_')[1]) in list_of_allowed_dvccc_ids:
+                        is_allowed_dvccc_id = False
+
+                if is_branch_of_interest1 and is_branch_of_interest2 and is_dvccc_result_branch and is_allowed_dvccc_id:
                     for stage in repo.stages():
                         for out in stage.outs:
                             valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)
