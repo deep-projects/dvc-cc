@@ -95,7 +95,7 @@ def main():
     parser.add_argument('-s','--summary', help='Summary the Output.', default=False, action='store_true')
     parser.add_argument('-d','--detail', help='Show all details and outputs for the sub experiments.', default=False, action='store_true')
     parser.add_argument('-c','--list-of-cc-ids', help='A list of cc experiment ids that you want include in the display.', nargs="+", type=str)
-    parser.add_argument('-p','--list-of-pos', help='A list of cc experiment ids that you want include in the display.', nargs="+", type=int)
+    parser.add_argument('-p','--list-of-pos', help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.', nargs="+", type=str)
     parser.add_argument('-sub_p','--list-of-position-of-the-subprojects', help='A list of positions of the subproject that you want include in the display.', nargs="+", type=int)
     parser.add_argument('-f','--only-failed', help='Show only failed experiments.', default=False, action='store_true')
     parser.add_argument('-ne','--only-not-executed', help='Show only not executed experiments.', default=False, action='store_true')
@@ -173,12 +173,30 @@ def main():
                 args.number_of_experiments = len(args.list_of_cc_ids)
 
         if args.list_of_pos is not None:
-            # convert negative values to count from back.
-            list_of_pos = np.array(args.list_of_pos)
-            list_of_pos[list_of_pos < 0] = 1 + np.array(experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]),axis=1).max()) + list_of_pos[list_of_pos < 0]
-            experiments = experiments[experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]) in list_of_pos, axis=1)]
-            if args.number_of_experiments is not None and args.number_of_experiments > 0 and len(args.list_of_pos) > args.number_of_experiments:
-                args.number_of_experiments = len(args.list_of_pos)
+            max_dvccc_id = experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]),axis=1).max()
+
+            list_of_pos = []
+            for pos in args.list_of_pos:
+                try:
+                    if pos.find(':') > -1:
+                        pos = np.array(pos.split(':'),dtype=int)
+                        list_of_pos.extend(np.arange(*pos))
+                    else:
+                        pos = int(pos)
+                        if pos >= 0:
+                            list_of_pos.append(pos)
+                        else:
+                            list_of_pos.append(1 + max_dvccc_id - pos)
+                except:
+                    raise ValueError('ERROR: The parameters '+str(pos)+' from --list-of-pos must be an integer or a slicings. i.e.1: 12 14    i.e.2: 12:15:2')
+
+
+            list_of_pos = np.array(list_of_pos)
+            experiments = experiments[
+                experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]) in list_of_pos, axis=1)]
+
+            # ignore this parameter
+            args.number_of_experiments = -1
 
         grouped = experiments.groupby('experimentId')
 
