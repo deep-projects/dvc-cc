@@ -30,11 +30,14 @@ def main():
                 print(line)
     elif len(argv) == 1 and sys.argv[1] == 'sync':
         git_name_of_branch = get_name_of_branch()
+        _ = check_output(["git", "pull"]).decode("utf8").split("\n")
+
         all_branches = check_output(["git", "branch", '-a']).decode("utf8").split("\n")
-        for b in all_branches:
-            pos = b.find('remotes/origin/')
-            if pos >= 0:
-                b = b[pos+15:]
+        all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
+        all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
+     
+        for b in all_branches_remote:
+            if b not in all_branches_local:
                 print('git checkout '+ b)
                 _ = check_output(['git', 'checkout', b])
                 _ = check_output(['dvc', 'checkout'])
