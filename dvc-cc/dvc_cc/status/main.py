@@ -190,7 +190,6 @@ def main():
                 except:
                     raise ValueError('ERROR: The parameters '+str(pos)+' from --list-of-pos must be an integer or a slicings. i.e.1: 12 14    i.e.2: 12:15:2')
 
-
             list_of_pos = np.array(list_of_pos)
             experiments = experiments[
                 experiments.apply(lambda x: int(x['experiment_name'].split('_')[1]) in list_of_pos, axis=1)]
