@@ -175,11 +175,22 @@ def jupyter_notebook_to_py_file(root, file_name):
         c = cells[i]
         use_this_cell = True
         if c['cell_type'] == 'code':
+
             if 'pycharm' in c['metadata']:
-                if c['metadata']['pycharm']['name'].replace(' ', '').startswith('#%%dvc-cc-h'):
+                if c['metadata']['pycharm']['name'].replace(' ', '').lower().startswith('#%%dvc-cc-h'):
                     use_this_cell = False
-                if c['metadata']['pycharm']['name'].replace(' ', '').startswith('#%%dch'):
+                elif c['metadata']['pycharm']['name'].replace(' ', '').lower().startswith('#%%dch'):
                     use_this_cell = False
+
+            if c['source'][0].replace(' ', '').lower().startswith('#%%dvc-cc-h'):
+                use_this_cell = False
+            elif c['source'][0].replace(' ', '').lower().startswith('#%%dch'):
+                use_this_cell = False
+            elif c['source'][0].replace(' ', '').lower().startswith('#dvc-cc-h'):
+                use_this_cell = False
+            elif c['source'][0].replace(' ', '').lower().startswith('#dch'):
+                use_this_cell = False
+
             if 'outputs' in c:
                 c['outputs'] = []
         if use_this_cell:

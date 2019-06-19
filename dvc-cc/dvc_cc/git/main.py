@@ -4,15 +4,6 @@ from dvc_cc.cli_modes import cli_modes
 import sys
 from argparse import ArgumentParser
 
-
-from dvc_cc.git.branch import main as git_branch
-from dvc_cc.git.branch import DESCRIPTION as GIT_BRANCH_DESCRIPTION
-
-from dvc_cc.git.commit_and_push import main as commit_and_push_main
-from dvc_cc.git.commit_and_push import DESCRIPTION as COMMIT_AND_PUSH_DESCRIPTION
-from dvc_cc.git.sync import main as sync_main
-from dvc_cc.git.sync import DESCRIPTION as SYNC_DESCRIPTION
-
 import subprocess
 from subprocess import check_output
 
