@@ -1,75 +1,125 @@
 import numpy as np
 import os
+import re
 
 class Variable:
-    original_value = None
+
+    original_string = None
     varname = None
     vartype = None
     varvalue = None
 
+    def __init__(self, original_string):
+        self.original_string = original_string
+        self.varname, vartype, varvalue = Variable.split_original_string(self.original_string)
 
-    def __init__(self, original_value, variables=None):
-        self.original_value = original_value
-        tmp = self.original_value.split(':')
-        self.varname = tmp[0]
+        self.set_type_of_variable(vartype)
+        self.set_constant_value(varvalue)
 
-        if len(tmp) > 1:
-            self.vartype = tmp[1]
-        self.set_type_of_variable()
-        if len(tmp) > 2:
-            self.set_constant_value(tmp[2])
-
-        if variables is not None and  self.varname in variables:
-            return variables[self.varname]
-
-    def set_constant_value(self, value):
-        if value == None or value == '' or value.lower() == 'none':
-            self.varvalue = None
-        elif self.vartype == 'file':
-            self.varvalue = str(value)
-        elif self.vartype == 'ufloat':
-            self.varvalue = np.cast[np.float](value)
-            if self.varvalue < 0.0:
-                print('Error: Only positive values are allowed for the datatype \'ufloat\'.')
-        elif self.vartype == np.uint:
-            if np.int(value) < 0.0:
-                print('Error: Only positive values are allowed for the datatype \'uint\'.')
-            else:
-                self.varvalue = np.uint(value)
+    def split_original_string(original_string):
+        tmp = original_string.split(':')
+        varname = re.sub(r"[^A-Za-z0-9_]+", '', tmp[0])
+        if len(tmp) == 1:
+            return [varname, None, None]
+        elif  len(tmp) == 2:
+            return [varname, tmp[1], None]
         else:
-            try:
-                self.varvalue = np.cast[self.vartype](value)
-            except:
-                print('Error: The value and the type does not match.')
-       
+            return [varname, tmp[1], tmp[2]]
 
-    def set_type_of_variable(self):
-        type_of_variable = None
-        while type_of_variable is None:
-            if self.vartype is None and self.vartype != '' and self.vartype != 'None':
-                type_of_variable = input('What type of variable is the \''+self.varname+'\'? (float, ufloat, int, uint, file): ')
-            else:
-                type_of_variable = self.vartype
-            type_of_variable = type_of_variable.lower()
-            if type_of_variable.startswith('i'):
-                type_of_variable = np.int
-            elif type_of_variable.startswith('ui'):
-                type_of_variable = np.uint
-            elif type_of_variable.startswith('d'):
-                type_of_variable = np.float
-            elif type_of_variable.startswith('fl'):
-                type_of_variable = np.float
-            elif type_of_variable.startswith('ufl'):
-                type_of_variable = 'ufloat'
-            elif type_of_variable.startswith('ud'):
-                type_of_variable = 'ufloat'
-            elif type_of_variable.startswith('fi'):
-                type_of_variable = 'file'
+
+    def set_type_of_variable(self, name_of_type=None):
+        '''
+        Set a type for the variable. If the parameter type is not valid or is None than the user will get asked to set the parameter.
+        :param name_of_type: string of the datatype.
+        :return:
+        '''
+        self.vartype = None
+        while self.vartype is None:
+
+            if name_of_type is None or name_of_type != '' or name_of_type != 'None':
+                name_of_type = input('What type of variable is the \''+self.varname+'\'? (int, float, file, one_of): ')
+
+            name_of_type = name_of_type.lower()
+
+
+            if name_of_type.startswith('i'):
+                self.vartype = 'int'
+            elif name_of_type.startswith('d') or name_of_type.startswith('fl'):
+                self.vartype = 'float'
+            elif name_of_type.startswith('fi'):
+                self.vartype = 'file'
+            elif name_of_type.startswith('o'):
+                last_input = None
+                self.vartype = '['
+                while last_input != '':
+                    if last_input == None:
+                        last_input = input('Allowed Values: ')
+                        if last_input == '':
+                            print('Error: You need to set a value!')
+                            last_input = None
+                        else:
+                            self.vartype = self.vartype + last_input
+                    else:
+                        last_input = input('Allowed Values (Enter for closing): ')
+                        if last_input != '':
+                            self.vartype = self.vartype + ',' + last_input
+                self.vartype = ']'
             else:
                 print('Warning: Did not understand the datatype.')
-                type_of_variable = None
-        self.vartype = type_of_variable
+                self.vartype = None
 
+
+    def set_constant_value(self, value):
+        self.varvalue = None
+        if value == None or value == '' or value.lower() == 'none':
+            self.varvalue = None
+        elif self.vartype == 'int':
+            self.varvalue = int(value)
+        elif self.vartype == 'float':
+            self.varvalue = float(value)
+        elif self.vartype == 'file':
+            self.varvalue = str(value)
+        else: # it is "one_of"
+            possible_values = self.vartype[1:-1].split(',')
+            for pv in possible_values:
+                if pv == str(value):
+                    self.varvalue = str(value)
+            if self.varvalue == None:
+                raise ValueError('The value ' + str(value) + ' is not in the list of allowed values ' + str(possible_values) + '.')
+
+
+    def search_varname_in_list(list_of_variables, varname_to_check):
+        if type(list_of_variables) == list:
+            for v in list_of_variables:
+                if v.varname == varname_to_check:
+                    return v
+            return None
+        else:
+            raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+    def search_var_in_list(list_of_variables, var_to_check):
+        if type(list_of_variables) == list:
+            for v in list_of_variables:
+                if v.varname == var_to_check.varname:
+                    return v
+            return var_to_check
+        else:
+            raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+    def search_varname_in_dict(list_of_variables, varname_to_check):
+        if type(list_of_variables) == dict:
+            if varname_to_check in list_of_variables:
+                return list_of_variables[varname_to_check]
+            else:
+                return None
+        else:
+            raise ValueError('ERROR: You used this function false. The first parameter must be a dict!')
+    def search_var_in_dict(list_of_variables, var_to_check):
+        if type(list_of_variables) == dict:
+            if var_to_check.varname in list_of_variables:
+                return list_of_variables[var_to_check.varname]
+            else:
+                return var_to_check
+        else:
+            raise ValueError('ERROR: You used this function false. The first parameter must be a dict!')
 
     def __pretty_str__(self):
         tmp = str(self)[2:-2].split(':')
@@ -87,11 +137,60 @@ class Variable:
     
         return '{{' + self.varname+':'+ vartype +':'+ str(self.varvalue) + '}}'
 
-def find_all_variables(text, variables = {}, return_founded_variables=False):
-    if type(text) is not list:
-        text = [text]
+
+class VariableAndTextFileCorrelation:
+    list_of_all_variables = []
+    filename_dict = {} # saves all variables related to the files
+    varname_dict = {} # saves all related files
+
+    def register_dvccc_file(self, name_of_textfile):
+        """
+
+        :param name_of_textfile:
+        :return:
+        """
+        with open(name_of_textfile, 'r') as f:
+            content = f.read()
+
+        if name_of_textfile not in self.filename_dict:
+            self.filename_dict[name_of_textfile] = []
+
+        start_pos = 0
+        while start_pos >= 0:
+            start_pos = content.find('{{', start_pos)
+            if start_pos is not -1:
+                end_pos = content.find('}}', start_pos)
+                start_pos += 2
+                varvalue = content[start_pos:end_pos]
+                v = Variable(varvalue)
+                r = Variable.search_varname_in_list(self.list_of_all_variables, v.varname)
+                if r is None:
+                    self.list_of_all_variables.append(v)
+                    self.varname_dict[v.varname] = [name_of_textfile]
+                else:
+                    v = r
+                    self.varname_dict[v.varname].append(name_of_textfile)
+
+                if v.varname not in self.filename_dict[name_of_textfile]:
+                    self.filename_dict[name_of_textfile].append(v.varname)
+
+    def update_dvccc_files(self):
+        """
+
+        :return:
+        """
+        for f in self.filename_dict:
+            #TODO: DO SOMETHING!!!
+            print('Hallo Welt')
+
+
+
+def find_all_variables(list_of_text, variables = {}):
+    if type(list_of_text) is not list:
+        list_of_text = [list_of_text]
+
     founded_var = {}
-    for subc in text:
+    for subc in list_of_text:
         start_pos = 0
         while start_pos >= 0:
             start_pos = subc.find('{{', start_pos)
@@ -99,17 +198,17 @@ def find_all_variables(text, variables = {}, return_founded_variables=False):
                 end_pos = subc.find('}}', start_pos)
                 start_pos += 2
                 varvalue = subc[start_pos:end_pos]
-                varname = varvalue.split(':')[0]
+                varname = Variable.split_original_string(varvalue)[0]
+
                 if varname not in variables:
                     variables[varname] = Variable(varvalue)
+
                 founded_var[varname] = variables[varname]
-    if return_founded_variables:
-        return variables, founded_var
-    else:
-        return variables
+
+    return variables, founded_var
 
 
-def update_variables_in_text(text, variables, only_varvalue = False, return_var_used = False):
+def update_variables_in_text(list_of_text, variables):
     convert_to_string = False
     if type(text) is not list:
         convert_to_string = True
