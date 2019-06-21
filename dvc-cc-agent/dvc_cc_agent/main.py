@@ -124,7 +124,7 @@ def main():
     parser.add_argument('git_path_to_working_repository', help='The git working directory. With this you can specify what the main git root is.')
     parser.add_argument('git_working_repository_owner', help='The name of the owner of the git repository which you want to execute.')
     parser.add_argument('git_working_repository_name', help='The git repository name.')
-    parser.add_argument('git_name_of_tag', help='The source code jumps to this here defined git tag (with git checkout) and execute dvc repro there.')
+    parser.add_argument('git_name_of_branch', help='The source code jumps to this here defined git tag (with git checkout) and execute dvc repro there. If you want to start from a tag use "tag/YOUR_TAG_NAME"')
     parser.add_argument('dvc_authentication_json', help='A path to json file which contains the dvc authentication. This should include the keys: username and password.')
     parser.add_argument('dvc_servername', help='The servername of the dvc directory.')
     parser.add_argument('dvc_path_to_working_repository', help='The directory that is used for the dvc script.')
@@ -146,7 +146,7 @@ def main():
     git_path_to_working_repository = args.git_path_to_working_repository
     git_working_repository_owner = args.git_working_repository_owner
     git_working_repository_name = args.git_working_repository_name
-    git_name_of_tag = args.git_name_of_tag
+    git_name_of_branch = args.git_name_of_branch
     
     dvc_servername = args.dvc_servername
     dvc_path_to_working_repository = args.dvc_path_to_working_repository
@@ -187,10 +187,12 @@ def main():
     print(subprocess.check_output(command, shell=True).decode())
     
     print('SWITCH GIT BRANCH   ' + get_time())
+
     if dvc_files_to_execute is None:
-        command = 'git checkout tags/' + git_name_of_tag + ' -b b' + git_name_of_tag
-    else: 
-        command = 'git checkout tags/' + git_name_of_tag + ' -b b' + git_name_of_tag + '___' + str(dvc_files_to_execute).replace('/','_').replace(',','_').replace('[','').replace(']','').replace(' ','')
+        name_of_result_branch  = 'r' + git_name_of_branch
+    else:
+        name_of_result_branch = 'r' + git_name_of_branch + '___' + str(dvc_files_to_execute).replace('/','_').replace(',','_').replace('[','').replace(']','').replace(' ','')
+    command = 'git checkout ' + git_name_of_branch + ' -b ' + name_of_result_branch
     print('\t'+command)
     print(subprocess.check_output(command, shell=True).decode())
     
@@ -226,10 +228,10 @@ def main():
         print('START DVC REPRO -P   ' + get_time())
         command = 'dvc repro -P'
         print(subprocess.check_output(command, shell=True).decode())
-    
+
     print('WRITE RED-YML-File TO MAIN-Directory   ' + get_time())
     #TODO HANDLE IF dvc_files_to_execute is NONE !!!
-    path = '.dvc_cc/'+git_name_of_tag+'/'+args.dvc_file_to_execute.replace('/','___').replace(',','_') + '.yml'
+    path = '.dvc_cc/'+git_name_of_branch+'/'+args.dvc_file_to_execute.replace('/','___').replace(',','_') + '.yml'
     with open('cc_execution_file.red.yml',"w") as f:
         print("batches:", file=f)
         with open(path,"r") as r:
@@ -256,9 +258,9 @@ def main():
     
     print('COMMIT AT GIT   ' + get_time())
     if dvc_files_to_execute is not None:
-        command = "git commit -m 'run "+str(dvc_files_to_execute)+" in the experiment setup: " + git_name_of_tag + "'"
+        command = "git commit -m 'run "+str(dvc_files_to_execute)+" in the experiment setup: " + git_name_of_branch + "'"
     else:
-        command = "git commit -m 'run all dvc-files in the experiment setup: " + git_name_of_tag + "'"
+        command = "git commit -m 'run all dvc-files in the experiment setup: " + git_name_of_branch + "'"
     print(subprocess.check_output(command, shell=True).decode())
     
     print('COMMIT AT DVC   ' + get_time())
@@ -274,12 +276,7 @@ def main():
     num_of_tries = 1
     while pushed_successfull == False:
         try:
-            if dvc_files_to_execute is None:
-                name_of_new_branch = 'b' + git_name_of_tag
-            else:
-                name_of_new_branch = 'b' + git_name_of_tag + '___' + str(dvc_files_to_execute).replace('/','_').replace(',','_').replace('[','').replace(']','').replace(' ','')
-
-            command = 'git push -u origin ' + name_of_new_branch + ':' + name_of_new_branch
+            command = 'git push -u origin ' + name_of_result_branch + ':' + name_of_result_branch
             if num_of_tries >= 2:
                 command = command + '_' + str(num_of_tries)
 
