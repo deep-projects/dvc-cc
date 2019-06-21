@@ -2,8 +2,10 @@ import os
 import itertools
 import uuid
 import random
-from dvc_cc.dummy.class_variable import * 
+from dvc_cc.hyperopt.variable import *
 import re
+import numpy as np
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -14,7 +16,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-class VariableOptimizerBase:
+class HyperOptimizerBase:
     is_global = False
     allowed_types = []
     num_of_draws = 1
@@ -39,7 +41,7 @@ def read_value(text,typeofvalue, order=2):
             user_input = None
     return user_input
 
-class VariableOptimizerGridSearch(VariableOptimizerBase):
+class HyperOptimizerGridSearch(HyperOptimizerBase):
     value = None
     minimum_value = None
     maximum_value = None
@@ -63,7 +65,7 @@ class VariableOptimizerGridSearch(VariableOptimizerBase):
         self.maximum_value = read_value('Max value: ', float)
         self.num_of_draws = read_value('Num of draws: ', int)
 
-class VariableOptimizerRandomSearch(VariableOptimizerBase):
+class HyperOptimizerRandomSearch(HyperOptimizerBase):
     value = None
     minimum_value = None
     maximum_value = None
@@ -101,14 +103,14 @@ class VariableOptimizerRandomSearch(VariableOptimizerBase):
             self.num_of_draws = None
         return
 
-class VariableOptimizerRandomSearchLocal(VariableOptimizerRandomSearch):
+class HyperOptimizerRandomSearchLocal(HyperOptimizerRandomSearch):
     name = 'RandomSearch-Local'
     shortname = 'rsl'
     is_global = False
 
     def __init__(self, dtype, seed=None):
         super().__init__(dtype, seed)
-class VariableOptimizerRandomSearchGlobal(VariableOptimizerRandomSearch):
+class HyperOptimizerRandomSearchGlobal(HyperOptimizerRandomSearch):
     name = 'RandomSearch-Global'
     shortname = 'rs'
     is_global = True
@@ -117,7 +119,7 @@ class VariableOptimizerRandomSearchGlobal(VariableOptimizerRandomSearch):
         super().__init__(dtype, seed)
     
 
-class Constant(VariableOptimizerBase):
+class Constant(HyperOptimizerBase):
     name = 'Constant'
     shortname = 'c'
     allowed_types = ['float', 'ufloat', 'int', 'uint', 'file']
@@ -136,13 +138,13 @@ class Constant(VariableOptimizerBase):
 
     read_value
 
-class RegexFileSearch(VariableOptimizerBase):
+class RegexFileSearch(HyperOptimizerBase):
     name = 'FileSearch'
     shortname = 'fs'
     allowed_types = ['file']
 
-    def __init__(self, root_dir):
-        self.root_dir = root_dir
+    def __init__(self, dtype):
+        super().__init__(dtype)
 
     def draw(self,):
         return self.matched_files
@@ -153,17 +155,18 @@ class RegexFileSearch(VariableOptimizerBase):
             regex = input('Set regex value that describes the Files: ')
 
             matched_files = []
-            for root, dirs, files in os.walk(self.root_dir, topdown=True):
-                root = self.root_dir[len(self.root_dir):]
+            for root, dirs, files in os.walk('', topdown=True):
+                root = root[2:]
 
                 for f in files:
                     if root == '':
                         if re.match(regex, f):
                             matched_files.append(f)
                     else:
-                        f = root[len(self.root_dir):] + '/' + f
+                        f = root + '/' + f
                         if re.match(regex, f):
                             matched_files.append(f)
+
             if len(matched_files) == 0:
                 print('   Warning the regex does not match any file.')
                 regex = None
@@ -182,7 +185,7 @@ def get_possible_hyperparameter(variabletype):
     if variabletype == 'file':
         return [RegexFileSearch]
     else:
-        return [VariableOptimizerGridSearch, VariableOptimizerRandomSearchLocal, VariableOptimizerRandomSearchGlobal]
+        return [HyperOptimizerGridSearch, HyperOptimizerRandomSearchLocal, HyperOptimizerRandomSearchGlobal]
 
 
 
@@ -197,20 +200,33 @@ def select_hyperparameteroptimizer(user_input, possible_hyperparameter):
         m.set_data(user_input)
         return m
 
-def dummy_to_dvc(current_path):
-    # get all variables:
-    variables = get_all_already_defined_variables()
 
-    if len(variables) > 0:
-        print('Found variables in dummy file.')
 
-    # loop over all variables and save the hyperparameterclass
-    hyperparameterclass = []
+def combine_combinations(combinations, is_global):
+    r = np.array([[0]])
+    one_global_hyperopt_was_set=False
+
+    for i in range(len(combinations)):
+        shape = r.shape
+        if not is_global[i] or not one_global_hyperopt_was_set:
+            print(i)
+            r = np.tile(r, len(combinations[i])).reshape(-1, shape[1])
+            next_draw = np.tile(combinations[i], shape[0]).reshape(-1, 1)
+            if is_global[i]:
+                one_global_hyperopt_was_set = True
+        else:
+            next_draw = np.tile(combinations[i], shape[0]//len(combinations[i])).reshape(-1, 1)
+
+
+        r = np.append(r, next_draw , axis=1)
+
+    return r[:,1:]
+
+def create_hyperopt_variables(vc): # vc == VariableCache
 
     num_of_global_draws = None
 
-    for key in variables:
-        v = variables[key]
+    for v in vc.list_of_all_variables:
         if v.varvalue is None:
             hyper = get_possible_hyperparameter(v.vartype)
             selected_hyper = None
@@ -226,56 +242,29 @@ def dummy_to_dvc(current_path):
                 selected_hyper = select_hyperparameteroptimizer(user_input, hyper)
                 if selected_hyper is None:
                     print('Warning: did not understand which Hyperoptimizer you want to use.')
-            if selected_hyper is RegexFileSearch:
-                selected_hyper = selected_hyper(current_path)
-                selected_hyper.set_settings()
-            elif type(selected_hyper) is not Constant:
+            if type(selected_hyper) is not Constant:
                 selected_hyper = selected_hyper(v.vartype)
                 selected_hyper.set_settings()
-            selected_hyper.variable = v
+
+
             if selected_hyper.is_global:
                 if num_of_global_draws is None:
                     num_of_global_draws = read_value('How many global draws do you want to make?: ', int)
                 selected_hyper.num_of_draws = num_of_global_draws
-            hyperparameterclass.append(selected_hyper)
+
+            v.hyperoptimizer = selected_hyper
+
         else:
-            m = Constant()
-            m.variable = v
-            m.set_data(v.varvalue)
-            hyperparameterclass.append(m)
+            c = Constant()
+            c.set_data(v.varvalue)
+            v.hyperoptimizer = c
 
+            #TODO: USING GLOBAL RANDOM SEARCH !!!
     # create a product over all variants
-    all_variants = [list(v.draw()) for v in hyperparameterclass]
-    all_variants = list(itertools.product(*all_variants))
+    is_global = [v.hyperoptimizer.is_global for v in vc.list_of_all_variables]
+    draws = [v.hyperoptimizer.draw() for v in vc.list_of_all_variables]
 
-    # find and read all dummy files.
-    if os.path.exists('dvc/.dummy'):
-        dummy_files = ['dvc/.dummy/' + f for f in os.listdir('dvc/.dummy') if f.find('.dummy') > -1]
-    else:
-        dummy_files = []
-
-    variables = {h.variable.varname: h.variable for h in hyperparameterclass}
-
-    created_dvc_files = []
-
-    for variant in all_variants:
-        for v_i in range(len(variables)):
-            variables[list(variables.keys())[v_i]].varvalue = variant[v_i]
-        for f in dummy_files:
-            with open(f,"r") as file_to_read:
-                txt = file_to_read.read()
-            txt , used_varval = update_variables_in_text(txt, variables, only_varvalue = True, return_var_used=True)
-            used_varval = '_'.join(used_varval)
-            dest = 'dvc/'+f[11:f[11:].find('.dummy')+11-4]+'_'+used_varval+'.dvc'
-            if not os.path.exists(dest):
-                created_dvc_files.append(dest)
-                with open(dest,"w") as dest_file:
-                    print(txt, file=dest_file)
-
-    return created_dvc_files
-
-
-
+    return combine_combinations(draws, is_global)
 
 
 

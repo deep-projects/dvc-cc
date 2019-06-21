@@ -10,7 +10,7 @@ from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
-from dvc_cc.dummy.class_variable import *
+from dvc_cc.hyperopt.class_variable import *
 import subprocess
 
 class bcolors:
@@ -44,10 +44,10 @@ def main():
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
     
-    if not os.path.exists('dvc/.dummy'):
-        os.mkdir('dvc/.dummy')
+    if not os.path.exists('dvc/.hyperopt'):
+        os.mkdir('dvc/.hyperopt')
 
-    # find and read all dummy files and search for all variables
+    # find and read all hyperopt files and search for all variables
     variables = get_all_already_defined_variables()
     
     if args.name_of_variable.lower() == 'all':
@@ -68,7 +68,7 @@ def main():
 'value'))
         print(variables[args.name_of_variable].__pretty_str__())
     else:
-        raise ValueError("This variable does not exist. Use 'dvc-cc dummy variable all' to get a list of all variable names.")
+        raise ValueError("This variable does not exist. Use 'dvc-cc hyperopt variable all' to get a list of all variable names.")
 
 
 

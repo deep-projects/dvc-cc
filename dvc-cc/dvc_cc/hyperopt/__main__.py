@@ -1,4 +1,4 @@
-from dvc_cc.dummy.main import main
+from dvc_cc.hyperopt.main import main
 
 
 if __name__ == '__main__':

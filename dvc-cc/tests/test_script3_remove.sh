@@ -4,7 +4,7 @@
 
 #########################################
 # 7. Step:                              #
-# Remove the dummy project              #
+# Remove the hyperopt project              #
 #########################################
 cd ~
 fusermount -u -z ${HOME}/test_repo/avocado

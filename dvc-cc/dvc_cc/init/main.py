@@ -148,7 +148,7 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
         print("      doc: 'The git repository name.'", file=f)
         print("      inputBinding: {position: 3}", file=f)
         print("      type: string", file=f)
-        print("    git_name_of_tag:", file=f)
+        print("    git_name_of_branch:", file=f)
         print("      doc: 'The source code jumps to this here defined git tag (with git checkout) and execute dvc repro there.'", file=f)
         print("      inputBinding: {position: 4}", file=f)
         print("      type: string", file=f)

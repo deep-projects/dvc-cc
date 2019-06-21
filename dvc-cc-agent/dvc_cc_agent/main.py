@@ -188,11 +188,17 @@ def main():
     
     print('SWITCH GIT BRANCH   ' + get_time())
 
+    is_tag = git_name_of_branch.startswith('tag/')
+    if is_tag:
+        git_name_of_branch = git_name_of_branch[4:]
     if dvc_files_to_execute is None:
         name_of_result_branch  = 'r' + git_name_of_branch
     else:
         name_of_result_branch = 'r' + git_name_of_branch + '___' + str(dvc_files_to_execute).replace('/','_').replace(',','_').replace('[','').replace(']','').replace(' ','')
-    command = 'git checkout ' + git_name_of_branch + ' -b ' + name_of_result_branch
+    if is_tag:
+        command = 'git checkout tag/' + git_name_of_branch + ' -b ' + name_of_result_branch
+    else:
+        command = 'git checkout ' + git_name_of_branch + ' -b ' + name_of_result_branch
     print('\t'+command)
     print(subprocess.check_output(command, shell=True).decode())
     

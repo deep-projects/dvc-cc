@@ -17,7 +17,7 @@ class Variable:
         self.set_constant_value(varvalue)
 
     def split_original_string(original_string):
-        tmp = original_string.split(':')
+        tmp = original_string.split(';')
         varname = re.sub(r"[^A-Za-z0-9_]+", '', tmp[0])
         if len(tmp) == 1:
             return [varname, None, None]
@@ -96,6 +96,16 @@ class Variable:
             return None
         else:
             raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+
+    def search_varname_in_list_return_index(list_of_variables, varname_to_check):
+        if type(list_of_variables) == list:
+            for i in range(len(list_of_variables)):
+                if list_of_variables[i].varname == varname_to_check:
+                    return i
+            return None
+        else:
+            raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+
     def search_var_in_list(list_of_variables, var_to_check):
         if type(list_of_variables) == list:
             for v in list_of_variables:
@@ -122,7 +132,7 @@ class Variable:
             raise ValueError('ERROR: You used this function false. The first parameter must be a dict!')
 
     def __pretty_str__(self):
-        tmp = str(self)[2:-2].split(':')
+        tmp = str(self)[2:-2].split(';')
         return '%25s%8s%6s'%(tmp[0],tmp[1],tmp[2])
 
     def __str__(self):
@@ -135,10 +145,14 @@ class Variable:
         elif self.vartype is np.int:
             vartype = 'int'
     
-        return '{{' + self.varname+':'+ vartype +':'+ str(self.varvalue) + '}}'
+        return '{{' + self.varname+';'+ vartype + ';'+ str(self.varvalue) + '}}'
 
 
-class VariableAndTextFileCorrelation:
+class VariableCache:
+    """
+    This class saves the relation between the hyperopt files and the variables in the files.
+    """
+
     list_of_all_variables = []
     filename_dict = {} # saves all variables related to the files
     varname_dict = {} # saves all related files
@@ -196,3 +210,30 @@ class VariableAndTextFileCorrelation:
                     start_pos += 2
             with open(filename, 'w') as f:
                 print(content, file=f)
+
+
+
+    def set_values_for_hyperopt_files(self, values_to_set):
+        """
+
+        :return:
+        """
+        for filename in self.filename_dict:
+            with open(filename, 'r') as f:
+                content = f.read()
+
+            start_pos = 0
+            while start_pos >= 0:
+                start_pos = content.find('{{', start_pos)
+                if start_pos is not -1:
+                    end_pos = content.find('}}', start_pos)
+                    varvalue = content[start_pos+2:end_pos]
+                    v = Variable(varvalue)
+                    index = search_varname_in_list_return_index(self.list_of_all_variables, v.varname)
+                    content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
+                    start_pos += 2
+
+            # TODO: MOVE THIS FILE TO UPPER FOLDER !
+            with open(filename[:-9]+'.dvc', 'w') as f:
+                print(content, file=f)
+

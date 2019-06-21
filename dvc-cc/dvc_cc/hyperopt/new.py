@@ -10,7 +10,7 @@ from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
-from dvc_cc.dummy.class_variable import *
+from dvc_cc.hyperopt.variable import *
 import subprocess
 
 class bcolors:
@@ -34,7 +34,7 @@ DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed u
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('command', help='The command that you would use in `dvc run --no exec ...`. Here everything for what the dots stand you can use in this command. Use <<<A_Variable>>> to create a dummy variable.', type=str)
+    parser.add_argument('command', help='The command that you would use in `dvc run --no exec ...`. Here everything for what the dots stand you can use in this command. Use <<<A_Variable>>> to create a hyperopt variable.', type=str)
     args = parser.parse_args()
 
     # go to the main git directory.
@@ -43,8 +43,8 @@ def main():
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
     
-    if not os.path.exists('dvc/.dummy'):
-        os.mkdir('dvc/.dummy')
+    if not os.path.exists('dvc/.hyperopt'):
+        os.mkdir('dvc/.hyperopt')
     
     # get all existent variables
     variables = get_all_already_defined_variables()
@@ -95,7 +95,7 @@ def main():
     # TODO: maybe it is possible to combine this and the next blog.
     # if no variable is found, than ask user to save this just as dvc file.
     if len(variables) == 0:
-        if input('Warning: No variable was found. Do you want to save this as standart dvc-file instead of a dummy file? (y/n)').lower().startswith('y'):
+        if input('Warning: No variable was found. Do you want to save this as standart dvc-file instead of a hyperopt file? (y/n)').lower().startswith('y'):
             command = ['dvc','run','--no-exec'] + args.command
             print('run command: "'+' '.join(command) + '"')
             subprocess.call(command)
@@ -110,18 +110,18 @@ def main():
     print('run command: "'+' '.join(command) + '"')
     subprocess.call(command)
 
-    # move the dvc file to dvc/.dummy/....dvc.dummy
+    # move the dvc file to dvc/.hyperopt/....dvc.hyperopt
     index = ''
-    while os.path.exists('dvc/.dummy/'+filename+'.dummy'+index):
+    while os.path.exists('dvc/.hyperopt/'+filename+'.hyperopt'+index):
         if index == '':
             index = '.2'
         else:
             index = int(index[1:]) + 1
             index = '.' + str(index)
-    os.rename('dvc/'+filename,'dvc/.dummy/'+filename+'.dummy'+index)
+    os.rename('dvc/'+filename,'dvc/.hyperopt/'+filename+'.hyperopt'+index)
 
 
-    subprocess.call(['git', 'add', 'dvc/.dummy/'+filename+'.dummy'+index])
+    subprocess.call(['git', 'add', 'dvc/.hyperopt/'+filename+'.hyperopt'+index])
 
 
 
