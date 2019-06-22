@@ -185,9 +185,12 @@ def main():
     filecontent = "\n['remote \\\"nas\\\"']\nurl = ssh://"+dvc_own_username+"@"+dvc_servername+dvc_path_to_working_repository+"\npassword = '"+dvc_own_password+"'\n\n[core]\nremote = nas"
     command = "echo \"" + filecontent + "\" > .dvc/config.local"
     print(subprocess.check_output(command, shell=True).decode())
-    
-    print('SWITCH GIT BRANCH   ' + get_time())
 
+    print('PULL FROM GIT   ' + get_time())
+    command = 'git pull'
+    print(subprocess.check_output(command, shell=True).decode())
+
+    print('SWITCH GIT BRANCH   ' + get_time())
     is_tag = git_name_of_branch.startswith('tag/')
     if is_tag:
         git_name_of_branch = git_name_of_branch[4:]
@@ -198,6 +201,8 @@ def main():
     if is_tag:
         command = 'git checkout tag/' + git_name_of_branch + ' -b ' + name_of_result_branch
     else:
+        command = 'git checkout ' + git_name_of_branch
+        print(subprocess.check_output(command, shell=True).decode())
         command = 'git checkout ' + git_name_of_branch + ' -b ' + name_of_result_branch
     print('\t'+command)
     print(subprocess.check_output(command, shell=True).decode())

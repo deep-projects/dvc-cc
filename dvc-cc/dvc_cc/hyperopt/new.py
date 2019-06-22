@@ -3,6 +3,7 @@ from dvc_cc.version import VERSION
 from dvc_cc.cli_modes import cli_modes
 
 import os
+import sys
 import yaml
 import requests
 import keyring
@@ -12,6 +13,7 @@ from argparse import ArgumentParser
 import datetime
 from dvc_cc.hyperopt.variable import *
 import subprocess
+import uuid
 
 class bcolors:
     HEADER = '\033[95m'
@@ -29,13 +31,16 @@ def get_main_git_directory_path():
     return git_path
 
 
+# TODO EDIT DESCRIPTION !!!
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 
 
 def main():
-    parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('command', help='The command that you would use in `dvc run --no exec ...`. Here everything for what the dots stand you can use in this command. Use <<<A_Variable>>> to create a hyperopt variable.', type=str)
-    args = parser.parse_args()
+    #parser = ArgumentParser(description=DESCRIPTION)
+    #parser.add_argument('command', help='The command that you would use in `dvc run --no exec ...`. Here everything for what the dots stand you can use in this command. Use <<<A_Variable>>> to create a hyperopt variable.', type=str)
+    #args = parser.parse_args()
+
+    print(sys.argv)
 
     # go to the main git directory.
     os.chdir(get_main_git_directory_path())
@@ -45,83 +50,37 @@ def main():
     
     if not os.path.exists('dvc/.hyperopt'):
         os.mkdir('dvc/.hyperopt')
-    
+
+
+
     # get all existent variables
-    variables = get_all_already_defined_variables()
+    vc = VariableCache()
+    hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
+    for f in hyperopt_files:
+        vc.register_dvccc_file(f)
 
-    # search for parameters
-    args.command = args.command.split(' ')
-    variables, founded_vars = find_all_variables(args.command, variables,return_founded_variables=True)
-    args.command = update_variables_in_text(args.command, variables)
+    # create the dvc file
+    found_user_filename = False
+    for i in range(len(sys.argv[1:])):
+        if sys.argv[i] == '-f':
+            found_user_filename = True
+            sys.argv[i + 1]='dvc/.hyperopt/'+sys.argv[i + 1].replace('/', '_')
+            output_filename = sys.argv[i+1]
 
-    # search for -f option!
-    filename = None
-    filename_pos = -1
-    outputnames = []
-    for i in range(len(args.command)):
-        if args.command[i] == '-f':
-            filename_pos = i+1
-            filename = args.command[filename_pos]
-        if args.command[i] == '-o' or args.command[i] == '-O' or args.command[i] == '-m' or args.command[i] == '-M':
-            outputnames.append(args.command[i + 1])
-            var = find_all_variables(args.command[i + 1])
-            for v in founded_vars:
-                if v not in var:
-                    print('ERROR: You need to define all parameters to all output and metric files!')
-                    print('       '+str(v)+' was not found in ' + args.command[i + 1])
-                    exit(1)
-
-    firstoutputname = outputnames[0]
-
-    # remove variable names in firstoutputname
-    variable_start = firstoutputname.find('<<<')
-    while variable_start >= 0:
-        variable_end = firstoutputname.find('>>>')
-        if firstoutputname[variable_start - 1] == '_':
-            variable_start = variable_start - 1
-        firstoutputname = firstoutputname[:variable_start] + firstoutputname[variable_end+3:]
-        variable_start = firstoutputname.find('<<<')
-
-    # make sure that the filename is in the dvc folder
-    if filename is None:
-        filename = firstoutputname + '.dvc'
-    filename = filename.split('/')[-1]
-
-    if filename_pos == -1:
-        args.command = ['-f', 'dvc/'+filename] + args.command
+    if found_user_filename:
+        subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])
     else:
-        args.command[filename_pos] = 'dvc/'+filename
+        output_filename = 'dvc/.hyperopt/'+ str(uuid.uuid4())+'.dvc'
+        subprocess.call(['dvc', 'run', '--no-exec', '-f', output_filename] + sys.argv[1:])
 
-    # TODO: maybe it is possible to combine this and the next blog.
-    # if no variable is found, than ask user to save this just as dvc file.
-    if len(variables) == 0:
-        if input('Warning: No variable was found. Do you want to save this as standart dvc-file instead of a hyperopt file? (y/n)').lower().startswith('y'):
-            command = ['dvc','run','--no-exec'] + args.command
-            print('run command: "'+' '.join(command) + '"')
-            subprocess.call(command)
-            exit(0)
-        else:
-            print('Hint: You can define variables with <<<some_name_of_your_variable>>>.')
-            exit(1)
+    new_hyperopt_filename = output_filename[:-4]+'.hyperopt'
+    os.rename(output_filename, new_hyperopt_filename)
 
+    vc.register_dvccc_file(new_hyperopt_filename)
 
-    # create the dvc file.
-    command = ['dvc','run','--no-exec'] + args.command
-    print('run command: "'+' '.join(command) + '"')
-    subprocess.call(command)
+    vc.update_dvccc_files()
 
-    # move the dvc file to dvc/.hyperopt/....dvc.hyperopt
-    index = ''
-    while os.path.exists('dvc/.hyperopt/'+filename+'.hyperopt'+index):
-        if index == '':
-            index = '.2'
-        else:
-            index = int(index[1:]) + 1
-            index = '.' + str(index)
-    os.rename('dvc/'+filename,'dvc/.hyperopt/'+filename+'.hyperopt'+index)
-
-
-    subprocess.call(['git', 'add', 'dvc/.hyperopt/'+filename+'.hyperopt'+index])
+    subprocess.call(['git', 'add', 'dvc/.hyperopt/*'])
 
 
 

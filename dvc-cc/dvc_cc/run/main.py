@@ -232,7 +232,7 @@ def get_last_cc_experimentid():
     a = r.json()
     return sorted(a,key=lambda x: x['registrationTime'])[-1]['_id']
 
-def exec_branch(dvc_files, branch_name, project_dir, no_exec):
+def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats):
     git_path, git_owner, git_name = get_gitinformation()
 
     dvc_url, dvc_server, dvc_path = get_dvcurl()
@@ -250,6 +250,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec):
         path = '.dvc_cc/' + branch_name + '/' + dvcfiles_to_execute.replace(",", "_").replace('/', '___') + '.yml'
         paths.append(path)
 
+        print(path)
         with open(path, "w") as f:
             # print("batches:", file=f)
             print("  - inputs:", file=f)
@@ -295,24 +296,28 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec):
     subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
     # subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
     subprocess.call(['git', 'commit', '-m', '\'Build new Pipeline: ' + path + '\''])
+    subprocess.call(['git', 'push'])
 
     # CREATE THE COMPLETE RED-YML
     if no_exec == False:
         with open('.dvc_cc/tmp.red.yml', "w") as f:
             print("batches:", file=f)
-            for path in paths:
-                with open(path, "r") as r:
-                    print(r.read(), file=f)
+            for i in range(num_of_repeats):
+                for path in paths:
+                    with open(path, "r") as r:
+                        print(r.read(), file=f)
             with open('.dvc_cc/cc_config.yml', "r") as r:
                 print(r.read(), file=f)
 
         # EXECUTE THE RED-YML
         p = 'faice exec .dvc_cc/tmp.red.yml'
+        cc_ids = []
+        # TODO: IS A LIST NEEDED?
         subprocess.call(p.split(' '))
-        cc_id = get_last_cc_experimentid()
-        print('The experiment ID is: ' + cc_id)
+        cc_ids.append(get_last_cc_experimentid())
+        print('The experiment ID is: ' + str(cc_ids))
         os.remove('.dvc_cc/tmp.red.yml')
-        return cc_id
+        return cc_ids
     else:
         return None
 
@@ -326,7 +331,7 @@ def main():
     # TODO: parser.add_argument('--use_only_a_tag', help='If you don't have any Hyperopt-DVC-CC files or just set one set of fixed parameters you can create a tag instead of a new branch.', default=False, action='store_true')
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
-    parser.add_argument('-r','--num_of_repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
+    parser.add_argument('-r','--num-of-repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
     parser.add_argument('-nb','--jupyter-notebook-to-py', help='If this paramer is set, than it will convert all jupyter notebook files to py files.', default=False, action='store_true')
     args = parser.parse_args()
     
@@ -350,7 +355,8 @@ def main():
         list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
         for f in list_of_hyperopt_files:
             f = 'dvc/.hyperopt/' + f
-            os.rename(f, f[:-9])
+            os.rename(f, f[:-9]+'.dvc')
+            print(f, f[:-9]+'.dvc')
     else:
         list_of_hyperopt_files = []
 
@@ -378,7 +384,7 @@ def main():
         #############################
         for f in list_of_hyperopt_files:
             f = 'dvc/.hyperopt/' + f
-            os.rename(f[:-9], f)
+            os.rename(f[:-9]+'.dvc', f)
 
     ####################################
     # Error if no DVC-file was defined #
@@ -405,6 +411,9 @@ def main():
         created_pyfiles_from_jupyter = []
     for f in created_pyfiles_from_jupyter:
         subprocess.call(['git', 'add', f])
+    if args.jupyter_notebook_to_py:
+        subprocess.call(['git', 'commit','-m', 'Convert Jupyter Notebooks to Py-File.'])
+        subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
 
     ##########################
     # Get All Hyperparemters #
@@ -412,6 +421,7 @@ def main():
     vc = VariableCache()
 
     for f in list_of_hyperopt_files:
+        f = 'dvc/.hyperopt/' + f
         vc.register_dvccc_file(f)
 
     ###################################
@@ -440,7 +450,7 @@ def main():
         else:
             branch_name = exp_name
 
-        cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec)
+        cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats)
 
         if len(draw) > 0:  # one or more hyperparameters was set!
             subprocess.call(['git', 'checkout', exp_name])
@@ -454,6 +464,7 @@ def main():
     ##########################
     # Return to START-Branch #
     ##########################
+    #TODO: THIS SHOULD BE IN THE FINALLY BLOCK! !!
     subprocess.call(['git', 'checkout', startbranch])
 
 

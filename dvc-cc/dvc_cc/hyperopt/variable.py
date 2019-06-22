@@ -36,8 +36,8 @@ class Variable:
         self.vartype = None
         while self.vartype is None:
 
-            if name_of_type is None or name_of_type != '' or name_of_type != 'None':
-                name_of_type = input('What type of variable is the \''+self.varname+'\'? (int, float, file, one_of): ')
+            if name_of_type is None or name_of_type == '' or name_of_type.lower() == 'none':
+                name_of_type = input('What type of variable is \''+self.varname+'\'? (int, float, file, one_of): ')
 
             name_of_type = name_of_type.lower()
 
@@ -136,16 +136,7 @@ class Variable:
         return '%25s%8s%6s'%(tmp[0],tmp[1],tmp[2])
 
     def __str__(self):
-        if self.vartype == 'file' or self.vartype == 'ufloat':
-            vartype = self.vartype
-        elif self.vartype is np.float:
-            vartype = 'float'
-        elif self.vartype is np.uint:
-            vartype = 'uint'
-        elif self.vartype is np.int:
-            vartype = 'int'
-    
-        return '{{' + self.varname+';'+ vartype + ';'+ str(self.varvalue) + '}}'
+        return '{{' + self.varname+';'+ self.vartype + ';'+ str(self.varvalue) + '}}'
 
 
 class VariableCache:
@@ -176,14 +167,16 @@ class VariableCache:
                 end_pos = content.find('}}', start_pos)
                 start_pos += 2
                 varvalue = content[start_pos:end_pos]
-                v = Variable(varvalue)
-                r = Variable.search_varname_in_list(self.list_of_all_variables, v.varname)
+                varname, _, _ = Variable.split_original_string(varvalue)
+                #v = Variable(varvalue)
+                r = Variable.search_varname_in_list(self.list_of_all_variables, varname)
                 if r is None:
+                    v = Variable(varvalue)
                     self.list_of_all_variables.append(v)
                     self.varname_dict[v.varname] = [name_of_textfile]
                 else:
                     v = r
-                    self.varname_dict[v.varname].append(name_of_textfile)
+                    self.varname_dict[r.varname].append(name_of_textfile)
 
                 if v.varname not in self.filename_dict[name_of_textfile]:
                     self.filename_dict[name_of_textfile].append(v.varname)
@@ -204,8 +197,9 @@ class VariableCache:
                 if start_pos is not -1:
                     end_pos = content.find('}}', start_pos)
                     varvalue = content[start_pos+2:end_pos]
-                    v = Variable(varvalue)
-                    v = Variable.search_var_in_list(self.list_of_all_variables, v)
+
+                    varname,_,_ = Variable.split_original_string(varvalue)
+                    v = Variable.search_varname_in_list(self.list_of_all_variables, varname)
                     content = content[:start_pos] + str(v) + content[end_pos+2:]
                     start_pos += 2
             with open(filename, 'w') as f:
@@ -228,8 +222,9 @@ class VariableCache:
                 if start_pos is not -1:
                     end_pos = content.find('}}', start_pos)
                     varvalue = content[start_pos+2:end_pos]
-                    v = Variable(varvalue)
-                    index = search_varname_in_list_return_index(self.list_of_all_variables, v.varname)
+
+                    varname,_,_ = Variable.split_original_string(varvalue)
+                    index = Variable.search_varname_in_list_return_index(self.list_of_all_variables, varname)
                     content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
                     start_pos += 2
 

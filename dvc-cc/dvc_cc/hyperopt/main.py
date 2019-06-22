@@ -11,8 +11,8 @@ from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
 
-#from dvc_cc.hyperopt.new import main as new_main
-#from dvc_cc.hyperopt.new import DESCRIPTION as NEW_DESCRIPTION
+from dvc_cc.hyperopt.new import main as new_main
+from dvc_cc.hyperopt.new import DESCRIPTION as NEW_DESCRIPTION
 
 from dvc_cc.hyperopt.stage import main as stage_main
 from dvc_cc.hyperopt.stage import DESCRIPTION as STAGE_DESCRIPTION
@@ -27,7 +27,7 @@ SCRIPT_NAME = 'dvc-cc hyperopt'
 TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 MODES = OrderedDict([
-    #('new', {'main': new_main, 'description': NEW_DESCRIPTION}),
+    ('new', {'main': new_main, 'description': NEW_DESCRIPTION}),
     #('stage', {'main': stage_main, 'description': STAGE_DESCRIPTION}),
     #('variable', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
     #('command', {'main': command_main, 'description': COMMAND_DESCRIPTION})
