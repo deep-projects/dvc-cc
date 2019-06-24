@@ -321,6 +321,43 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats):
     else:
         return None
 
+def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
+    # TODO: USE PARAMS FOR THIS: + '___' + str(draw)[1:-1].replace(',','_').replace(' ','').replace('[','').replace(']','').replace('-','')
+    hyperopt_draws = np.array(hyperopt_draws)
+    result = []
+    for i in range(len(list_of_variables)):
+        v = list_of_variables[i]
+        if v.vartype == 'float' or v.vartype == 'int':
+            values = np.array(hyperopt_draws[:, i], dtype=float)
+            values_unique = np.unique(values)
+            index = 0
+            strvalues = [v.varname.upper() + (('%.'+str(index)+'E')%varvalue).lower() for varvalue in values]
+            while len(np.unique(strvalues)) < len(values_unique):
+                index += 1
+                strvalues = [v.varname.upper() + (('%.'+str(index)+'E')%varvalue).lower() for varvalue in values]
+        else:
+            values = np.array(hyperopt_draws[:,i], dtype=str)
+            values_unique = np.unique(values)
+            start_index = 0
+            while len(np.unique(values_unique[start_index])) == 1:
+                start_index += 1
+            end_index = -1
+            while len(np.unique(values_unique[end_index])) == 1:
+                end_index -= 1
+            if end_index == -1:
+                strvalues = [v.varname.upper()+var[start_index:].lower().replace('/','_').replace(' ','') for var in values]
+            else:
+                strvalues = [v.varname.upper()+var[start_index:end_index+1].lower().replace('/','_').replace(' ','') for var in values]
+
+        result.append(strvalues)
+    result = list(map(list, zip(*result)))
+
+    batch_names = []
+    for i in range(len(result)):
+        batch_names.append(exp_name + '_' + '_'.join(result[i]))
+
+    return batch_names
+
 def main():
 
     parser = ArgumentParser(description=DESCRIPTION)
@@ -354,9 +391,7 @@ def main():
     if os.path.exists('dvc') and os.path.exists('dvc/.hyperopt'):
         list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
         for f in list_of_hyperopt_files:
-            f = 'dvc/.hyperopt/' + f
-            os.rename(f, f[:-9]+'.dvc')
-            print(f, f[:-9]+'.dvc')
+            os.rename('dvc/.hyperopt/' + f, 'dvc/'+f[:-9]+'.dvc')
     else:
         list_of_hyperopt_files = []
 
@@ -383,14 +418,32 @@ def main():
         # Rename the hyperopt-files #
         #############################
         for f in list_of_hyperopt_files:
-            f = 'dvc/.hyperopt/' + f
-            os.rename(f[:-9]+'.dvc', f)
+            os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
 
     ####################################
     # Error if no DVC-file was defined #
     ####################################
     if len(dvc_files) == 0:
         raise ValueError('Error: There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
+
+
+    ##########################
+    # Get All Hyperparemters #
+    ##########################
+    vc = VariableCache()
+
+    for f in list_of_hyperopt_files:
+        f = 'dvc/.hyperopt/' + f
+        vc.register_dvccc_file(f)
+
+    ###################################
+    # DEFINE ALL Hyperopt-Experiments #
+    ###################################
+    if len(vc.list_of_all_variables) > 0:
+        hyperopt_draws = create_hyperopt_variables(vc)
+    else:
+        hyperopt_draws = [[]]
+
 
     ###########################
     # Create an input branch! #
@@ -415,30 +468,23 @@ def main():
         subprocess.call(['git', 'commit','-m', 'Convert Jupyter Notebooks to Py-File.'])
         subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
 
-    ##########################
-    # Get All Hyperparemters #
-    ##########################
-    vc = VariableCache()
+    #####################################################
+    # TODO: SAVE the Hyperopt-Values and the VC!        #
+    #   WITH THIS It is possible to get rerun the code. #
+    #####################################################
 
-    for f in list_of_hyperopt_files:
-        f = 'dvc/.hyperopt/' + f
-        vc.register_dvccc_file(f)
-
-    ###################################
-    # DEFINE ALL Hyperopt-Experiments #
-    ###################################
-    if len(vc.list_of_all_variables) > 0:
-        hyperopt_draws = create_hyperopt_variables(vc)
-    else:
-        hyperopt_draws = [[]]
-
+    ######################################
+    # TODO: DEFINE THE NEW BRANCH NAMES! #
+    ######################################
+    branch_names = define_the_exp_name(exp_name, hyperopt_draws, vc.list_of_all_variables)
 
     #################################
     # Loop each Hyperopt-Experiment #
     #################################
-    for draw in hyperopt_draws:
+    for i in range(len(hyperopt_draws)):
+        draw = hyperopt_draws[i]
         if len(draw) > 0: # one or more hyperparameters was set!
-            branch_name = exp_name + str(uuid.uuid4()) #TODO: USE PARAMS FOR THIS: + '___' + str(draw)[1:-1].replace(',','_').replace(' ','').replace('[','').replace(']','').replace('-','')
+            branch_name = branch_names[i]
             subprocess.call(['git', 'checkout', '-b', branch_name])
 
             # TODO: HYPEROPT-FILES TO DVC WITH SETTED PARAMETERS #
@@ -467,135 +513,6 @@ def main():
     #TODO: THIS SHOULD BE IN THE FINALLY BLOCK! !!
     subprocess.call(['git', 'checkout', startbranch])
 
-
-    """
-
-    if len(dvc_files) == 0:
-        print(
-            'Error: There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
-    else:
-        paths = []
-        os.mkdir('.dvc_cc/' + new_tag)
-
-        for i in range(len(dvc_files)):
-            dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
-            path = '.dvc_cc/' + new_tag + '/' + dvcfiles_to_execute.replace(",", "_").replace('/', '___') + '.yml'
-            for i in range(args.num_of_repeats):
-                paths.append(path)
-
-            with open(path, "w") as f:
-                # print("batches:", file=f)
-                print("  - inputs:", file=f)
-                print("      git_authentication_json:", file=f)
-                print("        class: File", file=f)
-                print("        connector:", file=f)
-                print("          access: {username: '{{" + git_path.replace('.', '_').replace('-',
-                                                                                              '_') + "_username}}', password: '{{" + git_path.replace(
-                    '.', '_').replace('-', '_') + "_password}}', email: '{{" + git_path.replace('.', '_').replace('-',
-                                                                                                                  '_') + "_email}}'}",
-                      file=f)
-                print("          command: dvc-cc-connector", file=f)
-                print("      git_path_to_working_repository: \"" + git_path + "\"", file=f)
-                print("      git_working_repository_owner: \"" + git_owner + "\"", file=f)
-                print("      git_working_repository_name: \"" + git_name + "\"", file=f)
-                print("      git_name_of_branch: \"" + new_tag + "\"", file=f)
-                print("      dvc_authentication_json:", file=f)
-                print("        class: File", file=f)
-                print("        connector:", file=f)
-                print("          access: {username: '{{" + dvc_server.replace('.', '_').replace('-',
-                                                                                                '_') + "_username}}', password: '{{" + dvc_server.replace(
-                    '.', '_').replace('-', '_') + "_password}}'}", file=f)
-                print("          command: dvc-cc-connector", file=f)
-                print("      dvc_servername: \"" + dvc_server + "\"", file=f)
-                print("      dvc_path_to_working_repository: \"" + dvc_path + "\"", file=f)
-
-                if use_external_data_dir:
-                    print("      dvc_data_dir:", file=f)
-                    print("        class: Directory", file=f)
-                    print("        connector:", file=f)
-                    print("            command: \"red-connector-ssh\"", file=f)
-                    print("            mount: true", file=f)
-                    print("            access:", file=f)
-                    print("              host: '" + data_server + "'", file=f)
-                    print("              port: 22", file=f)
-                    print("              auth:", file=f)
-                    print("                username: '" + data_username + "'", file=f)
-                    print("                password: '" + data_password + "'", file=f)
-                    print("              dirPath: '" + data_path + "'", file=f)
-                print("      dvc_file_to_execute: '" + dvcfiles_to_execute + "'", file=f)
-                print("    outputs: {}", file=f)
-        for path in paths:
-            subprocess.call(['git', 'add', path])
-        subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
-        subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
-        subprocess.call(['git', 'commit', '-m', '\'Build new Pipeline: ' + path + '\''])
-        # subprocess.call(['git', 'tag', '-a', new_tag, '-m', '\'automatic tagging of the experiment.\''])
-
-        new_tag
-
-        print('Added new job: ' + new_tag)
-        try:
-            subprocess.call(['git', 'push'])
-            subprocess.call(['git', 'push', 'origin', '--tags'])
-        except:
-            if args.no_exec:
-                print(
-                    'Warning: The project could not pushed to the remote repository. You can ignore this, because you run this command with: --no-exec.')
-            else:
-                print(
-                    'ERROR: The project could not pushed to the remote repository and could not started. Maybe you do not have access to the internet? The job is now defined, but you need to call "dvc-cc run-all-defined" to run this job.')
-                args.no_exec = True
-
-        # Execute the job.
-        if args.no_exec == False:
-            # build .red.yml.file
-            with open('.dvc_cc/tmp.red.yml', "w") as f:
-                print("batches:", file=f)
-                for path in paths:
-                    with open(path, "r") as r:
-                        print(r.read(), file=f)
-                with open('.dvc_cc/cc_config.yml', "r") as r:
-                    print(r.read(), file=f)
-
-            p = 'faice exec .dvc_cc/tmp.red.yml'
-            subprocess.call(p.split(' '))
-            cc_id = get_last_cc_experimentid()
-            print('The experiment ID is: ' + cc_id)
-            os.remove('.dvc_cc/tmp.red.yml')
-        else:
-            cc_id = None
-
-        # write the job to the cc_agency_experiments.yml.
-        if os.path.exists('.dvc_cc/cc_agency_experiments.yml'):
-            with open(".dvc_cc/cc_agency_experiments.yml", 'r') as stream:
-                try:
-                    data = yaml.safe_load(stream)
-                except yaml.YAMLError as exc:
-                    print(exc)
-        else:
-            data = {}
-        data[new_tag] = {'id': cc_id, 'files': paths}
-        with open('.dvc_cc/cc_agency_experiments.yml', 'w') as outfile:
-            yaml.dump(data, outfile, default_flow_style=False)
-
-        for f in created_dvc_files_from_dummy:
-            os.remove(f)
-            subprocess.call(['git', 'add', f])
-
-        for f in created_pyfiles_from_jupyter:
-            os.remove(f)
-            subprocess.call(['git', 'add', f])
-
-        subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
-        subprocess.call(['git', 'commit', '-m', '\'Update cc_agency_experiments.yml: ' + path + '\''])
-        try:
-            subprocess.call(['git', 'push'])
-        except:
-            if args.no_exec == False:
-                print('ERROR: It could not pushed to git!')
-
-    subprocess.call(['git', 'checkout', startbranch])
-    """
 
 
 

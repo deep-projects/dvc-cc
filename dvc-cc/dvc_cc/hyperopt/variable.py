@@ -228,7 +228,6 @@ class VariableCache:
                     content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
                     start_pos += 2
 
-            # TODO: MOVE THIS FILE TO UPPER FOLDER !
-            with open(filename[:-9]+'.dvc', 'w') as f:
+            with open('dvc/'+filename[14:-9]+'.dvc', 'w') as f:
                 print(content, file=f)
 

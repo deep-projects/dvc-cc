@@ -40,8 +40,6 @@ def main():
     #parser.add_argument('command', help='The command that you would use in `dvc run --no exec ...`. Here everything for what the dots stand you can use in this command. Use <<<A_Variable>>> to create a hyperopt variable.', type=str)
     #args = parser.parse_args()
 
-    print(sys.argv)
-
     # go to the main git directory.
     os.chdir(get_main_git_directory_path())
 
@@ -57,23 +55,23 @@ def main():
     vc = VariableCache()
     hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
     for f in hyperopt_files:
-        vc.register_dvccc_file(f)
+        vc.register_dvccc_file('dvc/.hyperopt/'+f)
 
     # create the dvc file
     found_user_filename = False
     for i in range(len(sys.argv[1:])):
         if sys.argv[i] == '-f':
             found_user_filename = True
-            sys.argv[i + 1]='dvc/.hyperopt/'+sys.argv[i + 1].replace('/', '_')
+            sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_')
             output_filename = sys.argv[i+1]
 
     if found_user_filename:
         subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])
     else:
-        output_filename = 'dvc/.hyperopt/'+ str(uuid.uuid4())+'.dvc'
+        output_filename = 'dvc/'+ str(uuid.uuid4())+'.dvc'
         subprocess.call(['dvc', 'run', '--no-exec', '-f', output_filename] + sys.argv[1:])
 
-    new_hyperopt_filename = output_filename[:-4]+'.hyperopt'
+    new_hyperopt_filename = 'dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt'
     os.rename(output_filename, new_hyperopt_filename)
 
     vc.register_dvccc_file(new_hyperopt_filename)
