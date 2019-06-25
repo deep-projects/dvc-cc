@@ -222,6 +222,10 @@ def run_command(command):
 def get_last_cc_experimentid():
     pw = keyring.get_password('red', 'agency_password')
     uname = keyring.get_password('red', 'agency_username')
+    if uname is None:
+        uname = input('agency_username: ')
+        pw = input('agency_password: ')
+    #TODO CHECK if this is NONE!
     auth = (uname, pw)
 
     r = requests.get(
