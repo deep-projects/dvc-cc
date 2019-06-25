@@ -225,7 +225,11 @@ class VariableCache:
 
                     varname,_,_ = Variable.split_original_string(varvalue)
                     index = Variable.search_varname_in_list_return_index(self.list_of_all_variables, varname)
-                    content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
+                    if self.list_of_all_variables[index].vartype == 'int':
+                        #TODO: Find better solution for str(int(float(...)))
+                        content = content[:start_pos] + str(int(float(values_to_set[index]))) + content[end_pos+2:]
+                    else:
+                        content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
                     start_pos += 2
 
             with open('dvc/'+filename[14:-9]+'.dvc', 'w') as f:

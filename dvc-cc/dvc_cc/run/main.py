@@ -185,15 +185,15 @@ def jupyter_notebook_to_py_file(root, file_name):
                     use_this_cell = False
                 elif c['metadata']['pycharm']['name'].replace(' ', '').lower().startswith('#%%dch'):
                     use_this_cell = False
-
-            if c['source'][0].replace(' ', '').lower().startswith('#%%dvc-cc-h'):
-                use_this_cell = False
-            elif c['source'][0].replace(' ', '').lower().startswith('#%%dch'):
-                use_this_cell = False
-            elif c['source'][0].replace(' ', '').lower().startswith('#dvc-cc-h'):
-                use_this_cell = False
-            elif c['source'][0].replace(' ', '').lower().startswith('#dch'):
-                use_this_cell = False
+            if len(c['source']) > 0:
+                if c['source'][0].replace(' ', '').lower().startswith('#%%dvc-cc-h'):
+                    use_this_cell = False
+                elif c['source'][0].replace(' ', '').lower().startswith('#%%dch'):
+                    use_this_cell = False
+                elif c['source'][0].replace(' ', '').lower().startswith('#dvc-cc-h'):
+                    use_this_cell = False
+                elif c['source'][0].replace(' ', '').lower().startswith('#dch'):
+                    use_this_cell = False
 
             if 'outputs' in c:
                 c['outputs'] = []

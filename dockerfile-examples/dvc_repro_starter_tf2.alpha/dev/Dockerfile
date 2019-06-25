@@ -25,7 +25,6 @@ RUN pip install --upgrade red-connector-ssh==0.7
 # install tensorflow
 RUN pip install tensorflow-gpu==2.0.0-alpha0
 
-
 # Some common environmenta variables that Python uses
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 
 
@@ -33,8 +32,9 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 # You may also install anything else from pip like this
 RUN pip install --no-cache-dir tensorboard
 
-RUN pip install https://download.pytorch.org/whl/cu100/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl
+#RUN pip install https://download.pytorch.org/whl/cu100/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl
 RUN pip install torchvision
+RUN pip install torch
 
 RUN pip --no-cache-dir install \
         Pillow \
