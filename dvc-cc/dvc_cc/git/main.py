@@ -26,7 +26,7 @@ def main():
     if len(argv) == 1 and sys.argv[1] == 'branch':
         git_branch = check_output(['git','branch']).decode("utf8").split('\n')
         for line in git_branch:
-            if not line.startswith('  bcc_') and not line.startswith('  remotes/origin/bcc_'):
+            if not line.startswith('  rcc_') and not line.startswith('  remotes/origin/rcc_') and not line.startswith('  cc_') and not line.startswith('  remotes/origin/cc_'):
                 print(line)
     elif len(argv) == 1 and sys.argv[1] == 'sync':
         git_name_of_branch = get_name_of_branch()
