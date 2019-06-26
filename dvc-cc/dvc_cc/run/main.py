@@ -393,7 +393,10 @@ def main():
     # Check the Experimentname #
     ############################
     args.experimentname = args.experimentname.replace('/',' ').replace('_',' ').replace('\\',' ').replace(';',' ').replace('.',' ').split(' ')
-    args.experimentname = ''.join([e.capitalize()  for e in args.experimentname])
+    if len(args.experimentname) == 1:
+        args.experimentname = args.experimentname[0]
+    else:
+        args.experimentname = ''.join([e.capitalize()  for e in args.experimentname])
 
     #####################################
     # Rename the hyperopt-files to .dvc #
