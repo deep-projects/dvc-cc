@@ -393,7 +393,9 @@ def main():
     # WARN, if you are on a cc or rcc branch #
     ##########################################
     if startbranch.startswith('cc_'):
-        print('WARNING: you are on a DVC-CC branch.')
+        print('WARNING: You are on a DVC-CC branch.')
+        # TODO if the rerun command exists throw an error!
+        #   print('         You should use the dvc rerun command')
         user_input = input('Do you want to continue? [y,n]')
         if not user_input.startswith('y'):
             print('You can switch to a other branch with "git checkout THE_BRANCH_NAME".')
