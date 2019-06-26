@@ -10,7 +10,7 @@ from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
-from dvc_cc.hyperopt.class_variable import *
+from dvc_cc.hyperopt.variable import *
 import subprocess
 
 class bcolors:
