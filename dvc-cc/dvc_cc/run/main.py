@@ -457,74 +457,75 @@ def main():
     else:
         hyperopt_draws = [[]]
 
+    try:
+        ###########################
+        # Create an input branch! #
+        ###########################
+        exp_name = exp_id + '_' + args.experimentname
+        subprocess.call(['git', 'checkout', '-b', exp_name])
+        #print(['git', 'push', '-u', 'origin', exp_name+':'+exp_name])
+        #TODO: THIS THROWS ALWAYS A MERGE REQUEST ????
+        subprocess.call(['git', 'push', '-u', 'origin', exp_name+':'+exp_name])
 
-    ###########################
-    # Create an input branch! #
-    ###########################
-    exp_name = exp_id + '_' + args.experimentname
-    subprocess.call(['git', 'checkout', '-b', exp_name])
-    #print(['git', 'push', '-u', 'origin', exp_name+':'+exp_name])
-    #TODO: THIS THROWS ALWAYS A MERGE REQUEST ????
-    subprocess.call(['git', 'push', '-u', 'origin', exp_name+':'+exp_name])
-
-    #############################
-    # CONVERT Jupyter Notebooks #
-    #############################
-    # convert jupyter notebooks to py-files.
-    if args.jupyter_notebook_to_py:
-        created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(project_dir)
-    else:
-        created_pyfiles_from_jupyter = []
-    for f in created_pyfiles_from_jupyter:
-        subprocess.call(['git', 'add', f])
-    if args.jupyter_notebook_to_py:
-        subprocess.call(['git', 'commit','-m', 'Convert Jupyter Notebooks to Py-File.'])
-        subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
-
-    #####################################################
-    # TODO: SAVE the Hyperopt-Values and the VC!        #
-    #   WITH THIS It is possible to get rerun the code. #
-    #####################################################
-
-    ######################################
-    # TODO: DEFINE THE NEW BRANCH NAMES! #
-    ######################################
-    branch_names = define_the_exp_name(exp_name, hyperopt_draws, vc.list_of_all_variables)
-
-    #################################
-    # Loop each Hyperopt-Experiment #
-    #################################
-    for i in range(len(hyperopt_draws)):
-        draw = hyperopt_draws[i]
-        if len(draw) > 0: # one or more hyperparameters was set!
-            branch_name = branch_names[i]
-            subprocess.call(['git', 'checkout', '-b', branch_name])
-
-            # TODO: HYPEROPT-FILES TO DVC WITH SETTED PARAMETERS #
-            vc.set_values_for_hyperopt_files(draw)
-            subprocess.call(['git', 'add', '-A'])
-            subprocess.call(['git', 'commit', '-m', 'Convert DVC-CC-Hyperopt-Files to DVC-Files.'])
-            subprocess.call(['git', 'push', '-u', 'origin', branch_name + ':' + branch_name])
-
+        #############################
+        # CONVERT Jupyter Notebooks #
+        #############################
+        # convert jupyter notebooks to py-files.
+        if args.jupyter_notebook_to_py:
+            created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(project_dir)
         else:
-            branch_name = exp_name
+            created_pyfiles_from_jupyter = []
+        for f in created_pyfiles_from_jupyter:
+            subprocess.call(['git', 'add', f])
+        if args.jupyter_notebook_to_py:
+            subprocess.call(['git', 'commit','-m', 'Convert Jupyter Notebooks to Py-File.'])
+            subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
 
-        cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats)
+        #####################################################
+        # TODO: SAVE the Hyperopt-Values and the VC!        #
+        #   WITH THIS It is possible to get rerun the code. #
+        #####################################################
 
-        if len(draw) > 0:  # one or more hyperparameters was set!
-            subprocess.call(['git', 'checkout', exp_name])
+        ######################################
+        # TODO: DEFINE THE NEW BRANCH NAMES! #
+        ######################################
+        branch_names = define_the_exp_name(exp_name, hyperopt_draws, vc.list_of_all_variables)
 
-        with open('.dvc_cc/cc_ids.yml', 'a') as f:
-            print(cc_id, file=f)
-        subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
-        subprocess.call(['git', 'commit', '-m', 'Push CC-ID'])
-        subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
+        #################################
+        # Loop each Hyperopt-Experiment #
+        #################################
+        for i in range(len(hyperopt_draws)):
+            draw = hyperopt_draws[i]
+            if len(draw) > 0: # one or more hyperparameters was set!
+                branch_name = branch_names[i]
+                subprocess.call(['git', 'checkout', '-b', branch_name])
 
-    ##########################
-    # Return to START-Branch #
-    ##########################
-    #TODO: THIS SHOULD BE IN THE FINALLY BLOCK! !!
-    subprocess.call(['git', 'checkout', startbranch])
+                # TODO: HYPEROPT-FILES TO DVC WITH SETTED PARAMETERS #
+                vc.set_values_for_hyperopt_files(draw)
+                subprocess.call(['git', 'add', '-A'])
+                subprocess.call(['git', 'commit', '-m', 'Convert DVC-CC-Hyperopt-Files to DVC-Files.'])
+                subprocess.call(['git', 'push', '-u', 'origin', branch_name + ':' + branch_name])
+
+            else:
+                branch_name = exp_name
+
+            cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats)
+
+            if len(draw) > 0:  # one or more hyperparameters was set!
+                subprocess.call(['git', 'checkout', exp_name])
+
+            with open('.dvc_cc/cc_ids.yml', 'a') as f:
+                print(cc_id, file=f)
+            subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
+            subprocess.call(['git', 'commit', '-m', 'Push CC-ID'])
+            subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
+
+    finally:
+        ##########################
+        # Return to START-Branch #
+        ##########################
+        #TODO: THIS SHOULD BE IN THE FINALLY BLOCK! !!
+        subprocess.call(['git', 'checkout', startbranch])
 
 
 
