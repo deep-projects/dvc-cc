@@ -23,6 +23,9 @@ from dvc_cc.hyperopt.var import DESCRIPTION as VARIABLE_DESCRIPTION
 from dvc_cc.hyperopt.command import main as command_main
 from dvc_cc.hyperopt.command import DESCRIPTION as COMMAND_DESCRIPTION
 
+from dvc_cc.hyperopt.plot_beta_distribution import main as plot_beta_distribution_main
+from dvc_cc.hyperopt.plot_beta_distribution import DESCRIPTION as PLOT_BETA_DESCRIPTION
+
 SCRIPT_NAME = 'dvc-cc hyperopt'
 TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
@@ -30,7 +33,8 @@ MODES = OrderedDict([
     ('new', {'main': new_main, 'description': NEW_DESCRIPTION}),
     #('stage', {'main': stage_main, 'description': STAGE_DESCRIPTION}),
     ('var', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
-    #('command', {'main': command_main, 'description': COMMAND_DESCRIPTION})
+    #('command', {'main': command_main, 'description': COMMAND_DESCRIPTION}),
+    ('plot-beta', {'main': plot_beta_distribution_main, 'description': PLOT_BETA_DESCRIPTION})
 ])
 
 

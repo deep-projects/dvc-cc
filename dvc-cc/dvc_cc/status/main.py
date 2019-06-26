@@ -120,26 +120,29 @@ def main():
 
     execution_engine = read_execution_engine()
 
-
     if args.node:
         show_nodes(auth,execution_engine)
         exit(0)
 
-    if os.path.exists('.dvc_cc/cc_agency_experiments.yml'):
-        with open(".dvc_cc/cc_agency_experiments.yml", 'r') as stream:
+    if os.path.exists('.dvc_cc/cc_all_ids.yml'):
+        with open(".dvc_cc/cc_all_ids.yml", 'r') as stream:
             try:
                 experiments = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 print(exc)
                 exit(1)
+    else:
+        print('No jobs was found.')
+        exit(0)
 
     if args.only_not_executed:
-        experimentsIDS = [[e,experiments[e]['id']] for e in experiments if experiments[e]['id'] is None]
+        experimentsIDS = [[e,None] for e in experiments if experiments[e] is None or len(experiments[e]) == 0]
         print(pandas.DataFrame(experimentsIDS, columns=['experiment_name', 'ID']).to_string())
         exit(0)
 
-
-    experimentsIDS = pandas.DataFrame([[e,experiments[e]['id']] for e in experiments if experiments[e]['id'] is not None], columns=['experiment_name','experimentId'])
+    print(experiments)
+    print(type(experiments))
+    experimentsIDS = pandas.DataFrame([[e,experiments[e][0]] for e in experiments if experiments[e] is not None], columns=['experiment_name','experimentId'])
 
     if args.only_failed:
         requesting_string = execution_engine+'/batches?state=failed'

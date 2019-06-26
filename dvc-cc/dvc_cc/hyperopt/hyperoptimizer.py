@@ -125,7 +125,7 @@ class Constant(HyperOptimizerBase):
     allowed_types = ['float', 'ufloat', 'int', 'uint', 'file']
 
     def set_data(self,data):
-        data = data.split(',')
+        data = str(data).replace(' ', '').split(',')
         self.num_of_draws = len(data)
         self.value = data
 

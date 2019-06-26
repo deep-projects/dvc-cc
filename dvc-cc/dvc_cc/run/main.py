@@ -315,13 +315,12 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats):
 
         # EXECUTE THE RED-YML
         p = 'faice exec .dvc_cc/tmp.red.yml'
-        cc_ids = []
         # TODO: IS A LIST NEEDED?
         subprocess.call(p.split(' '))
-        cc_ids.append(get_last_cc_experimentid())
-        print('The experiment ID is: ' + str(cc_ids))
+        cc_id = get_last_cc_experimentid()
+        print('The experiment ID is: ' + str(cc_id))
         os.remove('.dvc_cc/tmp.red.yml')
-        return cc_ids
+        return cc_id
     else:
         return None
 
@@ -472,6 +471,7 @@ def main():
     else:
         hyperopt_draws = [[]]
 
+    cc_ids = []
     try:
         ###########################
         # Create an input branch! #
@@ -529,8 +529,20 @@ def main():
             if len(draw) > 0:  # one or more hyperparameters was set!
                 subprocess.call(['git', 'checkout', exp_name])
 
-            with open('.dvc_cc/cc_ids.yml', 'a') as f:
-                print(cc_id, file=f)
+            if os.path.exists('.dvc_cc/cc_ids.yml'):
+                with open('.dvc_cc/cc_ids.yml', 'r') as f:
+                    loaded_yml = yaml.load(f)
+            else:
+                loaded_yml = {}
+
+            if branch_name in loaded_yml:
+                loaded_yml[branch_name].append(cc_id)
+            else:
+                loaded_yml[branch_name] = [cc_id]
+
+            with open('.dvc_cc/cc_ids.yml', 'w') as f:
+                yaml.dump(loaded_yml, f)
+
             subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
             subprocess.call(['git', 'commit', '-m', 'Push CC-ID'])
             subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
@@ -542,7 +554,18 @@ def main():
         #TODO: THIS SHOULD BE IN THE FINALLY BLOCK! !!
         subprocess.call(['git', 'checkout', startbranch])
 
+        if loaded_yml is not None:
+            if os.path.exists('.dvc_cc/cc_all_ids.yml'):
+                with open('.dvc_cc/cc_all_ids.yml', 'r') as f:
+                    loaded_yml2 = yaml.load(f)
+            else:
+                loaded_yml2 = {}
+            loaded_yml2.update(loaded_yml)
+            with open('.dvc_cc/cc_all_ids.yml', 'w') as f:
+                yaml.dump(loaded_yml2, f)
 
+            subprocess.call(['git', 'add', '.dvc_cc/cc_all_ids.yml'])
+            subprocess.call(['git', 'commit', '-m', 'Update .dvc_cc/cc_all_ids.yml'])
 
 
 
