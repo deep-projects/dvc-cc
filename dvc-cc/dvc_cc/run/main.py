@@ -445,7 +445,10 @@ def main():
         # Rename the hyperopt-files #
         #############################
         for f in list_of_hyperopt_files:
-            os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
+            try:
+                os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
+            except:
+                print('Warning: File ' + 'dvc/'+f[:-9]+'.dvc' + ' not found.')
 
     ####################################
     # Error if no DVC-file was defined #
