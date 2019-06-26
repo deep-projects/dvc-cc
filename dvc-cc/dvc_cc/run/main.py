@@ -389,6 +389,12 @@ def main():
 
     exp_id = create_new_exp_id()
 
+    ############################
+    # Check the Experimentname #
+    ############################
+    args.experimentname = args.experimentname.replace('/',' ').replace('_',' ').replace('\\',' ').replace(';',' ').replace('.',' ').split(' ')
+    args.experimentname = ''.join([e.capitalize()  for e in args.experimentname])
+
     #####################################
     # Rename the hyperopt-files to .dvc #
     #####################################
