@@ -17,8 +17,8 @@ from dvc_cc.hyperopt.new import DESCRIPTION as NEW_DESCRIPTION
 from dvc_cc.hyperopt.stage import main as stage_main
 from dvc_cc.hyperopt.stage import DESCRIPTION as STAGE_DESCRIPTION
 
-#from dvc_cc.hyperopt.variable import main as variable_main
-#from dvc_cc.hyperopt.variable import DESCRIPTION as VARIABLE_DESCRIPTION
+from dvc_cc.hyperopt.var import main as variable_main
+from dvc_cc.hyperopt.var import DESCRIPTION as VARIABLE_DESCRIPTION
 
 from dvc_cc.hyperopt.command import main as command_main
 from dvc_cc.hyperopt.command import DESCRIPTION as COMMAND_DESCRIPTION
@@ -29,7 +29,7 @@ DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed u
 MODES = OrderedDict([
     ('new', {'main': new_main, 'description': NEW_DESCRIPTION}),
     #('stage', {'main': stage_main, 'description': STAGE_DESCRIPTION}),
-    #('variable', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
+    ('var', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
     #('command', {'main': command_main, 'description': COMMAND_DESCRIPTION})
 ])
 

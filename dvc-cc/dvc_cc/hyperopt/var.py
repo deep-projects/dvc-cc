@@ -36,39 +36,53 @@ def main():
     parser.add_argument('name_of_variable', help='The name of variable to show. Use "all" to show all variables. If you use "all" --set and --set-type has no effect.', type=str)
     parser.add_argument('--set', help='Set a constant value for one parameter. If a constant value is set, it will not be queried when running "dvc-cc run". Use "None" to undo the constant value.', type=str, default=None)
     parser.add_argument('--set-type', help='If you want to reset the type of the variable you can use this parameter. This should be one of the following: float, ufloat, int, uint or file.', type=str, default=None)
-    args = parser.parse_args()                                                 
+    args = parser.parse_args()
 
     # go to the main git directory.
     os.chdir(get_main_git_directory_path())
 
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
-    
+
     if not os.path.exists('dvc/.hyperopt'):
         os.mkdir('dvc/.hyperopt')
 
-    # find and read all hyperopt files and search for all variables
-    variables = get_all_already_defined_variables()
-    
-    if args.name_of_variable.lower() == 'all':
-        print('%25s%8s%6s'%('Varname','type','value'))
-        for v in variables:
-            print(variables[v].__pretty_str__())
-    elif args.name_of_variable in variables:
-        if args.set_type is not None:
-            variables[args.name_of_variable].vartype = args.set_type
-            variables[args.name_of_variable].set_type_of_variable()
-            variables[args.name_of_variable].set_constant_value(None)
-        if args.set is not None:
-            variables[args.name_of_variable].set_constant_value(args.set)
-        if args.set_type is not None or args.set is not None:
-            update_all_dummyfiles(variables)
-            
-        print('%25s%8s%6s'%('Varname','type',
-'value'))
-        print(variables[args.name_of_variable].__pretty_str__())
+    ######################
+    # Read all Variables #
+    ######################
+    vc = VariableCache()
+    if os.path.exists('dvc') and os.path.exists('dvc/.hyperopt'):
+        list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
+        for f in list_of_hyperopt_files:
+            os.rename('dvc/.hyperopt/' + f, 'dvc/'+f[:-9]+'.dvc')
     else:
-        raise ValueError("This variable does not exist. Use 'dvc-cc hyperopt variable all' to get a list of all variable names.")
+        list_of_hyperopt_files = []
+    for f in list_of_hyperopt_files:
+        f = 'dvc/.hyperopt/' + f
+        vc.register_dvccc_file(f)
+
+    if args.name_of_variable.upper() == 'ALL':
+        print('%25s%8s%6s'%('Varname','type','value'))
+        for v in vc.list_of_all_variables:
+            print(v.__pretty_str__())
+    else:
+        v = Variable.search_varname_in_list(vc.list_of_all_variables, args.name_of_variable.upper())
+        if v is not None:
+            if args.set_type is not None:
+                v.set_type_of_variable(args.set_type)
+            if args.set is not None:
+                v.set_constant_value(args.set)
+            if args.set_type is not None or args.set is not None:
+                vc.update_dvccc_files()
+            print(v.__pretty_str__())
+
+        else:
+            print('Did not found the Variable: ' + str(args.name_of_variable))
+            print("This variable "+str(args.name_of_variable)+" does not exist. The following Variables exists: ")
+            print('%25s%8s%6s'%('Varname','type','value'))
+            for v in vc.list_of_all_variables:
+                print(v.__pretty_str__())
+            exit(1)
 
 
 

@@ -67,6 +67,7 @@ class Variable:
             else:
                 print('Warning: Did not understand the datatype.')
                 self.vartype = None
+        self.varvalue = None
 
 
     def set_constant_value(self, value):
