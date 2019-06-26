@@ -53,8 +53,6 @@ def main():
     vc = VariableCache()
     if os.path.exists('dvc') and os.path.exists('dvc/.hyperopt'):
         list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
-        for f in list_of_hyperopt_files:
-            os.rename('dvc/.hyperopt/' + f, 'dvc/'+f[:-9]+'.dvc')
     else:
         list_of_hyperopt_files = []
     for f in list_of_hyperopt_files:
@@ -66,7 +64,7 @@ def main():
         for v in vc.list_of_all_variables:
             print(v.__pretty_str__())
     else:
-        v = Variable.search_varname_in_list(vc.list_of_all_variables, args.name_of_variable.upper())
+        v = Variable.search_varname_in_list(vc.list_of_all_variables, args.name_of_variable)
         if v is not None:
             if args.set_type is not None:
                 v.set_type_of_variable(args.set_type)
