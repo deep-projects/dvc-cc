@@ -389,6 +389,19 @@ def main():
 
     exp_id = create_new_exp_id()
 
+    ##########################################
+    # WARN, if you are on a cc or rcc branch #
+    ##########################################
+    if startbranch.startswith('cc_'):
+        print('WARNING: you are on a DVC-CC branch.')
+        user_input = input('Do you want to continue? [y,n]')
+        if not user_input.startswith('y'):
+            print('You can switch to a other branch with "git checkout THE_BRANCH_NAME".')
+            exit(0)
+    elif startbranch.startswith('rcc_'):
+        print('ERROR: you are on a DVC-CC-RESULT branch. It is not allowed to execute DVC-CC here. To run a job take a look at the readme of this repository.')
+        exit(1)
+
     ############################
     # Check the Experimentname #
     ############################
