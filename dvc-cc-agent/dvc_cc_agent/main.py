@@ -177,7 +177,7 @@ def main():
 
     print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
     os.makedirs('~/dvc_remote_directory', exist_ok=True)
-    print("os.path.exists('~/dvc_remote_directory'): " + os.path.exists('~/dvc_remote_directory'))
+    print("os.path.exists('~/dvc_remote_directory'): ", os.path.exists('~/dvc_remote_directory'))
     command = 'sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory <<< ' + dvc_own_password
     sshfs_raise_an_error = False
     try:

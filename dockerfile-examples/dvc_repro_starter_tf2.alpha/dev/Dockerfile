@@ -52,7 +52,7 @@ RUN pip --no-cache-dir install \
         dvc \
         paramiko
 
-RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 12!'
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 13!'
 
 RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_agent-0.3.0-py3-none-any.whl
 
