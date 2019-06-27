@@ -180,7 +180,7 @@ def jupyter_notebook_to_py_file(root, file_name):
         use_this_cell = True
         if c['cell_type'] == 'code':
 
-            if 'pycharm' in c['metadata']:
+            if 'pycharm' in c['metadata'] and 'name' in c['metadata']['pycharm']:
                 if c['metadata']['pycharm']['name'].replace(' ', '').lower().startswith('#%%dvc-cc-h'):
                     use_this_cell = False
                 elif c['metadata']['pycharm']['name'].replace(' ', '').lower().startswith('#%%dch'):
@@ -194,6 +194,20 @@ def jupyter_notebook_to_py_file(root, file_name):
                     use_this_cell = False
                 elif c['source'][0].replace(' ', '').lower().startswith('#dch'):
                     use_this_cell = False
+
+            if use_this_cell:
+                c_source_lines = []
+                is_in_uncommand_line = False
+                for source_line in c['source']:
+                    source_line_tmp = source_line.replace('\t', '').replace(' ', '')
+                    if is_in_uncommand_line == False and (source_line_tmp .find('"""dcs') >= 0 or source_line_tmp .find('"""dvc-cc-show') >= 0):
+                        is_in_uncommand_line = True
+                    elif is_in_uncommand_line:
+                        if source_line_tmp.find('"""') >= 0:
+                            is_in_uncommand_line = False
+                    else:
+                        c_source_lines.append(source_line)
+                c['source'] = c_source_lines
 
             if 'outputs' in c:
                 c['outputs'] = []
@@ -474,6 +488,7 @@ def main():
     else:
         hyperopt_draws = [[]]
 
+    loaded_yml = None
     cc_ids = []
     try:
         ###########################
