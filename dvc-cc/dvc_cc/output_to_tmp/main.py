@@ -10,6 +10,7 @@ from git import Git
 import subprocess
 import time
 import numpy as np
+import getpass
 
 DESCRIPTION = 'This script gives you the possibility to get all output files that match some regex over different branches and saves them in a tmp folder.'
 
@@ -61,11 +62,11 @@ def check_out_if_its_valid(out, regex_name_of_file=None, ex_regex_name_of_file=N
 
     # check if file does not match regex. If is_a_valid_file is still True, than this is a file of interest.
     if regex_name_of_file is not None:
-        if not re.match(regex_name_of_file, out.rel_path):
+        if not re.match(regex_name_of_file, str(out)):
             return possible_status_messages[1]
 
     if ex_regex_name_of_file is not None:
-        if re.match(ex_regex_name_of_file, out.rel_path):
+        if re.match(ex_regex_name_of_file, str(out)):
             return possible_status_messages[1]
 
     if out.use_cache == False:
@@ -113,6 +114,13 @@ def main():
     g = Git()
     starting_branch = g.branch().split('*')[1].split('\n')[0][1:]
 
+    # Set the password only once!
+    if args.download_stages:
+        remote_name = repo.config.config['core']['remote']
+        remote_settings = repo.config.config['remote "' + remote_name + '"']
+        if 'ask_password' in remote_settings and remote_settings['ask_password']:
+            remote_settings['password'] = getpass.getpass('Password for ' + remote_settings['url'] + ': ')
+            remote_settings['ask_password'] = False
 
     if not args.no_save:
         path_to_output = create_output_dir(repo.root_dir, args.path_to_output)
@@ -148,20 +156,18 @@ def main():
         file_counter = 0
         saved_files = {}
         for branch in repo.brancher(all_branches=True):
-            print('##########################################'+branch)
-            if branch != 'Working Tree':
-                print(branch)
-                g.checkout(branch)
-                repo.checkout()
-                outs = []
-                branch_names = []
+            outs = []
+            branch_names = []
+            if branch.lower() != 'working tree':
 
                 # check if this is a result branch:
-                is_dvccc_result_branch = branch.startswith('bcc_')
+                is_dvccc_result_branch = branch.startswith('rcc_')
 
                 # search for all output files in the current branch
-                is_branch_of_interest1 = args.regex_name_of_branch is None or re.match(args.regex_name_of_branch, branch)
-                is_branch_of_interest2 = args.exclude_regex_name_of_branch is None or not re.match(args.exclude_regex_name_of_branch, branch)
+                is_branch_of_interest1 = args.regex_name_of_branch is None or re.match(args.regex_name_of_branch,
+                                                                                       branch)
+                is_branch_of_interest2 = args.exclude_regex_name_of_branch is None or not re.match(
+                    args.exclude_regex_name_of_branch, branch)
 
                 is_allowed_dvccc_id = True
                 if list_of_allowed_dvccc_ids is not None and is_dvccc_result_branch:
@@ -169,6 +175,11 @@ def main():
                         is_allowed_dvccc_id = False
 
                 if is_branch_of_interest1 and is_branch_of_interest2 and is_dvccc_result_branch and is_allowed_dvccc_id:
+                    print(branch)
+                    g.checkout(branch)
+                    repo.checkout()
+
+                    print('\tIt is a branch of interest!')
                     for stage in repo.stages():
                         for out in stage.outs:
                             valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)
