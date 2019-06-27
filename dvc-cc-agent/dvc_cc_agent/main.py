@@ -138,8 +138,7 @@ def main():
         git_authentication_json = json.load(f)
     with open(args.dvc_authentication_json) as f:
         dvc_authentication_json = json.load(f)
-    
-    
+
     git_own_username = git_authentication_json['username']
     git_own_email = git_authentication_json['email']
     git_own_password = git_authentication_json['password']
@@ -175,10 +174,18 @@ def main():
     command = 'git clone --recurse-submodules ' + git_complete_path_to_repo
     print('\t' + 'git clone --recurse-submodules ' + 'https://' + git_own_username+":"+"$$$$$$$$$$$$$"+"@"+git_path_to_working_repository + '/' + git_working_repository_owner + '/'+ git_working_repository_name)
     print(subprocess.check_output(command, shell=True).decode())
-    
+
+    print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
+    command = 'sshfs -o ' + dvc_own_password + ' ' +dvc_own_username+"@"+dvc_servername+dvc_path_to_working_repository + ' dvc_remote_direcotry'
+    print(subprocess.check_output(command, shell=True).decode())
+    path_to_save_output = '~/dvc_remote_direcotry/' + git_working_repository_owner + '/' + git_working_repository_name + '/' + git_name_of_branch
+    os.makedirs(path_to_save_output, exist_ok=True)
+
+
     print('CD TO PATH   ' + get_time())
     print('\t chdir: '+git_working_repository_name[:-4])
     print(os.chdir(git_working_repository_name[:-4]))
+    os.makedirs('stdout_stderr', exist_ok=True)
     
     print('WRITE TO config.local FILE   ' + get_time())
     print("\n\t['remote \\\"nas\\\"']\n\turl = ssh://"+dvc_own_username+"@"+dvc_servername+dvc_path_to_working_repository+"\n\tpassword = '"+"$$$$$$$$$$$$$"+"'\n\n\t[core]\n\tremote = nas")
@@ -222,22 +229,24 @@ def main():
         print('\tls -i data:'+subprocess.check_output(command, shell=True).decode())
         command = 'ls -il data'
         print('\tls -il data:'+subprocess.check_output(command, shell=True).decode())
-    
+
     # check dvc status
     command = 'dvc status -c'
     dvc_status = subprocess.check_output(command, shell=True).decode()
+
+    path_to_save_output + '/' + f + '_' + str(time.time())
 
     if dvc_files_to_execute is not None:
         for f in dvc_files_to_execute:
             if f.endswith('.dvc'):
                 print('START DVC REPRO ' + f + '   ' + get_time())
-                command = 'dvc repro ' + f
+                command = 'dvc repro ' + f + ' 2>&1 | tee ' + path_to_save_output + '/' + f + '_' + str(time.time()) + ' stdout_stderr'
                 print(subprocess.check_output(command, shell=True).decode())
             else:
                 print('WARNING: A file that should be execute ('+f+') does not ends with .dvc. The job is skipped!')
     else:
         print('START DVC REPRO -P   ' + get_time())
-        command = 'dvc repro -P'
+        command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_output + '/' + str(time.time()) + ' stdout_stderr'
         print(subprocess.check_output(command, shell=True).decode())
 
     print('WRITE RED-YML-File TO MAIN-Directory   ' + get_time())
