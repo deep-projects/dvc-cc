@@ -445,9 +445,9 @@ def main():
         # Rename the hyperopt-files #
         #############################
         for f in list_of_hyperopt_files:
-            try:
+            if os.path.exists('dvc/'+f[:-9]+'.dvc'):
                 os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
-            except:
+            else:
                 print('Warning: File ' + 'dvc/'+f[:-9]+'.dvc' + ' not found.')
 
     ####################################
