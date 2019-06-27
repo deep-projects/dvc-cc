@@ -140,8 +140,6 @@ def main():
         print(pandas.DataFrame(experimentsIDS, columns=['experiment_name', 'ID']).to_string())
         exit(0)
 
-    print(experiments)
-    print(type(experiments))
     experimentsIDS = pandas.DataFrame([[e,experiments[e][0]] for e in experiments if experiments[e] is not None], columns=['experiment_name','experimentId'])
 
     if args.only_failed:
