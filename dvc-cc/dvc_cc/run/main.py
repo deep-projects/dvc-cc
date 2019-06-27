@@ -180,6 +180,7 @@ def jupyter_notebook_to_py_file(root, file_name):
         use_this_cell = True
         if c['cell_type'] == 'code':
 
+            # ignore cells
             if 'pycharm' in c['metadata'] and 'name' in c['metadata']['pycharm']:
                 if c['metadata']['pycharm']['name'].replace(' ', '').lower().startswith('#%%dvc-cc-h'):
                     use_this_cell = False
@@ -195,16 +196,23 @@ def jupyter_notebook_to_py_file(root, file_name):
                 elif c['source'][0].replace(' ', '').lower().startswith('#dch'):
                     use_this_cell = False
 
+            # include code
             if use_this_cell:
                 c_source_lines = []
                 is_in_uncommand_line = False
                 for source_line in c['source']:
                     source_line_tmp = source_line.replace('\t', '').replace(' ', '')
-                    if is_in_uncommand_line == False and (source_line_tmp .find('"""dcs') >= 0 or source_line_tmp .find('"""dvc-cc-show') >= 0):
-                        is_in_uncommand_line = True
+                    if is_in_uncommand_line == False and (source_line_tmp.find('"""dcs') >= 0 or source_line_tmp.find('"""dvc-cc-show') >= 0):
+                        pos = source_line_tmp.find('"""dcs')
+                        if pos == -1:
+                            pos = source_line_tmp.find('"""dvc-cc-show')
+                        if source_line_tmp.find('"""',pos+5) == -1:
+                            is_in_uncommand_line = True
                     elif is_in_uncommand_line:
                         if source_line_tmp.find('"""') >= 0:
                             is_in_uncommand_line = False
+                        else:
+                            c_source_lines.append(source_line)
                     else:
                         c_source_lines.append(source_line)
                 c['source'] = c_source_lines
@@ -218,6 +226,9 @@ def jupyter_notebook_to_py_file(root, file_name):
     nb = nbformat.reads(json.dumps(notebook), nbformat.NO_CONVERT)
     exporter = PythonExporter()
     source, meta = exporter.from_notebook_node(nb)
+
+    # nicer output :)
+    source = re.sub('\n\n# In\[[0-9\ ]*\]:\n\n\n', '\n#%%\n', source)
 
     output_name = root+'/'+file_name[:-6]+'.py'
     with open(output_name, 'w') as fh:
@@ -425,6 +436,12 @@ def main():
         args.experimentname = args.experimentname[0]
     else:
         args.experimentname = ''.join([e.capitalize()  for e in args.experimentname])
+
+    #################################################################################
+    # Do a DVC-checkout to delete all files that was not created with DVC repro/run #
+    #   TODO: This does not work currently! https://github.com/iterative/dvc/issues/2146
+    #################################################################################
+    subprocess.call(['dvc', 'checkout'])
 
     #####################################
     # Rename the hyperopt-files to .dvc #
