@@ -176,15 +176,16 @@ def main():
     print(subprocess.check_output(command, shell=True).decode())
 
     print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
-    os.makedirs('dvc_remote_directory', exist_ok=True)
-    command = 'sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' dvc_remote_directory <<< ' + dvc_own_password
+    os.makedirs('~/dvc_remote_directory', exist_ok=True)
+    print("os.path.exists('~/dvc_remote_directory'): " + os.path.exists('~/dvc_remote_directory'))
+    command = 'sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory <<< ' + dvc_own_password
     sshfs_raise_an_error = False
     try:
-        subprocess.check_output(command, shell=True).decode()
+        subprocess.check_output(command.split(' '), shell=True).decode()
     except:
         sshfs_raise_an_error = True
     if sshfs_raise_an_error:
-        raise ValueError('Could not use the SSHFS connection to the DVC remote directory: sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' dvc_remote_directory <<< $$$$$$$$$$$$$$')
+        raise ValueError('Could not use the SSHFS connection to the DVC remote directory: sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory <<< $$$$$$$$$$$$$$')
     path_to_save_output = '~/dvc_remote_directory/' + git_working_repository_owner + '/' + git_working_repository_name + '/' + git_name_of_branch
     os.makedirs(path_to_save_output, exist_ok=True)
 

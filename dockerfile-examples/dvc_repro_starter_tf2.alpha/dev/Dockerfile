@@ -23,7 +23,7 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade red-connector-ssh==0.7
 
 # install tensorflow
-RUN pip install tensorflow-gpu==2.0.0-alpha0
+RUN pip install tensorflow-gpu==2.0.0-beta1
 
 # Some common environmenta variables that Python uses
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 
@@ -52,7 +52,7 @@ RUN pip --no-cache-dir install \
         dvc \
         paramiko
 
-RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 11!'
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 12!'
 
 RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_agent-0.3.0-py3-none-any.whl
 
