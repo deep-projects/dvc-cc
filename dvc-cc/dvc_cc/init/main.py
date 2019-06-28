@@ -168,11 +168,24 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
         print("      doc: 'This is optional parameter. Here you can specify a sshfs folder for the \"data\" folder.'", file=f)
         print("      inputBinding: {prefix: --data_dir}", file=f)
         print("      type: Directory?", file=f)
+        print("    dvc_remote_directory_sshfs:", file=f)
+        print("      doc: 'A SSHFS connection to stream the output of DVC REPRO -P.'", file=f)
+        print("      inputBinding: {prefix: --dvc_remote_directory_sshfs}", file=f)
+        print("      type: Directory?", file=f)
         print("    dvc_file_to_execute:", file=f)
         print("      doc: 'This is optional parameter. If this parameter is given it will run \"dvc repro DVC_FILE_TO_EXECUTE\". Is this parameter is not set it will run \"dvc repro -P\"'", file=f)
         print("      inputBinding: {prefix: --dvc_file_to_execute}", file=f)
         print("      type: string?", file=f)
-    
+
+        print("    live_output_files:", file=f)
+        print("      doc: 'Comma separated string list of files that should be included to the live output for example: tensorboard,output.json This could track a tensorboard folder and a output.json file.'", file=f)
+        print("      inputBinding: {prefix: --live_output_files}", file=f)
+        print("      type: string?", file=f)
+        print("    live_output_update_frequence:", file=f)
+        print("      doc: 'The update frequence of the live output in seconds.'", file=f)
+        print("      inputBinding: {prefix: --live_output_update_frequence}", file=f)
+        print("      type: int?", file=f)
+
         print("  outputs: {}", file=f)
         print("container:", file=f)
         if num_of_gpus == 0:

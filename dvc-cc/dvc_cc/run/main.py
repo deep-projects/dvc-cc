@@ -261,7 +261,9 @@ def get_last_cc_experimentid():
     a = r.json()
     return sorted(a,key=lambda x: x['registrationTime'])[-1]['_id']
 
-def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats):
+
+
+def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, live_output_files, live_output_update_frequence):
     git_path, git_owner, git_name = get_gitinformation()
 
     dvc_url, dvc_server, dvc_path = get_dvcurl()
@@ -319,7 +321,27 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats):
                 print("                username: '" + data_username + "'", file=f)
                 print("                password: '" + data_password + "'", file=f)
                 print("              dirPath: '" + data_path + "'", file=f)
+
+            print("      dvc_remote_directory_sshfs:", file=f)
+            print("        class: Directory", file=f)
+            print("        connector:", file=f)
+            print("            command: \"red-connector-ssh\"", file=f)
+            print("            mount: true", file=f)
+            print("            access:", file=f)
+            print("              host: '" + dvc_server + "'", file=f)
+            print("              port: 22", file=f)
+            print("              auth:", file=f)
+            print("                username: '" + "{{" + dvc_server.replace('.', '_').replace('-',
+                                                                                        '_') + "_username}}'", file=f)
+            print("                password: '" + "{{" + dvc_server.replace(
+                                        '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
+            print("              writable: True", file=f)
+            print("              dirPath: '" + dvc_path + "'", file=f)
+
             print("      dvc_file_to_execute: '" + dvcfiles_to_execute + "'", file=f)
+            if live_output_files is not None:
+                print("      live_output_files: '" + live_output_files + "'", file=f)
+                print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
             print("    outputs: {}", file=f)
         subprocess.call(['git', 'add', path])
     subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
@@ -398,6 +420,14 @@ def main():
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
     parser.add_argument('-r','--num-of-repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
     parser.add_argument('-nb','--jupyter-notebook-to-py', help='If this paramer is set, than it will convert all jupyter notebook files to py files.', default=False, action='store_true')
+
+
+    parser.add_argument('-l','--live_output_files',
+                        help='Comma separated string list of files that should be included to the live output for example: "tensorboard,output.json" This could track a tensorboard folder and a output.json file.')
+    parser.add_argument('-lf','--live_output_update_frequence', type=int,
+                        help='The update frequence of the live output in seconds.',
+                        default=60)
+
     args = parser.parse_args()
     
     project_dir = get_main_git_directory_path()
@@ -559,14 +589,14 @@ def main():
             else:
                 branch_name = exp_name
 
-            cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats)
+            cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats, args.live_output_files, args.live_output_update_frequence)
 
             if len(draw) > 0:  # one or more hyperparameters was set!
                 subprocess.call(['git', 'checkout', exp_name])
 
             if os.path.exists('.dvc_cc/cc_ids.yml'):
                 with open('.dvc_cc/cc_ids.yml', 'r') as f:
-                    loaded_yml = yaml.load(f)
+                    loaded_yml = yaml.safe_load(f)
             else:
                 loaded_yml = {}
 
@@ -592,7 +622,7 @@ def main():
         if loaded_yml is not None:
             if os.path.exists('.dvc_cc/cc_all_ids.yml'):
                 with open('.dvc_cc/cc_all_ids.yml', 'r') as f:
-                    loaded_yml2 = yaml.load(f)
+                    loaded_yml2 = yaml.safe_load(f)
             else:
                 loaded_yml2 = {}
             loaded_yml2.update(loaded_yml)

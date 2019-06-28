@@ -5,6 +5,7 @@ import os
 import datetime
 import time
 import shutil
+import dvc_cc_agent.copy_output_files
 
 def get_command_list_in_right_order():
     from dvc.repo import Repo as DVCRepo
@@ -128,10 +129,11 @@ def main():
     parser.add_argument('dvc_authentication_json', help='A path to json file which contains the dvc authentication. This should include the keys: username and password.')
     parser.add_argument('dvc_servername', help='The servername of the dvc directory.')
     parser.add_argument('dvc_path_to_working_repository', help='The directory that is used for the dvc script.')
-    parser.add_argument('--data_dir', default=None, help='This is optional parameter. Here you can specify a sshfs folder for the \"data\" folder.')
+    parser.add_argument('--dvc_remote_directory_sshfs', default=None, help='A SSHFS connection to stream the output of DVC REPRO -P.')
+    parser.add_argument('--data_dir_sshfs', default=None, help='This is optional parameter. Here you can specify a sshfs folder for the \"data\" folder.')
     parser.add_argument('--dvc_file_to_execute', default=None, help='This is optional parameter. If this parameter is given it will run \"dvc repro DVC_FILE_TO_EXECUTE\". Is this parameter is not set it will run \"dvc repro -P\"')
-    
-    
+    parser.add_argument('--live_output_files', default=None, help='Comma separated string list of files that should be included to the live output for example: "tensorboard,output.json" This could track a tensorboard folder and a output.json file.')
+    parser.add_argument('--live_output_update_frequence', default=60, help='The update frequence of the live output in seconds.')
     args = parser.parse_args()
     
     with open(args.git_authentication_json) as f:
@@ -152,7 +154,7 @@ def main():
     dvc_own_username = dvc_authentication_json['username']
     dvc_own_password = dvc_authentication_json['password']
     
-    data_dir = args.data_dir
+    data_dir = args.data_dir_sshfs
     if args.dvc_file_to_execute is None:
         dvc_files_to_execute = None
     else:
@@ -176,27 +178,34 @@ def main():
     print(subprocess.check_output(command, shell=True).decode())
 
     print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
-    os.makedirs('~/dvc_remote_directory', exist_ok=True)
-    print("os.path.exists('~/dvc_remote_directory'): ", os.path.exists('~/dvc_remote_directory'))
-    command = 'sshfs ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory'
-    sshfs_raise_an_error = False
+    if args.dvc_remote_directory_sshfs is None:
+        print('DO NOT USE SSHFS FOR OUTPUT!')
+        sshfs_dvc_remote_directory = os.path.expanduser('~/dvc_remote_directory')
+        os.makedirs(sshfs_dvc_remote_directory)
+    else:
+        print('USE SSHFS FOR OUTPUT!')
+        sshfs_dvc_remote_directory = args.dvc_remote_directory_sshfs
+
+    # TODO: JUST A TEST
+    command = 'ls -il ' + sshfs_dvc_remote_directory
+    print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
+
+    path_to_save_output = sshfs_dvc_remote_directory + '/' + git_working_repository_owner + '/' + git_working_repository_name + '/' + '_'.join(git_name_of_branch.split('_')[:3]) + '/' + '_'.join(git_name_of_branch.split('_')[3:]) + '/'
     try:
-        sp = subprocess.Popen(
-            command.split(' '), stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding='utf8')
-        sp.stdin.write(dvc_own_password)
-        print(sp.communicate()[0])
-        sp.stdin.close()
+        os.makedirs(path_to_save_output)
     except:
-        sshfs_raise_an_error = True
-    if sshfs_raise_an_error:
-        raise ValueError('Could not use the SSHFS connection to the DVC remote directory: sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory <<< $$$$$$$$$$$$$$')
-    path_to_save_output = '~/dvc_remote_directory/' + git_working_repository_owner + '/' + git_working_repository_name + '/' + git_name_of_branch
-    os.makedirs(path_to_save_output, exist_ok=True)
+        print('Warning: The folder already exists: ' + path_to_save_output)
+    print('EXISTS OUTPUT-PATH: ' + str(os.path.exists(path_to_save_output)),':',path_to_save_output)
+    print('EXISTS PATH TO SCRIPT?: ', str(os.path.exists('/home/cc/.pyenv/versions/3.7.2/lib/python3.7/site-packages/dvc_cc_agent/start_dvc_repro.sh')))
+
+    #TODO: JUST A TEST
+    command = 'ls -il ' + sshfs_dvc_remote_directory
+    print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
 
     print('CD TO PATH   ' + get_time())
     print('\t chdir: '+git_working_repository_name[:-4])
     print(os.chdir(git_working_repository_name[:-4]))
-    os.makedirs('stdout_stderr', exist_ok=True)
+    os.makedirs('stdout_stderr')
     
     print('WRITE TO config.local FILE   ' + get_time())
     print("\n\t['remote \\\"nas\\\"']\n\turl = ssh://"+dvc_own_username+"@"+dvc_servername+dvc_path_to_working_repository+"\n\tpassword = '"+"$$$$$$$$$$$$$"+"'\n\n\t[core]\n\tremote = nas")
@@ -246,16 +255,26 @@ def main():
     command = 'dvc status -c'
     dvc_status = subprocess.check_output(command, shell=True).decode()
 
+    # start copier:
+    if args.live_output_files is not None:
+        #['something', 'file']
+        print('Start thread to live push output:', args.live_output_files.split(','))
+        dvc_cc_agent.copy_output_files.Thread(args.live_output_files.split(','),path_to_save_output, args.live_output_update_frequence)
+
+    # start dvc repro
     if dvc_files_to_execute is not None:
         for f in dvc_files_to_execute:
             if f.endswith('.dvc'):
                 print('START DVC REPRO ' + f + '   ' + get_time())
-                command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh ' + f + ' ' + path_to_save_output
-                print(subprocess.check_output(command, shell=True).decode())
-                print(subprocess.check_output(command, shell=True).decode())
+                command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh ' + f + ' ' + f.replace('/','_') + ' ' + path_to_save_output
+                #command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh'
+                print(command)
+                print(subprocess.check_output(command.split(' ')).decode())
             else:
                 print('WARNING: A file that should be execute ('+f+') does not ends with .dvc. The job is skipped!')
+        subprocess.call(['git','add','stdout_stderr/*'])
     else:
+        # TODO USE HERE ALSO THE SCRIPT !!! Currently this will not work!
         print('START DVC REPRO -P   ' + get_time())
         command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_output + '/' + str(time.time()) + ' stdout_stderr'
         print(subprocess.check_output(command, shell=True).decode())

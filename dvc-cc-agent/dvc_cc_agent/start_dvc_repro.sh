@@ -1,7 +1,9 @@
 #!/bin/bash
 
 timestamp() {
-  date +"%T"
+  date +"%y_%m_%d_%H_%M_%S_%N"
 }
-echo "dvc repro `$1` 2>&1 | tee `$2`/`$1`_test stdout_stderr/test"
-dvc repro $1 2>&1 | tee $2/$1_test stdout_stderr/test
+tmstmp=$( timestamp )
+echo "DVC REPRO $1 2>&1 | tee $3$2_$tmstmp stdout_stderr/$2_$tmstmp"
+export PYTHONUNBUFFERED=true
+dvc repro $1 2>&1 | tee $3$2_$tmstmp stdout_stderr/$2_$tmstmp
