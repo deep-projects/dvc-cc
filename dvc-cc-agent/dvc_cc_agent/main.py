@@ -178,10 +178,14 @@ def main():
     print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
     os.makedirs('~/dvc_remote_directory', exist_ok=True)
     print("os.path.exists('~/dvc_remote_directory'): ", os.path.exists('~/dvc_remote_directory'))
-    command = 'sshfs -o password_stdin ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory <<< ' + dvc_own_password
+    command = 'sshfs ' +dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository + ' ~/dvc_remote_directory'
     sshfs_raise_an_error = False
     try:
-        subprocess.check_output(command.split(' '), shell=True).decode()
+        sp = subprocess.Popen(
+            command.split(' '), stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding='utf8')
+        sp.stdin.write(dvc_own_password)
+        print(sp.communicate()[0])
+        sp.stdin.close()
     except:
         sshfs_raise_an_error = True
     if sshfs_raise_an_error:
@@ -199,6 +203,7 @@ def main():
     filecontent = "\n['remote \\\"nas\\\"']\nurl = ssh://"+dvc_own_username+"@"+dvc_servername+dvc_path_to_working_repository+"\npassword = '"+dvc_own_password+"'\n\n[core]\nremote = nas"
     command = "echo \"" + filecontent + "\" > .dvc/config.local"
     print(subprocess.check_output(command, shell=True).decode())
+
 
     print('PULL FROM GIT   ' + get_time())
     command = 'git pull'
@@ -241,13 +246,12 @@ def main():
     command = 'dvc status -c'
     dvc_status = subprocess.check_output(command, shell=True).decode()
 
-    path_to_save_output + '/' + f + '_' + str(time.time())
-
     if dvc_files_to_execute is not None:
         for f in dvc_files_to_execute:
             if f.endswith('.dvc'):
                 print('START DVC REPRO ' + f + '   ' + get_time())
-                command = 'dvc repro ' + f + ' 2>&1 | tee ' + path_to_save_output + '/' + f + '_' + str(time.time()) + ' stdout_stderr'
+                command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh ' + f + ' ' + path_to_save_output
+                print(subprocess.check_output(command, shell=True).decode())
                 print(subprocess.check_output(command, shell=True).decode())
             else:
                 print('WARNING: A file that should be execute ('+f+') does not ends with .dvc. The job is skipped!')
