@@ -84,6 +84,19 @@ def main():
         if engine_url == '':
             engine_url = 'https://agency.f4.htw-berlin.de/cc'
 
+        dvc_remote_server = input('The remote DVC server that you want use (default: avocado01.f4.htw-berlin.de): ')
+        if dvc_remote_server == '':
+            dvc_remote_server = 'avocado01.f4.htw-berlin.de'
+        dvc_remote_path = input('The remote DVC folder that you want use (default: /data/ldap/Data-Version-Control-Cache): ')
+        if dvc_remote_path == '':
+            dvc_remote_path = '/data/ldap/Data-Version-Control-Cache'
+
+        dvc_remote_user = input('The username for the remote DVC folder: ')
+        if dvc_remote_user == '':
+            dvc_remote_user = input('Do you really want to use the connection to the remote dvc folder without credentials? [n,y]')
+            if not dvc_remote_user.lower().startswith('y'):
+                dvc_remote_user = input('The username for the remote DVC folder: ')
+
     else:
         # set default values
         num_of_gpus = 0 ##
@@ -93,7 +106,9 @@ def main():
         batch_concurrency_limit = 12
         engine = 'ccagency'
         engine_url = 'https://agency.f4.htw-berlin.de/cc'
-
+        dvc_remote_server = 'avocado01.f4.htw-berlin.de'
+        dvc_remote_path = '/data/ldap/Data-Version-Control-Cache'
+        dvc_remote_user = ''
 
     # Change the directory to the main git directory.
     os.chdir(get_main_git_directory_path())
@@ -108,7 +123,26 @@ def main():
     except:
         subprocess.call(['dvc', 'init'])
         dvcrepo = DVCRepo('.')
-    
+
+    # set remote dvc connection
+    if dvc_remote_user == '':
+        subprocess.call(
+            ['dvc', 'remote', 'add', '--force', '-d', 'dvc_connection', 'ssh://' + dvc_remote_server + ':' + dvc_remote_path])
+        subprocess.call(['dvc', 'remote', 'modify', 'dvc_connection', 'ask_password', 'false'])
+    else:
+        subprocess.call(['dvc', 'remote', 'add', '--force', '-d', 'dvc_connection',
+                         'ssh://' + dvc_remote_user + '@' + dvc_remote_server + ':' + dvc_remote_path])
+        subprocess.call(['dvc', 'remote', 'modify', 'dvc_connection', 'ask_password', 'true'])
+    # test remote connection
+    subprocess.call(['dvc','push'])
+
+    if dvc_remote_path != '/data/ldap/Data-Version-Control-Cache2':
+        try:
+            subprocess.call(['ssh', dvc_remote_user + '@' + dvc_remote_server, "mkdir -p "+dvc_remote_path+" ; chmod 774 "+dvc_remote_path+" ; setfacl -d -m u::rwX,g::rwX,o::- "+dvc_remote_path])
+        except:
+            print('Warning: Currently acl is not installed on the server! You will maybe have problems by sharing the same remote dvc folder!')
+
+
     # create the main folder of the dvc_cc software package.
     if not os.path.exists('.dvc_cc'):
         os.mkdir('.dvc_cc')

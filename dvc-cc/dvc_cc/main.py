@@ -31,19 +31,24 @@ from dvc_cc.setting.main import DESCRIPTION as SETTING_DESCRIPTION
 from dvc_cc.hyperopt.main import main as hyperopt_main
 from dvc_cc.hyperopt.main import DESCRIPTION as HYPEROPT_DESCRIPTION
 
+from dvc_cc.live_output.main import main as live_output_main
+from dvc_cc.live_output.main import DESCRIPTION as LIVE_OUTPUT_DESCRIPTION
+
 SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 MODES = OrderedDict([
-    ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
-    ('run', {'main': run_main, 'description': run_DESCRIPTION}),
-    ('run-all-defined', {'main': run_all_defined_main, 'description': RUN_ALL_DEFINED_DESCRIPTION}),
-    ('output-to-tmp', {'main': output_to_tmp_main, 'description': output_to_tmp_DESCRIPTION}),
     ('init', {'main': init_main, 'description': INIT_DESCRIPTION}),
+    ('setting', {'main': setting_main, 'description': SETTING_DESCRIPTION}),
+    ('hyperopt', {'main': hyperopt_main, 'description': HYPEROPT_DESCRIPTION}),
+    ('run', {'main': run_main, 'description': run_DESCRIPTION}),
+    # TODO: This should be the rerun-part!
+    #('run-all-defined', {'main': run_all_defined_main, 'description': RUN_ALL_DEFINED_DESCRIPTION}),
+    ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
     ('status', {'main': status_main, 'description': STATUS_DESCRIPTION}),
     ('cancel', {'main': cancel_main, 'description': CANCEL_DESCRIPTION}),
-    ('setting', {'main': setting_main, 'description': SETTING_DESCRIPTION}),
-    ('hyperopt', {'main': hyperopt_main, 'description': HYPEROPT_DESCRIPTION})
+    ('live-output', {'main': live_output_main, 'description': LIVE_OUTPUT_DESCRIPTION}),
+    ('output-to-tmp', {'main': output_to_tmp_main, 'description': output_to_tmp_DESCRIPTION})
 ])
 
 
