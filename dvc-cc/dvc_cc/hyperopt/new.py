@@ -59,11 +59,13 @@ def main():
 
     # create the dvc file
     found_user_filename = False
-    for i in range(len(sys.argv[1:])):
+    command_start_in = 0
+    for i in range(len(sys.argv)-1):
         if sys.argv[i] == '-f':
             found_user_filename = True
             sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_')
             output_filename = sys.argv[i+1]
+
 
     if found_user_filename:
         subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])

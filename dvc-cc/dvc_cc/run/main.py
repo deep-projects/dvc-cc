@@ -95,7 +95,7 @@ def get_dvcurl():
     else:
       dvc_url = dvc_url[0].split('@')[1]
       dvc_server = dvc_url[:dvc_url.find(':')]
-      dvc_path = dvc_url[dvc_url.find(':'):].rstrip()
+      dvc_path = dvc_url[dvc_url.find(':')+1:].rstrip()
     return dvc_url, dvc_server, dvc_path
 
 def check_git_repo(args):
@@ -371,35 +371,68 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     else:
         return None
 
+def intarray_to_shortstr(input_array):
+    input_array = np.array(input_array, dtype=int)
+    str_array = np.array(input_array, dtype=str)
+    max_length = np.max([len(s) for s in str_array])
+    if max_length <= 6:
+        return str_array
+    else:
+        unique_values = len(np.unique(str_array))
+        i = 0
+        while len(np.unique([('%.'+str(i)+'E')%s for s in input_array])) < unique_values:
+            i += 1
+        return [('%.'+str(i)+'E')%s for s in input_array]
+
+def floatarray_to_shortstr(input_array):
+    input_array = np.array(input_array, dtype=float)
+    unique_values = len(np.unique(input_array))
+    i = 0
+    while len(np.unique([('%.'+str(i)+'f')%s for s in input_array])) < unique_values:
+        i += 1
+    str_array = [('%.'+str(i)+'f')%s for s in input_array]
+    max_length = np.max([len(s) for s in str_array])
+    if max_length <= 6:
+        return str_array
+    else:
+        unique_values = len(np.unique(str_array))
+        i = 0
+        while len(np.unique([('%.'+str(i)+'E')%s for s in input_array])) < unique_values:
+            i += 1
+        return [('%.'+str(i)+'E')%s for s in input_array]
+
+def strarray_to_shortstr(input_array):
+    input_array = np.array(input_array, dtype=str)
+    unique_values = len(np.unique(input_array))
+    min_len_of_text = np.min([len(s) for s in input_array])
+    if unique_values == 1:
+        return [s[0] for s in input_array]
+    else:
+        start_index = 0
+        while len(np.unique([s[start_index] for s in input_array])) == 1 and start_index < min_len_of_text - 1:
+            start_index += 1
+        end_index = start_index + 1
+        while len(np.unique([s[start_index:end_index] for s in input_array])) < unique_values:
+            end_index += 1
+        return [s[start_index:end_index] for s in input_array]
+
 def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
     # TODO: USE PARAMS FOR THIS: + '___' + str(draw)[1:-1].replace(',','_').replace(' ','').replace('[','').replace(']','').replace('-','')
     hyperopt_draws = np.array(hyperopt_draws)
     result = []
     for i in range(len(list_of_variables)):
         v = list_of_variables[i]
-        if v.vartype == 'float' or v.vartype == 'int':
-            values = np.array(hyperopt_draws[:, i], dtype=float)
-            values_unique = np.unique(values)
-            index = 0
-            strvalues = [v.varname.upper() + (('%.'+str(index)+'E')%varvalue).lower() for varvalue in values]
-            while len(np.unique(strvalues)) < len(values_unique):
-                index += 1
-                strvalues = [v.varname.upper() + (('%.'+str(index)+'E')%varvalue).lower() for varvalue in values]
+        if v.vartype == 'float':
+            values = floatarray_to_shortstr(hyperopt_draws[:, i])
+        elif v.vartype == 'int':
+            values = intarray_to_shortstr(hyperopt_draws[:, i])
         else:
-            values = np.array(hyperopt_draws[:,i], dtype=str)
-            values_unique = np.unique(values)
-            start_index = 0
-            while len(np.unique(values_unique[start_index])) == 1:
-                start_index += 1
-            end_index = -1
-            while len(np.unique(values_unique[end_index])) == 1:
-                end_index -= 1
-            if end_index == -1:
-                strvalues = [v.varname.upper()+var[start_index:].lower().replace('/','_').replace(' ','') for var in values]
-            else:
-                strvalues = [v.varname.upper()+var[start_index:end_index+1].lower().replace('/','_').replace(' ','') for var in values]
+            values = [hyperopt_draws[j, i].lower().replace('/', '_').replace(' ', '') for j in range(len(hyperopt_draws))]
+            values = strarray_to_shortstr(values)
+        values = [v.varname.upper() + var for var in values]
 
-        result.append(strvalues)
+        result.append(values)
+
     result = list(map(list, zip(*result)))
 
     batch_names = []

@@ -136,7 +136,53 @@ class Constant(HyperOptimizerBase):
         self.set_data(input('Set one or comma seperated values: '))
         return
 
-    read_value
+#class All_Variable(HyperOptimizerBase):
+#    name = 'All'
+#    shortname = 'a'
+#    allowed_types = ['one_of']
+#
+#    def set_data(self,data):
+#        data = str(data).replace(' ', '').split(',')
+#        self.num_of_draws = len(data)
+#        self.value = data
+#
+#    def draw(self,):
+#        return self.value
+#
+#    def set_settings(self,):
+#        self.set_data(input('Set one or comma seperated values: '))
+#        return
+
+
+class One_Of(HyperOptimizerBase):
+    name = 'one_of'
+    shortname = 'o'
+    allowed_types = ['one_of']
+    v = None
+
+    def set_data(self,inputdata, vartype):
+        vartypes = vartype[1:-1].split(',')
+        inputdata = str(inputdata).replace(' ', '').split(',')
+        data = []
+        for d in inputdata:
+            if d in vartypes:
+                data.append(d)
+            elif d.isdigit():
+                data.append(vartypes[int(d)])
+            else:
+                raise ValueError('The user data did not match any of the parameter.')
+
+        self.num_of_draws = len(data)
+        if self.num_of_draws == 0:
+            raise ValueError('The user data did not match any of the parameter.')
+        self.value = data
+
+    def draw(self,):
+        return self.value
+
+    def set_settings(self,vartype):
+        self.set_data(input('Set one or comma seperated values: '), vartype)
+        return
 
 class RegexFileSearch(HyperOptimizerBase):
     name = 'FileSearch'
@@ -179,11 +225,12 @@ class RegexFileSearch(HyperOptimizerBase):
         self.num_of_draws = len(matched_files)
         self.matched_files = matched_files
 
-    read_value
 
 def get_possible_hyperparameter(variabletype):
     if variabletype == 'file':
         return [RegexFileSearch]
+    elif variabletype.startswith('[') and variabletype.endswith(']'):
+        return []
     else:
         return [HyperOptimizerGridSearch, HyperOptimizerRandomSearchLocal, HyperOptimizerRandomSearchGlobal]
 
@@ -209,7 +256,6 @@ def combine_combinations(combinations, is_global):
     for i in range(len(combinations)):
         shape = r.shape
         if not is_global[i] or not one_global_hyperopt_was_set:
-            print(i)
             r = np.tile(r, len(combinations[i])).reshape(-1, shape[1])
             next_draw = np.tile(combinations[i], shape[0]).reshape(-1, 1)
             if is_global[i]:
@@ -233,16 +279,25 @@ def create_hyperopt_variables(vc): # vc == VariableCache
             while selected_hyper is None:
                 print('Specifie the variable ' + v.varname)
                 print('\tYou can set one or multiple comma sebarated values directly.')
-                print('\tOr do hyperoptimization with one of the following options:')
-                for h in hyper:
-                    print('\t\t- ' + h.name + ' (with --' + h.shortname + ')')
+                if len(hyper) > 0:
+                    print('\tOr do hyperoptimization with one of the following options:')
+                    for h in hyper:
+                        print('\t\t- ' + h.name + ' (with --' + h.shortname + ')')
 
-                user_input = input('\t'+ v.varname + ': ')
+                user_input = input('\t'+ str(v.varname) + ' (' + str(v.vartype) + '): ')
 
-                selected_hyper = select_hyperparameteroptimizer(user_input, hyper)
+                if v.vartype.startswith('[') and v.vartype.endswith(']'):
+                    try:
+                        selected_hyper = One_Of()
+                        selected_hyper.set_data(user_input, v.vartype)
+                    except:
+                        print('Warning: Did not understand the user input.')
+                        selected_hyper = None
+                else:
+                    selected_hyper = select_hyperparameteroptimizer(user_input, hyper)
                 if selected_hyper is None:
                     print('Warning: did not understand which Hyperoptimizer you want to use.')
-            if type(selected_hyper) is not Constant:
+            if type(selected_hyper) is not Constant and not One_Of:
                 selected_hyper = selected_hyper(v.vartype)
                 selected_hyper.set_settings()
 
