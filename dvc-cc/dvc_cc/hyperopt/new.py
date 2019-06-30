@@ -74,8 +74,12 @@ def main():
     new_hyperopt_filename = 'dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt'
     os.rename(output_filename, new_hyperopt_filename)
 
-    vc.register_dvccc_file(new_hyperopt_filename)
-
+    try:
+        vc.register_dvccc_file(new_hyperopt_filename)
+    except KeyboardInterrupt as ki:
+        # Delete the file if the user want to cancel the job
+        os.remove(new_hyperopt_filename)
+        raise ki
     vc.update_dvccc_files()
 
     subprocess.call(['git', 'add', 'dvc/.hyperopt/*'])

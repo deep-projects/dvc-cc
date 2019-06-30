@@ -17,7 +17,7 @@ class Variable:
         self.set_constant_value(varvalue)
 
     def split_original_string(original_string):
-        tmp = original_string.split(';')
+        tmp = original_string.split(':')
         varname = re.sub(r"[^A-Za-z0-9_]+", '', tmp[0])
         if len(tmp) == 1:
             return [varname, None, None]
@@ -63,10 +63,14 @@ class Variable:
                         last_input = input('Allowed Values (Enter for closing): ')
                         if last_input != '':
                             self.vartype = self.vartype + ',' + last_input
-                self.vartype = ']'
+                self.vartype = self.vartype + ']'
+            # it is one_of with the values already set.
+            elif name_of_type.startswith('[') and name_of_type.endswith(']'):
+                self.vartype = name_of_type
             else:
                 print('Warning: Did not understand the datatype.')
                 self.vartype = None
+                name_of_type = None
         self.varvalue = None
 
 
@@ -133,11 +137,11 @@ class Variable:
             raise ValueError('ERROR: You used this function false. The first parameter must be a dict!')
 
     def __pretty_str__(self):
-        tmp = str(self)[2:-2].split(';')
+        tmp = str(self)[2:-2].split(':')
         return '%25s%8s%6s'%(tmp[0],tmp[1],tmp[2])
 
     def __str__(self):
-        return '{{' + self.varname+';'+ self.vartype + ';'+ str(self.varvalue) + '}}'
+        return '{{' + self.varname+':'+ self.vartype + ':'+ str(self.varvalue) + '}}'
 
 
 class VariableCache:

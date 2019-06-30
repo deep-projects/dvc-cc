@@ -94,8 +94,8 @@ def get_dvcurl():
       dvc_path = input("dvc_path_to_working_repository: ")
     else:
       dvc_url = dvc_url[0].split('@')[1]
-      dvc_server = dvc_url[:dvc_url.find('/')]
-      dvc_path = dvc_url[dvc_url.find('/'):].rstrip()
+      dvc_server = dvc_url[:dvc_url.find(':')]
+      dvc_path = dvc_url[dvc_url.find(':'):].rstrip()
     return dvc_url, dvc_server, dvc_path
 
 def check_git_repo(args):
