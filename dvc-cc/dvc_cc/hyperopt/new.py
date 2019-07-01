@@ -1,16 +1,5 @@
-from collections import OrderedDict
-from dvc_cc.version import VERSION
-from dvc_cc.cli_modes import cli_modes
-
-import os
 import sys
-import yaml
-import requests
-import keyring
-from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
-from argparse import ArgumentParser
-import datetime
 from dvc_cc.hyperopt.variable import *
 import subprocess
 import uuid
@@ -22,14 +11,15 @@ def get_main_git_directory_path():
     return git_path
 
 
-# TODO EDIT DESCRIPTION !!!
-DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'Use this to define your pipeline with or without hyperparameters. It is the same use as '\
+              +bcolors.OKBLUE+'dvc run --no-exec'+bcolors.ENDC + '.. If you want use ' \
+               'hyperparameters you can set use i.e. {{a}} for the hyperparameter a. The script will ask you ' \
+               'for the type of the hyperparameter. You can also set the type directly with i.e. {{a:int}}. ' \
+               'You should use " for your command!\n' \
+               'I.E.: '+bcolors.OKBLUE+'dvc-cc hyperopt new -d data.npy -o tensorboard -m summary.json "python train.py --learning-rate {{lr}} --batch-size {{bs}}"'+bcolors.ENDC
 
 
 def main():
-    #parser = ArgumentParser(description=DESCRIPTION)
-    #parser.add_argument('command', help='The command that you would use in `dvc run --no exec ...`. Here everything for what the dots stand you can use in this command. Use <<<A_Variable>>> to create a hyperopt variable.', type=str)
-    #args = parser.parse_args()
 
     # go to the main git directory.
     os.chdir(get_main_git_directory_path())
@@ -40,7 +30,9 @@ def main():
     if not os.path.exists('dvc/.hyperopt'):
         os.mkdir('dvc/.hyperopt')
 
-
+    if len(sys.argv) == 1:
+        print(DESCRIPTION)
+        exit(0)
 
     # get all existent variables
     vc = VariableCache()

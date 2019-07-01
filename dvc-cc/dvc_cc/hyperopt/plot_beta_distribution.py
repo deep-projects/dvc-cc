@@ -1,30 +1,17 @@
-from collections import OrderedDict
-from dvc_cc.version import VERSION
-from dvc_cc.cli_modes import cli_modes
-
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+from dvc_cc.bcolors import *
 
 
-DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'This script represents beta distributions. You can use this to work with '+bcolors.OKBLUE+'dvc-cc run'+bcolors.ENDC+ \
+              ' and see from which distribution the hyperparemeter is drawn.'
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
     args = parser.parse_args()
 
-    print('Use CTR+C to stop this process!')
+    print('Use CTRL+C to stop this script.')
     min = float(input('Min-Value: '))
     max = float(input('Max-Value: '))
     results = {}

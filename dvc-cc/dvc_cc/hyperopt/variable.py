@@ -1,6 +1,5 @@
-import numpy as np
-import os
 import re
+from dvc_cc.bcolors import *
 
 class Variable:
 
@@ -37,7 +36,7 @@ class Variable:
         while self.vartype is None:
 
             if name_of_type is None or name_of_type == '' or name_of_type.lower() == 'none':
-                name_of_type = input('What type of variable is \''+self.varname+'\'? (int, float, file, one_of): ')
+                name_of_type = input('What type of variable is \''+str(self.varname)+'\'? (int, float, file, one_of): ')
 
             name_of_type = name_of_type.lower()
 
@@ -53,14 +52,15 @@ class Variable:
                 self.vartype = '['
                 while last_input != '':
                     if last_input == None:
-                        last_input = input('Allowed Values: ')
+                        print('\tPlease set all allowed values for the variable ' + self.varname)
+                        last_input = input('\t\tAllowed Values: ')
                         if last_input == '':
-                            print('Error: You need to set a value!')
+                            print(bcolors.FAIL+'\t\t\   Error: You need to set a value!'+bcolors.ENDC)
                             last_input = None
                         else:
                             self.vartype = self.vartype + last_input
                     else:
-                        last_input = input('Allowed Values (Enter for closing): ')
+                        last_input = input('\t\tAllowed Values (Enter for closing): ')
                         if last_input != '':
                             self.vartype = self.vartype + ',' + last_input
                 self.vartype = self.vartype + ']'
@@ -68,7 +68,7 @@ class Variable:
             elif name_of_type.startswith('[') and name_of_type.endswith(']'):
                 self.vartype = name_of_type
             else:
-                print('Warning: Did not understand the datatype.')
+                print(bcolors.FAIL+'\tError: Did not understand the datatype you want to set.'+bcolors.ENDC)
                 self.vartype = None
                 name_of_type = None
         self.varvalue = None
@@ -100,7 +100,7 @@ class Variable:
                     return v
             return None
         else:
-            raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+            raise ValueError('You used this function wrong. The first parameter must be a list!')
 
     def search_varname_in_list_return_index(list_of_variables, varname_to_check):
         if type(list_of_variables) == list:
@@ -109,7 +109,7 @@ class Variable:
                     return i
             return None
         else:
-            raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+            raise ValueError('You used this function wrong. The first parameter must be a list!')
 
     def search_var_in_list(list_of_variables, var_to_check):
         if type(list_of_variables) == list:
@@ -118,7 +118,7 @@ class Variable:
                     return v
             return var_to_check
         else:
-            raise ValueError('ERROR: You used this function false. The first parameter must be a list!')
+            raise ValueError('You used this function wrong. The first parameter must be a list!')
     def search_varname_in_dict(list_of_variables, varname_to_check):
         if type(list_of_variables) == dict:
             if varname_to_check in list_of_variables:
@@ -126,7 +126,7 @@ class Variable:
             else:
                 return None
         else:
-            raise ValueError('ERROR: You used this function false. The first parameter must be a dict!')
+            raise ValueError('You used this function wrong. The first parameter must be a dict!')
     def search_var_in_dict(list_of_variables, var_to_check):
         if type(list_of_variables) == dict:
             if var_to_check.varname in list_of_variables:
@@ -134,7 +134,7 @@ class Variable:
             else:
                 return var_to_check
         else:
-            raise ValueError('ERROR: You used this function false. The first parameter must be a dict!')
+            raise ValueError('You used this function wrong. The first parameter must be a dict!')
 
     def __pretty_str__(self):
         tmp = str(self)[2:-2].split(':')

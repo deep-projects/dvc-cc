@@ -1,21 +1,17 @@
-from collections import OrderedDict
-from dvc_cc.version import VERSION
-from dvc_cc.cli_modes import cli_modes
 import sys
-from argparse import ArgumentParser
-
 import subprocess
 from subprocess import check_output
-
 from dvc.repo import Repo as DVCRepo
 import getpass
 import time
-#from dvc_cc.job.main import main as job_main
-#from dvc_cc.job.main import DESCRIPTION as JOB_DESCRIPTION
+from dvc_cc.bcolors import *
 
 SCRIPT_NAME = 'dvc-cc git'
 TITLE = 'tools'
-DESCRIPTION = 'This code call the git command and run after this "dvc checkout". If you call "dvc-cc git branch", it will not show the dvc-cc result branches. If you call "dvc-cc git sync" it will checkout to all remote branches!'
+DESCRIPTION = 'With this script you can call everything what you can do with git. If you call '+bcolors.OKBLUE+'dvc-cc git branch'+bcolors.ENDC+' it will ' \
+              'show you only your working branches and ignore DVC-CC branches. If you call '+bcolors.OKBLUE+'dvc-cc git sync'+bcolors.ENDC+' it will sync ' \
+              'all remote branches and create a local branch for this. All other commands are piped to git directly and ' \
+              'run '+bcolors.OKBLUE+'dvc checkout'+bcolors.ENDC+' after this to clean up your branches.'
 
 
 def get_name_of_branch():
@@ -26,7 +22,20 @@ def get_name_of_branch():
 
 def main():
     argv = sys.argv[1:]
-    if len(argv) == 1 and sys.argv[1] == 'branch':
+    if '-h' in argv or '--help' in argv or len(argv) == 0:
+      print(DESCRIPTION)
+      print()
+      print('dvc-cc git branch:')
+      print('\tShows the branches without the automatic created branches from DVC-CC.')
+      print('dvc-cc git sync [-d] [-l]:')
+      print('\tCreate local branches for all remote branches.')
+      print('\t\t-d: Than it will download all files from the DVC-Server.')
+      print('\t\t-l: If this is set, than it will repeat every 20 seconds the script.')
+      print('\t\t\tYou can cancel it with CTRL+C.')
+      print('dvc-cc git OTHER_GIT_COMMAND:')
+      print('\tEvery other git command will be piped directly to git. After it was called it will run '+bcolors.OKBLUE+'dvc checkout'+bcolors.ENDC)
+      print('\t\tto cleanup the repository')
+    elif len(argv) == 1 and sys.argv[1] == 'branch':
         git_branch = check_output(['git','branch']).decode("utf8").split('\n')
         for line in git_branch:
             if not line.startswith('  rcc_') and not line.startswith('  remotes/origin/rcc_') and not line.startswith('  cc_') and not line.startswith('  remotes/origin/cc_'):
@@ -57,7 +66,7 @@ def main():
             is_first_iteration = True
             while loop or is_first_iteration:
                 if is_first_iteration == False:
-                    print('All remote branches were created locally. Wait 20 seconds for the next pull request.')
+                    print('All remote branches were created locally. Wait 20 seconds for the next pull request. To cancel the script press CTRL+C.')
                     time.sleep(20)
                 is_first_iteration = False
                 for b in all_branches_remote:

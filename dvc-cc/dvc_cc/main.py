@@ -36,7 +36,8 @@ from dvc_cc.live_output.main import DESCRIPTION as LIVE_OUTPUT_DESCRIPTION
 
 SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
-DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
+DESCRIPTION = 'This software is for Machine Learner and Deep Learner to make scalable and reproducable experiments. It combines ' \
+              'the two softwares Data Version Control (www.dvc.org) and Curious Containers (www.curious-containers.cc). DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 MODES = OrderedDict([
     ('init', {'main': init_main, 'description': INIT_DESCRIPTION}),
     ('setting', {'main': setting_main, 'description': SETTING_DESCRIPTION}),

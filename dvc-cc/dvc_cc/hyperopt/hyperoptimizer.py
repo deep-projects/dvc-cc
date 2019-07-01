@@ -1,20 +1,8 @@
-import os
-import itertools
-import uuid
 import random
 from dvc_cc.hyperopt.variable import *
 import re
 import numpy as np
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+from dvc_cc.bcolors import *
 
 class HyperOptimizerBase:
     is_global = False
@@ -37,7 +25,7 @@ def read_value(text,typeofvalue, order=2):
         try:
             user_input = typeofvalue(input('\t'*order+text))
         except ValueError:
-            print('\t'*order+'Wrong datatype: Your input must be the dataype ' + str(typeofvalue) + '.')
+            print(bcolors.FAIL+'\t'*order+'Wrong datatype: Your input must be from the datatype ' + str(typeofvalue) + '.'+bcolors.ENDC)
             user_input = None
     return user_input
 
@@ -136,24 +124,6 @@ class Constant(HyperOptimizerBase):
         self.set_data(input('Set one or comma seperated values: '))
         return
 
-#class All_Variable(HyperOptimizerBase):
-#    name = 'All'
-#    shortname = 'a'
-#    allowed_types = ['one_of']
-#
-#    def set_data(self,data):
-#        data = str(data).replace(' ', '').split(',')
-#        self.num_of_draws = len(data)
-#        self.value = data
-#
-#    def draw(self,):
-#        return self.value
-#
-#    def set_settings(self,):
-#        self.set_data(input('Set one or comma seperated values: '))
-#        return
-
-
 class One_Of(HyperOptimizerBase):
     name = 'one_of'
     shortname = 'o'
@@ -214,13 +184,13 @@ class RegexFileSearch(HyperOptimizerBase):
                             matched_files.append(f)
 
             if len(matched_files) == 0:
-                print('   Warning the regex does not match any file.')
+                print(bcolors.FAIL+'   Warning the regex does not match any file.'+bcolors.ENDC)
                 regex = None
             else:
-                print('Your regex match '+ str(len(matched_files)) + ' Files. 5 Examples: ')
+                print('Your regex match '+bcolors.OKGREEN+ str(len(matched_files)) + ' Files'+bcolors.ENDC+'. here are 5 random Examples: ')
                 for s in range(5):
                     print('\t\t- ' + random.sample(matched_files, 1)[0])
-                if input('Do you want use another regex? (yes,no): ').lower().startswith('y'):
+                if not input('Do you want to use this regex? [y,n]: ').lower().startswith('y'):
                     regex = None
         self.num_of_draws = len(matched_files)
         self.matched_files = matched_files
@@ -278,25 +248,26 @@ def create_hyperopt_variables(vc): # vc == VariableCache
             selected_hyper = None
             while selected_hyper is None:
                 print('Specifie the variable ' + v.varname)
-                print('\tYou can set one or multiple comma sebarated values directly.')
+                print('\tSet one or multiple comma sebarated values directly.')
                 if len(hyper) > 0:
                     print('\tOr do hyperoptimization with one of the following options:')
                     for h in hyper:
-                        print('\t\t- ' + h.name + ' (with --' + h.shortname + ')')
+                        print('\t\t- ' + h.name + ' (with '+bcolors.OKGREEN+'--' + h.shortname + bcolors.ENDC +')')
 
-                user_input = input('\t'+ str(v.varname) + ' (' + str(v.vartype) + '): ')
+                user_input = input('\t'+ str(v.varname) + ' (' + bcolors.OKGREEN+str(v.vartype) + bcolors.ENDC+'): ')
 
                 if v.vartype.startswith('[') and v.vartype.endswith(']'):
                     try:
                         selected_hyper = One_Of()
                         selected_hyper.set_data(user_input, v.vartype)
                     except:
-                        print('Warning: Did not understand the user input.')
+                        print(bcolors.FAIL+'\t\tError: Your input did not match one of the possible values.'+bcolors.ENDC)
+                        print('\t\tPlease use one of the values ' + bcolors.OKGREEN+str(v.vartype) + bcolors.ENDC + ' or use an index.')
                         selected_hyper = None
                 else:
                     selected_hyper = select_hyperparameteroptimizer(user_input, hyper)
                 if selected_hyper is None:
-                    print('Warning: did not understand which Hyperoptimizer you want to use.')
+                    print(bcolors.FAIL+'\t\tWarning: did not understand which Hyperoptimizer you want to use.'+bcolors.ENDC)
             if type(selected_hyper) is not Constant and type(selected_hyper) is not One_Of:
                 selected_hyper = selected_hyper(v.vartype)
                 selected_hyper.set_settings()
@@ -304,7 +275,7 @@ def create_hyperopt_variables(vc): # vc == VariableCache
 
             if selected_hyper.is_global:
                 if num_of_global_draws is None:
-                    num_of_global_draws = read_value('How many global draws do you want to make?: ', int)
+                    num_of_global_draws = read_value('\tHow many global draws do you want to make?: ', int)
                 selected_hyper.num_of_draws = num_of_global_draws
 
             v.hyperoptimizer = selected_hyper
@@ -314,7 +285,6 @@ def create_hyperopt_variables(vc): # vc == VariableCache
             c.set_data(v.varvalue)
             v.hyperoptimizer = c
 
-            #TODO: USING GLOBAL RANDOM SEARCH !!!
     # create a product over all variants
     is_global = [v.hyperoptimizer.is_global for v in vc.list_of_all_variables]
     draws = [v.hyperoptimizer.draw() for v in vc.list_of_all_variables]

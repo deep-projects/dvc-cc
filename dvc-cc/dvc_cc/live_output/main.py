@@ -4,6 +4,7 @@ import os
 from argparse import ArgumentParser
 import subprocess
 import shutil
+from dvc_cc.bcolors import *
 DESCRIPTION = 'With this script you can mount or unmount the live output directory.'
 
 def get_gitinformation():
@@ -23,28 +24,28 @@ def get_gitinformation():
 def get_dvcurl():
     dvc_url = []
     try:
-      with open(".dvc/config","r") as fi:
+      with open(".dvc/config.local","r") as fi:
         for ln in fi:
             if ln.startswith("url = ") or ln.startswith("url="):
               dvc_url.append(ln)
     except:
-        print('No .dvc/config was found.')
+        print('No .dvc/config.local was found.')
         try:
-          with open(".dvc/config.local","r") as fi:
+          with open(".dvc/config","r") as fi:
             for ln in fi:
                 if ln.startswith("url =") or ln.startswith("url="):
                   dvc_url.append(ln)
         except:
-          print('No .dvc/config.local was found.')
+          print('No .dvc/config was found.')
 
     if len(dvc_url) != 1:
-      if len(dvc_url) == 0:
-        print('no url was found. please set the url in the .dvc/config file.')
-      if len(dvc_url) > 1:
-        print('multiple url was found. only one url is currently allowed')
-      print('Please specifier the servername and the repository.')
-      dvc_server = input("dvc_servername: ")
-      dvc_path = input("dvc_path_to_working_repository: ")
+        if len(dvc_url) == 0:
+            print(bcolors.WARNING+'Warning: no url was found. please set the url in the .dvc/config or .dvc/config.local file.'+ bcolors.ENDC)
+        if len(dvc_url) > 1:
+            print(bcolors.WARNING+'Warning: Multiple url was found. only one url is currently allowed'+bcolors.ENDC)
+        print('\tPlease specifier the servername and the repository.')
+        dvc_server = input("\tdvc_servername: ")
+        dvc_path = input("\tdvc_path_to_working_repository: ")
     return dvc_url[0].split('=')[1].replace(' ', '').replace('\n', '').split('://')[1]
 
 def main():
@@ -65,7 +66,7 @@ def main():
             print(command)
             subprocess.call(command.split(' '))
         else:
-            print('Warning tmp_live_output already exists. Use --umount to umount and delete this directory and try again.')
+            print(bcolors.WARNING+'Warning: tmp_live_output already exists. Use --umount to umount and delete this directory and try again.'+bcolors.ENDC)
     elif args.umount:
         if os.path.exists('tmp_live_output'):
             try:
@@ -73,4 +74,4 @@ def main():
             finally:
                 shutil.rmtree('tmp_live_output')
         else:
-            print('Warning: tmp_live_output does not exists.')
+            print(bcolors.WARNING+'Warning: tmp_live_output does not exists.'+bcolors.ENDC)

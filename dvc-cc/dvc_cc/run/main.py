@@ -20,7 +20,7 @@ from dvc_cc.hyperopt.variable import *
 from dvc_cc.hyperopt.hyperoptimizer import *
 import uuid
 
-DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker.'
+DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker on the CC server.'
 
 def read_execution_engine():
     with open('.dvc_cc/cc_config.yml') as f:
@@ -445,16 +445,14 @@ def main():
 
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('experimentname', help='The name of the experiment that should be used. This can help you to search between all files.')
-    parser.add_argument('-ne','--no-exec', help='If true the experiment get defined, but it will not run at a server.', default=False, action='store_true')
+    #TODO: parser.add_argument('-ne','--no-exec', help='If true the experiment get defined, but it will not run at a server.', default=False, action='store_true')
     # TODO: parser.add_argument('-l','--local', help='Run the experiment locally!', default=False, action='store_true')
     # TODO: parser.add_argument('-q','--question', help='A question that you want to answer with that experiment.')
     # TODO: parser.add_argument('--use_only_a_tag', help='If you don't have any Hyperopt-DVC-CC files or just set one set of fixed parameters you can create a tag instead of a new branch.', default=False, action='store_true')
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
-    parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout.', default=False, action='store_true')
+    parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout. Warning: Untracked changes could be lost!', default=False, action='store_true')
     parser.add_argument('-r','--num-of-repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
     parser.add_argument('-nb','--jupyter-notebook-to-py', help='If this paramer is set, than it will convert all jupyter notebook files to py files.', default=False, action='store_true')
-
-
     parser.add_argument('-l','--live_output_files',
                         help='Comma separated string list of files that should be included to the live output for example: "tensorboard,output.json" This could track a tensorboard folder and a output.json file.')
     parser.add_argument('-lf','--live_output_update_frequence', type=int,
@@ -480,7 +478,7 @@ def main():
     # WARN, if you are on a cc or rcc branch #
     ##########################################
     if startbranch.startswith('cc_'):
-        print('WARNING: You are on a DVC-CC branch.')
+        print(bcolors.WARNING+'WARNING: You are on a DVC-CC branch.'+bcolors.ENDC)
         # TODO if the rerun command exists throw an error!
         #   print('         You should use the dvc rerun command')
         user_input = input('Do you want to continue? [y,n]')
@@ -488,7 +486,7 @@ def main():
             print('You can switch to a other branch with "git checkout THE_BRANCH_NAME".')
             exit(0)
     elif startbranch.startswith('rcc_'):
-        print('ERROR: you are on a DVC-CC-RESULT branch. It is not allowed to execute DVC-CC here. To run a job take a look at the readme of this repository.')
+        print(bcolors.FAIL+'ERROR: you are on a DVC-CC-RESULT branch. It is not allowed to execute DVC-CC here. To run a job take a look at the readme of this repository.'+ bcolors.ENDC)
         exit(1)
 
     ############################
@@ -542,13 +540,13 @@ def main():
             if os.path.exists('dvc/'+f[:-9]+'.dvc'):
                 os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
             else:
-                print('Warning: File ' + 'dvc/'+f[:-9]+'.dvc' + ' not found.')
+                print(bcolors.WARNING+'Warning: File ' + 'dvc/'+f[:-9]+'.dvc' + ' not found.'+bcolors.ENDC)
 
     ####################################
     # Error if no DVC-file was defined #
     ####################################
     if len(dvc_files) == 0:
-        raise ValueError('Error: There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
+        raise ValueError('There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
 
 
     ##########################
@@ -567,7 +565,7 @@ def main():
         hyperopt_draws = create_hyperopt_variables(vc)
         user_input = input('You defined ' + str(len(hyperopt_draws)) + ' * ' + str(args.num_of_repeats) + ' = ' + str(
             len(
-                hyperopt_draws) * args.num_of_repeats) + ' hyperoptimization pairs. Do you want to continue and start the job? [y , n]: ')
+                hyperopt_draws) * args.num_of_repeats) + ' hyperoptimization pairs. Do you want to continue and start the job? [y,n]: ')
         if not user_input.lower().startswith('y'):
             print('The job was canceled')
     else:

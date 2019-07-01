@@ -1,11 +1,7 @@
 from argparse import ArgumentParser
-# from dvc_cc.job.main_core import *
-from collections import OrderedDict
-from dvc_cc.version import VERSION
-from dvc_cc.cli_modes import cli_modes
-import yaml
 import subprocess
 import os
+from dvc_cc.bcolors import *
 
 
 SCRIPT_NAME = 'dvc-cc init'
@@ -22,81 +18,91 @@ def get_main_git_directory_path():
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('--not-interactive', help='If this parameter is set, it will not ask the user for the parameters. All parameters are set to default values.',default=False, action='store_true')
+    parser.add_argument('--not-interactive', help='If this parameter is set, it will not ask the user to set the values. All values will set by default values.',default=False, action='store_true')
     args = parser.parse_args()
 
     if not args.not_interactive:
-        print('Define the settings for this project:')
+        print('In the next steps you need to define some settings for your project.')
+        print('If you do not set an argument it will take the default values.')
 
+        print()
         num_of_gpus = None
         while num_of_gpus is None:
-            num_of_gpus = input('Number of GPUs (default 0): ')
+            num_of_gpus = input(bcolors.OKBLUE+'Number of GPUs'+bcolors.ENDC+' (default 0): ')
             if num_of_gpus == '':
                 num_of_gpus = 0
             elif num_of_gpus.isdigit():
                 num_of_gpus = int(num_of_gpus)
             else:
-                print('Warning: Did not understand your answer. Please use integer values i.e. 0,1,2,3,...')
+                print(bcolors.FAIL + '\tWarning: Did not understand your answer. Please use integer values i.e. 0,1,2,3,...' + bcolors.ENDC)
                 num_of_gpus = None
 
+        print()
         ram = None
         while ram is None:
-            ram = input('RAM in GB (default 100): ')
+            ram = input(bcolors.OKBLUE+'RAM in GB'+bcolors.ENDC+' (default 100): ')
             if ram == '':
                 ram = 100000 # 100 GB
             elif ram.isdigit():
                 ram = int(ram)*1000
             else:
-                print('Warning: Did not understand your answer. Please use integer values i.e. 10,100,...')
+                print(bcolors.FAIL + '\tWarning: Did not understand your answer. Please use integer values i.e. 10,100,...'+bcolors.ENDC)
                 ram = None
-        docker_image = input('docker_image default (docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev): ')
-        # TODO check the input string...
+
+        print()
+        docker_image = input(bcolors.OKBLUE+'Docker Image'+bcolors.ENDC+' default (docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev): ')
         if docker_image == '':
             docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'
             docker_image_needs_credentials = False
         else:
             docker_image_needs_credentials = None
             while docker_image_needs_credentials is None:
-                docker_image_needs_credentials = input('Does this docker image needs credentials? [y,n]:')
+                docker_image_needs_credentials = input('Does this docker image needs '+bcolors.OKBLUE+'credentials'+bcolors.ENDC+'? [y,n]:')
                 if docker_image_needs_credentials.lower().startswith('y'):
                     docker_image_needs_credentials = True
                 elif docker_image_needs_credentials.lower().startswith('n'):
                     docker_image_needs_credentials = False
                 else:
-                    print('Warning: Did not understand your answer. Please use y or n.')
+                    print(bcolors.FAIL+'\tWarning: Did not understand your answer. Please use y or n.'+bcolors.ENDC)
                     docker_image_needs_credentials = None
 
+        print()
         batch_concurrency_limit = None
         while batch_concurrency_limit is None:
-            batch_concurrency_limit = input('Batch concurrency limit (default 12): ')
+            batch_concurrency_limit = input(bcolors.OKBLUE+'Batch concurrency limit'+bcolors.ENDC+' (default 12): ')
             if batch_concurrency_limit == '':
                 batch_concurrency_limit = 12
             elif batch_concurrency_limit.isdigit():
                 batch_concurrency_limit = int(batch_concurrency_limit)
             else:
-                print('Warning: Did not understand your answer. Please use integer values i.e. 1,4,12,...')
+                print(bcolors.FAIL+'\tWarning: Did not understand your answer. Please use integer values i.e. 1,4,12,...'+bcolors.ENDC)
                 batch_concurrency_limit = None
 
-        engine = input('The engine you want to use (default: ccagency): ')
+        print()
+        engine = input('The '+bcolors.OKBLUE+'engine'+bcolors.ENDC+' you want to use (default: ccagency): ')
         if engine == '':
             engine = 'ccagency'
         engine_url = input('The engine-url you want to use (default: https://agency.f4.htw-berlin.de/cc): ')
         if engine_url == '':
             engine_url = 'https://agency.f4.htw-berlin.de/cc'
 
-        dvc_remote_server = input('The remote DVC server that you want use (default: avocado01.f4.htw-berlin.de): ')
+        print()
+        dvc_remote_server = input('The remote '+bcolors.OKBLUE+'DVC server'+bcolors.ENDC+' that you want use (default: avocado01.f4.htw-berlin.de): ')
         if dvc_remote_server == '':
             dvc_remote_server = 'avocado01.f4.htw-berlin.de'
-        dvc_remote_path = input('The remote DVC folder that you want use (default: /data/ldap/Data-Version-Control-Cache): ')
+        print()
+        dvc_remote_path = input('The remote '+bcolors.OKBLUE+'DVC folder'+bcolors.ENDC+' that you want use (default: /data/ldap/Data-Version-Control-Cache): ')
         if dvc_remote_path == '':
             dvc_remote_path = '/data/ldap/Data-Version-Control-Cache'
 
-        dvc_remote_user = input('The username for the remote DVC folder: ')
+        print()
+        dvc_remote_user = input('The '+bcolors.OKBLUE+'username'+bcolors.ENDC+' for the remote DVC folder: ')
         if dvc_remote_user == '':
             dvc_remote_user = input('Do you really want to use the connection to the remote dvc folder without credentials? [n,y]')
             if not dvc_remote_user.lower().startswith('y'):
                 dvc_remote_user = input('The username for the remote DVC folder: ')
-
+        print()
+        print()
     else:
         # set default values
         num_of_gpus = 0 ##
@@ -140,7 +146,7 @@ def main():
         try:
             subprocess.call(['ssh', dvc_remote_user + '@' + dvc_remote_server, "mkdir -p "+dvc_remote_path+" ; chmod 774 "+dvc_remote_path+" ; setfacl -d -m u::rwX,g::rwX,o::- "+dvc_remote_path])
         except:
-            print('Warning: Currently acl is not installed on the server! You will maybe have problems by sharing the same remote dvc folder!')
+            print(bcolors.WARNING+'Warning: Currently acl is not installed on the server! You will maybe have problems by sharing the same remote dvc folder!'+bcolors.ENDC)
 
 
     # create the main folder of the dvc_cc software package.
@@ -157,8 +163,6 @@ def main():
 
 
 def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url):
-    #TODO: Allow interactive sessions.
-    #TODO: Allow more parameters to set in the config.
     with open('.dvc_cc/cc_config.yml',"w") as f:
         print("cli:", file=f)
         print("  baseCommand: [dvc-cc-agent]", file=f)
