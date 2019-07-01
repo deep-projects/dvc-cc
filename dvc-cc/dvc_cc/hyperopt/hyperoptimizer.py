@@ -232,7 +232,6 @@ def select_hyperparameteroptimizer(user_input, possible_hyperparameter, dtype_of
         return m
 
 
-
 def combine_combinations(combinations, is_global):
     r = np.array([[0]])
     one_global_hyperopt_was_set=False

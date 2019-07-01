@@ -33,8 +33,11 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 RUN pip install --no-cache-dir tensorboard
 
 #RUN pip install https://download.pytorch.org/whl/cu100/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl
-RUN pip install torchvision
-RUN pip install torch
+#RUN pip install torchvision
+#RUN pip install torch
+
+RUN pip install https://download.pytorch.org/whl/cu100/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
+RUN pip install https://download.pytorch.org/whl/cu100/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
 
 RUN pip --no-cache-dir install \
         Pillow \
@@ -52,7 +55,7 @@ RUN pip --no-cache-dir install \
         dvc \
         paramiko \
         pyyaml
-RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 51!'
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 52!'
 
 RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_agent-0.3.0-py3-none-any.whl
 

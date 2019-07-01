@@ -16,7 +16,7 @@ parser.add_argument('--seed', type=int,default=None)
 parser.add_argument('--num_of_hidden_layers', type=int,default=1)
 parser.add_argument('--num_of_kernels', type=int,default=64)
 parser.add_argument('--dropout_rate', type=float,default=0.2)
-parser.add_argument('--learning_rate', type=float,default=0.1)
+parser.add_argument('--learning_rate', type=float,default=0.001)
 parser.add_argument('--activation_function', type=str,default='relu')
 parser.add_argument('--batch_size', type=int,default=1000)
 parser.add_argument('--epochs', type=int,default=10)
@@ -30,20 +30,37 @@ import tensorflow as tf
 if not args.seed is None:
     tf.random.set_seed(args.seed+100)
 import yaml
+import time
 
 ################
 ### LOAD DATASET
 ################
-if args.dataset == 'fashion_mnist':
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
-elif args.dataset == 'mnist':
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-elif args.dataset == 'cifar10':
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
-elif args.dataset == 'cifar100':
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar100.load_data()
-else:
+if args.dataset not in ['fashion_mnist','mnist','cifar10','cifar100']:
     raise ValueError('Did not find a dataset with this Name.')
+
+num_of_tries = 0
+while num_of_tries < 100:
+    try:
+        if args.dataset == 'fashion_mnist':
+            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+            num_of_tries = 99999999
+        elif args.dataset == 'mnist':
+            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+            num_of_tries = 99999999
+        elif args.dataset == 'cifar10':
+            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+            num_of_tries = 99999999
+        elif args.dataset == 'cifar100':
+            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar100.load_data()
+            num_of_tries = 99999999
+        else:
+            raise ValueError('Did not find a dataset with this Name.')
+    except:
+        if num_of_tries < 12:
+            num_of_tries += 1
+            time.sleep(10)
+        else:
+            raise ValueError('The data could not be downloaded.')
 
 x_train, x_test = x_train / 255.0, x_test / 255.0
 
@@ -65,7 +82,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=args.learning_rat
 
 callbacks = [
   # Interrupt training if `val_loss` stops improving for over 2 epochs
-  tf.keras.callbacks.EarlyStopping(patience=10, monitor='val_loss'),
+  tf.keras.callbacks.EarlyStopping(patience=100, monitor='val_loss'),
   # Write TensorBoard logs to `./logs` directory
   tf.keras.callbacks.TensorBoard(log_dir='tensorboard'),
   tf.keras.callbacks.ModelCheckpoint(

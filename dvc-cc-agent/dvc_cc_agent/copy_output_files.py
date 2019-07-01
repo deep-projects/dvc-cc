@@ -2,6 +2,7 @@ import threading
 import time
 import shutil
 import os
+import uuid
 
 class Thread(object):
 
@@ -20,13 +21,14 @@ class Thread(object):
         thread.start()                                  # Start the execution
 
     def run(self):
+        thread_uuid = str(uuid.uuid4()).split('-')[0]
         while True:
             for f in self.files:
                 if os.path.exists(f):
                     if os.path.isdir(f):
-                        if os.path.exists(self.destination_path+f):
-                            shutil.rmtree(self.destination_path+f)
-                        shutil.copytree(f, self.destination_path+f)
+                        if os.path.exists(self.destination_path+f+'_'+thread_uuid):
+                            shutil.rmtree(self.destination_path+f+'_'+thread_uuid)
+                        shutil.copytree(f, self.destination_path+f+'_'+thread_uuid)
                     else:
-                        shutil.copyfile(f, self.destination_path+f)
+                        shutil.copyfile(f, self.destination_path+f+'_'+thread_uuid)
             time.sleep(self.interval)
