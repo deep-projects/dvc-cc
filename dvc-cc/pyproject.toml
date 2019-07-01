@@ -28,6 +28,6 @@ pyrsistent = "^0.15.2"
 [tool.poetry.scripts]
 dvc-cc = 'dvc_cc.main:main'
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=0.14.11"]
 build-backend = "poetry.masonry.api"
 

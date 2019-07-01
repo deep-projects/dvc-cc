@@ -296,7 +296,7 @@ def create_hyperopt_variables(vc): # vc == VariableCache
 
         else:
             c = Constant()
-            c.set_data(v.varvalue)
+            c.set_data(v.varvalue, v.vartype)
             v.hyperoptimizer = c
 
     # create a product over all variants
