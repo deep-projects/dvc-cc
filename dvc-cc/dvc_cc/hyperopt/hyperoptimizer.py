@@ -297,7 +297,7 @@ def create_hyperopt_variables(vc): # vc == VariableCache
                     selected_hyper = select_hyperparameteroptimizer(user_input, hyper)
                 if selected_hyper is None:
                     print('Warning: did not understand which Hyperoptimizer you want to use.')
-            if type(selected_hyper) is not Constant and not One_Of:
+            if type(selected_hyper) is not Constant and type(selected_hyper) is not One_Of:
                 selected_hyper = selected_hyper(v.vartype)
                 selected_hyper.set_settings()
 
