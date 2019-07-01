@@ -82,8 +82,8 @@ class HyperOptimizerRandomSearch(HyperOptimizerBase):
     def set_settings(self,):
         self.minimum_value = read_value('Min value: ', float)
         self.maximum_value = read_value('Max value: ', float)
-        self.a = read_value('A value of Beta-Distribution: ', float)
-        self.b = read_value('B value of Beta-Distribution: ', float)
+        self.a = read_value('Value A of the Beta-Distribution: ', float)
+        self.b = read_value('Value B of the Beta-Distribution: ', float)
         
         if self.is_global == False:
             self.num_of_draws = read_value('How many draws do you want to make?: ', int)
@@ -110,12 +110,23 @@ class HyperOptimizerRandomSearchGlobal(HyperOptimizerRandomSearch):
 class Constant(HyperOptimizerBase):
     name = 'Constant'
     shortname = 'c'
-    allowed_types = ['float', 'ufloat', 'int', 'uint', 'file']
+    allowed_types = ['float', 'int', 'file']
 
-    def set_data(self,data):
+    def set_data(self,data, dtype_of_variable):
         data = str(data).replace(' ', '').split(',')
         self.num_of_draws = len(data)
         self.value = data
+        if dtype_of_variable == 'int':
+            [int(val) for val in self.value]
+        elif dtype_of_variable == 'int':
+            [float(val) for val in self.value]
+        elif dtype_of_variable.startswith('['):
+            dtype_of_variable = dtype_of_variable[1:-1].split(',')
+            tmp = np.array([val in dtype_of_variable or (val.isdigit() and int(val) < len(dtype_of_variable)) for val in self.value])
+            if len(tmp[tmp==False]) > 0:
+                raise  ValueError('You need to set one of the following types: '+ str(self.value))
+        if len(np.unique(self.value)) != len(self.value):
+            raise ValueError('It is not allowed to use the same value twice: ' + str(self.value))
 
     def draw(self,):
         return self.value
@@ -206,7 +217,7 @@ def get_possible_hyperparameter(variabletype):
 
 
 
-def select_hyperparameteroptimizer(user_input, possible_hyperparameter):
+def select_hyperparameteroptimizer(user_input, possible_hyperparameter, dtype_of_variable):
     if user_input.startswith('--'):
         for h in possible_hyperparameter:
             if h.shortname == user_input[2:].lower():
@@ -214,7 +225,10 @@ def select_hyperparameteroptimizer(user_input, possible_hyperparameter):
         return None
     else:
         m = Constant()
-        m.set_data(user_input)
+        try:
+            m.set_data(user_input, dtype_of_variable)
+        except:
+            return None
         return m
 
 
@@ -266,7 +280,7 @@ def create_hyperopt_variables(vc): # vc == VariableCache
                         print('\t\tPlease use one of the values ' + bcolors.OKGREEN+str(v.vartype) + bcolors.ENDC + ' or use an index.')
                         selected_hyper = None
                 else:
-                    selected_hyper = select_hyperparameteroptimizer(user_input, hyper)
+                    selected_hyper = select_hyperparameteroptimizer(user_input, hyper, v.vartype)
                 if selected_hyper is None:
                     print(bcolors.FAIL+'\t\tWarning: did not understand which Hyperoptimizer you want to use.'+bcolors.ENDC)
             if type(selected_hyper) is not Constant and type(selected_hyper) is not One_Of:

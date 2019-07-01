@@ -57,18 +57,21 @@ def main():
             loop = False
 
         try:
-            _ = check_output(["git", "pull"]).decode("utf8").split("\n")
-
-            all_branches = check_output(["git", "branch", '-a']).decode("utf8").split("\n")
-            all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
-            all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
-
             is_first_iteration = True
             while loop or is_first_iteration:
+
                 if is_first_iteration == False:
-                    print('All remote branches were created locally. Wait 20 seconds for the next pull request. To cancel the script press CTRL+C.')
-                    time.sleep(20)
+                    print('All remote branches were created locally. Wait 5 seconds for the next pull request. To cancel the script press CTRL+C.')
+                    time.sleep(5)
                 is_first_iteration = False
+
+                _ = check_output(["git", "pull"]).decode("utf8").split("\n")
+
+                all_branches = check_output(["git", "branch", '-a']).decode("utf8").split("\n")
+                all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
+                all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
+
+
                 for b in all_branches_remote:
                     if b not in all_branches_local:
                         print('git checkout '+ b)

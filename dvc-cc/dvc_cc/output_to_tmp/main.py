@@ -177,9 +177,11 @@ def main():
                 if is_branch_of_interest1 and is_branch_of_interest2 and is_dvccc_result_branch and is_allowed_dvccc_id:
                     print(branch)
                     g.checkout(branch)
+                    #TODO: This would be nice, but its too sloow!
                     repo.checkout()
 
                     print('\tIt is a branch of interest!')
+                    #TODO: repo.stages is very slow!
                     for stage in repo.stages():
                         for out in stage.outs:
                             valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)

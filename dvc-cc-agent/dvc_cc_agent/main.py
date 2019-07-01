@@ -173,7 +173,7 @@ def main():
     # clone repository
     #git clone https://$2:$3@$1/$4/$5/
     git_complete_path_to_repo = 'https://' + git_own_username+":"+git_own_password+"@"+git_path_to_working_repository + '/' + git_working_repository_owner + '/'+ git_working_repository_name
-    command = 'git clone --recurse-submodules ' + git_complete_path_to_repo
+    command = 'git clone --recurse-submodules ' + git_complete_path_to_repo + ' repo'
     print('\t' + 'git clone --recurse-submodules ' + 'https://' + git_own_username+":"+"$$$$$$$$$$$$$"+"@"+git_path_to_working_repository + '/' + git_working_repository_owner + '/'+ git_working_repository_name)
     print(subprocess.check_output(command, shell=True).decode())
 
@@ -203,15 +203,22 @@ def main():
     print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
 
     print('CD TO PATH   ' + get_time())
-    print('\t chdir: '+git_working_repository_name[:-4])
-    print(os.chdir(git_working_repository_name[:-4]))
+    print('\t chdir: repo')
+    print(os.chdir('repo'))
     os.makedirs('stdout_stderr')
     
     print('WRITE TO config.local FILE   ' + get_time())
     print("\n\t['remote \\\"nas\\\"']\n\turl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\n\tpassword = '"+"$$$$$$$$$$$$$"+"'\n\n\t[core]\n\tremote = nas")
-    filecontent = "\n['remote \\\"nas\\\"']\nurl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\npassword = '"+dvc_own_password+"'\n\n[core]\nremote = nas"
-    command = "echo \"" + filecontent + "\" > .dvc/config.local"
-    print(subprocess.check_output(command, shell=True).decode())
+    could_not_create_dvcconfigfile = False
+    try:
+        filecontent = "\n['remote \\\"nas\\\"']\nurl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\npassword = '"+dvc_own_password+"'\n\n[core]\nremote = nas"
+        command = "echo \"" + filecontent + "\" > .dvc/config.local"
+        subprocess.check_output(command, shell=True).decode()
+    except:
+        could_not_create_dvcconfigfile = True
+    if could_not_create_dvcconfigfile:
+        ls_output = subprocess.check_output('ls', shell=True).decode()
+        raise ValueError('It could create the dvc config file! Maybe it is not a DVC-Repository? Or the cd command did not worked correctly.\n Here is the ls output:\n' + ls_output)
 
 
     print('PULL FROM GIT   ' + get_time())

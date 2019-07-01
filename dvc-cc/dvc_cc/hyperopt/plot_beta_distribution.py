@@ -11,6 +11,7 @@ def main():
     parser = ArgumentParser(description=DESCRIPTION)
     args = parser.parse_args()
 
+    print('Here matplotlib.pyplot.show() will be called.')
     print('Use CTRL+C to stop this script.')
     min = float(input('Min-Value: '))
     max = float(input('Max-Value: '))
