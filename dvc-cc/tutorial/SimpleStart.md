@@ -31,7 +31,7 @@ dvc-cc init
 ## 2) Create the source code
 
 No we can create some code like a simple fully connected network. Just create the file **source/train.py**:
-```
+```python
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int,default=None)
