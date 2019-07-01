@@ -166,15 +166,15 @@ In the upper case we define the types of the variable.  If you want to find out 
 
 <sup>
     
-| name | saved in git | saved in dvc cache | save the checksum | description                                                                                       |
+| name | <sup>saved in git</sup> | <sup>saved in dvc cache</sup> | <sup>save the checksum</sup> | <sup>description</sup>                                                                                       |
 |:----:|:------------:|:------------------:|:-----------------:|---------------------------------------------------------------------------------------------------|
-|  -d  |     False    |        False       |        True       | You use this to define dependencies (inputs) or everything from what this stage depends on.       |
-|  -o  |     False    |        True        |        True       | Large output files                                                                                |
-|  -O  |     True     |        False       |        True       | Small output files                                                                                |
-|  -m  |     True     |        True        |        True       | Metrics are also output files but have a special feature that you can use with `dvc metrics show`  |
-|  -M  |     True     |        False       |        True       | Metrics see above. Find more information about metrics here: https://dvc.org/doc/commands-reference/metrics-show                                                                                 |
+|  -d  |     <sup>False</sup>    |        <sup>False</sup>       |        <sup>True</sup>       | <sup>You use this to define dependencies (inputs)</sup> or everything from what this stage depends on.       |
+|  -o  |     <sup>False</sup>    |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Large output files</sup>                                                                                |
+|  -O  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Small output files </sup>                                                                               |
+|  -m  |     <sup>True</sup>     |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Metrics are also output files but have a special feature that you can use with `dvc metrics show`</sup>  |
+|  -M  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Metrics see above. Find more information about metrics here: https://dvc.org/doc/commands-reference/metrics-show </sup>                                                                                |
 
-</sup>
+
 
 ### 3.3) Always commit and push your changes
 Add the end of editing your source code or pipeline you should always commit your changes. If you do not do this, this can be lost by using dvc-cc.
