@@ -164,7 +164,7 @@ dvc-cc hyperopt new -d source/train.py \
 It looks similar to the `dvc run` command but instead of setting the parameter you can use variables with {{A_Variable_Name}}.
 In the upper case we define the types of the variable.  If you want to find out more about the parameters `-d`, `-o`, `-O`, `-m` and `-M` check the dvc documentation: https://dvc.org/doc/commands-reference/run .
 
-<sup>
+
     
 | name | <sup>saved in git</sup> | <sup>saved in dvc cache</sup> | <sup>save the checksum</sup> | <sup>description</sup>                                                                                       |
 |:----:|:------------:|:------------------:|:-----------------:|---------------------------------------------------------------------------------------------------|
