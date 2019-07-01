@@ -143,13 +143,23 @@ There exists two ways to work with DVC-CC. First you just work with DVC like you
 If we do not have any hyper parameter we can work easily with DVC and define the dependencies and output files of our
 script. DVC will handle everything else:
 ```
-dvc run --no-exec -d source/train.py -o tensorboard -o model.h5 -m summary.yml -f train.dvc "python source/train.py --seed 100 --num_of_hidden_layers 3 --num_of_kernels 128 --dropout_rate 0.1 --learning_rate 0.01 --activation_function relu --batch_size 512 --epochs 1000 --dataset mnist"
+dvc run --no-exec -d source/train.py \
+                  -o tensorboard \
+                  -o model.h5 \
+                  -m summary.yml \
+                  -f train.dvc \
+                  "python source/train.py --seed 100 --num_of_hidden_layers 3 --num_of_kernels 128 --dropout_rate 0.1 --learning_rate 0.01 --activation_function relu --batch_size 512 --epochs 1000 --dataset mnist"
 ```
 ### 3.2) The DVC-CC way
 Everytime we changed some dependency or parameter we would need to rerun this command. If you want do some kind of
 hyperoptimization this could be very frustrating. For this kind you should use `dvc-cc hyperopt new`:
 ```
-dvc-cc hyperopt new -d source/train.py -o tensorboard -o model.h5 -m summary.yml -f train.dvc "python source/train.py --seed {{seed:int}} --num_of_hidden_layers {{nh:int}} --num_of_kernels {{nk:int}} --dropout_rate {{dr:float}} --learning_rate {{lr:float}} --activation_function {{af:[relu,tanh]}} --batch_size {{bs:int}} --epochs {{e:int}} --dataset {{d:[mnist,fashion_mnist,cifar10,cifar100]}}"
+dvc-cc hyperopt new -d source/train.py \
+                    -o tensorboard \
+                    -o model.h5 \
+                    -m summary.yml \
+                    -f train.dvc \
+                    "python source/train.py --seed {{seed:int}} --num_of_hidden_layers {{nh:int}} --num_of_kernels {{nk:int}} --dropout_rate {{dr:float}} --learning_rate {{lr:float}} --activation_function {{af:[relu,tanh]}} --batch_size {{bs:int}} --epochs {{e:int}} --dataset {{d:[mnist,fashion_mnist,cifar10,cifar100]}}"
 ```
 It looks similar to the `dvc run` command but instead of setting the parameter you can use variables with {{A_Variable_Name}}.
 In the upper case we define the types of the variable. 
