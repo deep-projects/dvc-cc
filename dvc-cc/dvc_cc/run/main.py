@@ -445,7 +445,7 @@ def main():
 
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('experimentname', help='The name of the experiment that should be used. This can help you to search between all files.')
-    #TODO: parser.add_argument('-ne','--no-exec', help='If true the experiment get defined, but it will not run at a server.', default=False, action='store_true')
+    parser.add_argument('-ne','--no-exec', help='If true the experiment get defined, but it will not run at a server. Warning: You should not use this command.', default=False, action='store_true')
     # TODO: parser.add_argument('-l','--local', help='Run the experiment locally!', default=False, action='store_true')
     # TODO: parser.add_argument('-q','--question', help='A question that you want to answer with that experiment.')
     # TODO: parser.add_argument('--use_only_a_tag', help='If you don't have any Hyperopt-DVC-CC files or just set one set of fixed parameters you can create a tag instead of a new branch.', default=False, action='store_true')

@@ -243,6 +243,7 @@ def create_hyperopt_variables(vc): # vc == VariableCache
     num_of_global_draws = None
 
     for v in vc.list_of_all_variables:
+        print()
         if v.varvalue is None:
             hyper = get_possible_hyperparameter(v.vartype)
             selected_hyper = None
