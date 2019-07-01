@@ -565,6 +565,11 @@ def main():
     ###################################
     if len(vc.list_of_all_variables) > 0:
         hyperopt_draws = create_hyperopt_variables(vc)
+        user_input = input('You defined ' + str(len(hyperopt_draws)) + ' * ' + str(args.num_of_repeats) + ' = ' + str(
+            len(
+                hyperopt_draws) * args.num_of_repeats) + ' hyperoptimization pairs. Do you want to continue and start the job? [y , n]: ')
+        if not user_input.lower().startswith('y'):
+            print('The job was canceled')
     else:
         hyperopt_draws = [[]]
 
