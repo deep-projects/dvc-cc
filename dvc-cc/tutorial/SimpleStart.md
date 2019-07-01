@@ -162,7 +162,10 @@ dvc-cc hyperopt new -d source/train.py \
                     "python source/train.py --seed {{seed:int}} --num_of_hidden_layers {{nh:int}} --num_of_kernels {{nk:int}} --dropout_rate {{dr:float}} --learning_rate {{lr:float}} --activation_function {{af:[relu,tanh]}} --batch_size {{bs:int}} --epochs {{e:int}} --dataset {{d:[mnist,fashion_mnist,cifar10,cifar100]}}"
 ```
 It looks similar to the `dvc run` command but instead of setting the parameter you can use variables with {{A_Variable_Name}}.
-In the upper case we define the types of the variable. 
+In the upper case we define the types of the variable.  If you want to find out more about the parameters `-d`, `-o`, `-O`, `-m` and `-M` check the dvc documentation: https://dvc.org/doc/commands-reference/run .
+name | saved in git | saved in dvc cache | save the checksum | description
+--------------------------------------------------------------------------
+-d | False | False | True | You use this to define dependencies (inputs) or everything from what this stage depends on.
 
 ### 3.3) Always commit and push your changes
 Add the end of editing your source code or pipeline you should always commit your changes. If you do not do this, this can be lost by using dvc-cc.
