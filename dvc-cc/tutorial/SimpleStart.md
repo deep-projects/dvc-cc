@@ -166,7 +166,7 @@ In the upper case we define the types of the variable.  If you want to find out 
 
 | name | saved in git | saved in dvc cache | save the checksum | description                                                                                       |
 |:----:|:------------:|:------------------:|:-----------------:|---------------------------------------------------------------------------------------------------|
-|  -d  |     False    |        False       |        True       | You use this to define dependencies (inputs) or everything from what this stage depends on.       |
+|  -d  |     False    |        False       |        True       | <sup>You use this to define dependencies (inputs) or everything from what this stage depends on.</sup>       |
 |  -o  |     False    |        True        |        True       | Large output files                                                                                |
 |  -O  |     True     |        False       |        True       | Small output files                                                                                |
 |  -m  |     True     |        True        |        True       | Metrics are also output files but have a special feature that you can use with `dvc metrics show`  |
