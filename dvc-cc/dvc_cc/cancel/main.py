@@ -2,11 +2,10 @@
 from argparse import ArgumentParser
 import keyring
 import requests
-import json
-import numpy as np
 import yaml
+from dvc_cc.bcolors import *
 
-DESCRIPTION = 'This script can cancel running jobs. This script do not cancel jobs that are NOT pushed to run in the cloud.'
+DESCRIPTION = 'Cancel jobs that are running or registered on a CC server.'
 
 def read_execution_engine():
     with open('.dvc_cc/cc_config.yml') as f:
@@ -15,11 +14,11 @@ def read_execution_engine():
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('-ids','--experiment-ids', help='A list of ID\s of experiments.', nargs="+", type=str)
-    parser.add_argument('-sids','--subexperiment-ids', help='A list of ID\'s of sub experiments', nargs="+", type=str)
-    parser.add_argument('--all', help='If this parameter is set, all jobs get canceled.', default=False, action='store_true')
-    parser.add_argument('--last', help='If this parameter is true, than the last started job get executed.', default=False, action='store_true')
-    parser.add_argument('--last_n', help='If you set this parameter it will cancel the last n jobs, that was sstarted.', default=None, type=int)
+    parser.add_argument('-ids','--experiment-ids', help='A list of CC IDs of the experiments. Run "dvc-cc status -id" to show the ID for the experiments.', nargs="+", type=str)
+    parser.add_argument('-sids','--subexperiment-ids', help='A list of CC SUB-IDs of the experiments. Run "dvc-cc status -id" to show the SUB-ID for the experiments.', nargs="+", type=str)
+    parser.add_argument('--all', help='If this parameter is set, all running or registered jobs get canceled.', default=False, action='store_true')
+    parser.add_argument('--last', help='If this parameter is true, than the last started job get canceled.', default=False, action='store_true')
+    parser.add_argument('--last_n', help='If you set this parameter it will cancel the last n jobs, that was started.', default=None, type=int)
     args = parser.parse_args()
 
     pw = keyring.get_password('red', 'agency_password')
@@ -45,7 +44,7 @@ def main():
             args.experiment_ids.append(data[i]['_id'])
 
     if (args.experiment_ids is None or len(args.experiment_ids) == 0) and (args.subexperiment_ids is None or len(args.subexperiment_ids) == 0) and args.all == False:
-        print('Error: You need to set one of the following parameters: "-ids", "-sids", "--all", "--last" or "--last_n"')
+        print(bcolors.FAIL + 'Error: You need to set one of the following parameters: "-ids", "-sids", "--all", "--last" or "--last_n"' + bcolors.ENDC)
         print()
         print(parser.print_help())
         exit(1)

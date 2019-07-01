@@ -9,6 +9,7 @@ from subprocess import check_output
 
 from dvc.repo import Repo as DVCRepo
 import getpass
+import time
 #from dvc_cc.job.main import main as job_main
 #from dvc_cc.job.main import DESCRIPTION as JOB_DESCRIPTION
 
@@ -40,11 +41,6 @@ def main():
                 remote_settings['ask_password'] = False
 
         git_name_of_branch = get_name_of_branch()
-        _ = check_output(["git", "pull"]).decode("utf8").split("\n")
-
-        all_branches = check_output(["git", "branch", '-a']).decode("utf8").split("\n")
-        all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
-        all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
 
         if (len(argv) > 2 and argv[1] == '-l') or (len(argv) == 3 and argv[2] == '-l'):
             loop = True
@@ -52,8 +48,17 @@ def main():
             loop = False
 
         try:
+            _ = check_output(["git", "pull"]).decode("utf8").split("\n")
+
+            all_branches = check_output(["git", "branch", '-a']).decode("utf8").split("\n")
+            all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
+            all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
+
             is_first_iteration = True
             while loop or is_first_iteration:
+                if is_first_iteration == False:
+                    print('All remote branches were created locally. Wait 20 seconds for the next pull request.')
+                    time.sleep(20)
                 is_first_iteration = False
                 for b in all_branches_remote:
                     if b not in all_branches_local:
