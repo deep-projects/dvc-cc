@@ -7,6 +7,8 @@ from argparse import ArgumentParser
 import subprocess
 from subprocess import check_output
 
+from dvc.repo import Repo as DVCRepo
+import getpass
 #from dvc_cc.job.main import main as job_main
 #from dvc_cc.job.main import DESCRIPTION as JOB_DESCRIPTION
 
@@ -28,22 +30,44 @@ def main():
         for line in git_branch:
             if not line.startswith('  rcc_') and not line.startswith('  remotes/origin/rcc_') and not line.startswith('  cc_') and not line.startswith('  remotes/origin/cc_'):
                 print(line)
-    elif len(argv) == 1 and sys.argv[1] == 'sync':
+    elif sys.argv[1] == 'sync':
+        repo = DVCRepo()
+        if (len(argv) > 2 and argv[1] == '-d') or (len(argv) == 3 and argv[2] == '-d'):
+            remote_name = repo.config.config['core']['remote']
+            remote_settings = repo.config.config['remote "' + remote_name + '"']
+            if 'ask_password' in remote_settings and remote_settings['ask_password']:
+                remote_settings['password'] = getpass.getpass('Password for ' + remote_settings['url'] + ': ')
+                remote_settings['ask_password'] = False
+
         git_name_of_branch = get_name_of_branch()
         _ = check_output(["git", "pull"]).decode("utf8").split("\n")
 
         all_branches = check_output(["git", "branch", '-a']).decode("utf8").split("\n")
         all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
         all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
-     
-        for b in all_branches_remote:
-            if b not in all_branches_local:
-                print('git checkout '+ b)
-                _ = check_output(['git', 'checkout', b])
-                _ = check_output(['dvc', 'checkout'])
-        print('git checkout ' + git_name_of_branch)
-        _ = check_output(['git', 'checkout', git_name_of_branch])
-        _ = check_output(['dvc', 'checkout'])
+
+        if (len(argv) > 2 and argv[1] == '-l') or (len(argv) == 3 and argv[2] == '-l'):
+            loop = True
+        else:
+            loop = False
+
+        try:
+            is_first_iteration = True
+            while loop or is_first_iteration:
+                is_first_iteration = False
+                for b in all_branches_remote:
+                    if b not in all_branches_local:
+                        print('git checkout '+ b)
+                        _ = check_output(['git', 'checkout', b])
+                        print('\t\ŧI CHECKOUT THE DATA')
+                        repo.checkout()
+                        if argv[1] == '-d':
+                            print('\t\ŧI PULL THE DATA')
+                            repo.pull()
+        finally:
+            print('git checkout ' + git_name_of_branch)
+            _ = check_output(['git', 'checkout', git_name_of_branch])
+            repo.checkout()
     else:
         subprocess.call(['git'] + argv)
         subprocess.call(['dvc', 'checkout'])

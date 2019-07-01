@@ -50,9 +50,9 @@ RUN pip --no-cache-dir install \
         sklearn \
         pandas \
         dvc \
-        paramiko
-
-RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 49!'
+        paramiko \
+        pyyaml
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 50!'
 
 RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_agent-0.3.0-py3-none-any.whl
 
