@@ -3,6 +3,7 @@ from git import Repo as GITRepo
 from dvc_cc.hyperopt.variable import *
 import subprocess
 import uuid
+import os
 from dvc_cc.bcolors import *
 
 def get_main_git_directory_path():

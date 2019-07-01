@@ -299,9 +299,9 @@ def main():
     print('Remove ".dvc_cc"-direcotry   ' + get_time())
     shutil.rmtree('.dvc_cc')
 
-    print('Remove ".dvc_cc"-direcotry   ' + get_time())
-    if os.path.exists('dvc/hyperopt'):
-        shutil.rmtree('dvc/hyperopt')
+    print('Remove "dvc/.hyperopt"-direcotry   ' + get_time())
+    if os.path.exists('dvc/.hyperopt'):
+        shutil.rmtree('dvc/.hyperopt')
     
     print('WRITE README.md')
     write_readme(dvc_status, data_dir is not None and len(data_dir) > 0 and data_dir[0] == '/')
