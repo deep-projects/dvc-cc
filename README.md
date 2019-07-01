@@ -11,6 +11,9 @@ To archive this target, DVC-CC is based on the two softwares [Open-source Versio
 - CC is used in the backend to run your scripts in a docker on your cluster system.
 
 
+## Tutorial
+Find here the first tutorial: https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/SimpleStart.md
+
 ## Install
 ```
 pip install cc-faice
