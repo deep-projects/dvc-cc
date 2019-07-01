@@ -245,3 +245,9 @@ If you call `dvc-cc run` with the `-nb` parameter it will convert all jupyter no
 
 If the first line of a cell starts with `#%% dvc-cc-hide` it will ignore this cell by converting from a jupyter notebook to a py file. If you have a multiline commend that starts with `"""dvc-cc-show` than this commend will be uncommend and will be executed on the server. With this you can define some code that only runs in your jupyter notebook or only runs on the server in the py file.
 
+### 8.4) Large Data-Files
+You can connect to some data per SSHFS to your `data` folder. This will than also connected in per SSHFS in the server.
+
+### 8.5) Download all DVC files parallel.
+Create a second git repository and create a hardlink from the second git repository .dvc/cache to the first git repository .dvc/cache. They use now the same DVC cache but can work on different branches. If this is done, you can call `dvc-cc git sync -d -l` to create a unlimited loop that download all files to the DVC cache that are needed, and create all git branches.
+
