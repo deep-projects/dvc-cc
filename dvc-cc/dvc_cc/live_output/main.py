@@ -60,7 +60,7 @@ def main():
             os.mkdir('tmp_live_output')
             _, git_owner, git_name = get_gitinformation()
             dvc_url = get_dvcurl()
-            command = 'sshfs ' + dvc_url + '/' +  git_owner + '/' + git_name + ' tmp_live_output'
+            command = 'sshfs -o ' + dvc_url + '/' +  git_owner + '/' + git_name + ' tmp_live_output'
             with open('.gitignore', "a+") as f:
                 f.write('\ntmp_live_output')
             print(command)
