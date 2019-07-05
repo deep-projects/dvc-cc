@@ -3,7 +3,7 @@
 ## 0) Install DVC-CC
 If you use work on **Apple** you need to install dulwich first:
 ```
-TODO
+pip install dulwich --global-option="--pure"
 ```
 ### 0.1) Install with poetry
 Download the dvc-cc git repository and go to the folder dvc-cc/dvc-cc and activate the dvc-cc environment from poetry.
