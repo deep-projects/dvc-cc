@@ -16,8 +16,7 @@ Find here the first tutorial: https://github.com/deep-projects/dvc-cc/blob/maste
 
 ## Install
 ```
-pip install cc-faice
-pip install https://github.com/mastaer/dvc-cc/releases/tag/dvc_cc-0.2.0-py3-none-any.whl
+pip install pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc-0.3.0-py3-none-any.whl
 ```
 
 ## Basic Usage
