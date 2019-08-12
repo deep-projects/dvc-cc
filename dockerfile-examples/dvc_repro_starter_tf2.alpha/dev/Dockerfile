@@ -54,7 +54,9 @@ RUN pip --no-cache-dir install \
         pandas \
         dvc \
         paramiko \
-        pyyaml
+        pyyaml \
+        seaborn \
+        pandas
 
 RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 53!'
 
