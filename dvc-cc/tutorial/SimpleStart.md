@@ -19,6 +19,9 @@ pip install dist/........whl
 ### 0.2) Install it with pip
 If you do not need the newest version you can use the following pip installation to install the package.
 ```
+conda create --name dvc_cc pip python scipy numpy matplotlib pandas pyyaml pyrsistent psutil cffi MarkupSafe Pillow
+conda activate dvc_cc
+
 pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc-0.3.0-py3-none-any.whl
 ```
 
