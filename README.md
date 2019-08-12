@@ -19,7 +19,7 @@ Find here the first tutorial: https://github.com/deep-projects/dvc-cc/blob/maste
 conda create --name dvc_cc pip python scipy numpy matplotlib pandas pyyaml pyrsistent psutil cffi MarkupSafe Pillow
 conda activate dvc_cc
 
-pip install pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc-0.3.0-py3-none-any.whl
+pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc-0.3.0-py3-none-any.whl
 ```
 
 ## Basic Usage
