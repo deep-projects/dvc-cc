@@ -16,7 +16,7 @@ To archive this target, DVC-CC is based on the two softwares [Open-source Versio
 conda create --name dvc_cc pip python scipy numpy matplotlib pandas pyyaml pyrsistent psutil cffi MarkupSafe Pillow
 conda activate dvc_cc
 
-pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc-0.3.0-py3-none-any.whl
+pip install https://github.com/deep-projects/dvc-cc/releases/download/0.4.0/dvc_cc-0.4.0-py3-none-any.whl
 ```
 
 ## Basic Usage
