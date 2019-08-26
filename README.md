@@ -1,18 +1,18 @@
 # DVC-CC
-TODO: a simple DVC-CC-LOGO :)
-TODO: SOME DESCRIPTION
-TODO: GIF of how to use DVC-CC basic commands
+- TODO: a simple DVC-CC-LOGO :)
+- TODO: SOME DESCRIPTION
+- TODO: GIF of how to use DVC-CC basic commands
 
 ## Installation of DVC-CC
 
 DVC-CC is written in python so you can easily install DVC-CC by using pip. We recommend that you install DVC-CC in an anaconda environment. You can install [anaconda](https://www.anaconda.com/distribution/), create, and activate an environment with the following lines:
 
-### Installation with pip
 ```bash
 conda create --name dvc_cc python pip
 conda activate dvc_cc
 ```
 
+### Installation with pip
 The following script will install the client on your computer:
 
 ```bash
