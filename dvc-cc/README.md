@@ -1,5 +1,5 @@
 # The DVC-CC client
-In this subrepository the DVC-CC client is defined. The client is needed to define hyper optimization and push your jobs to [Curious Containers CC](https://www.curious-containers.cc/).
+In this subrepository the [DVC-CC](https://github.com/deep-projects/dvc-cc) client is defined. The client is needed to define hyper optimization and push your jobs to [Curious Containers CC](https://www.curious-containers.cc/).
 
 ## Get started
 TODO

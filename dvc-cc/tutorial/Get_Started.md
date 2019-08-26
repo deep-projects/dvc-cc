@@ -1,29 +1,32 @@
-# Tutorial #1
+# Get Started
 
-## 0) Install DVC-CC
-If you use work on **Apple** you need to install dulwich first:
-```
-pip install dulwich --global-option="--pure"
-```
-### 0.1) Install with poetry
-Download the dvc-cc git repository and go to the folder dvc-cc/dvc-cc and activate the dvc-cc environment from poetry.
-```
-poetry install
-```
-or just build a wheel package and install it with pip:
-```
-poetry install
-pip install dist/........whl
-```
+## 1) Create an empty GIT-Repository
+Create an empty [github](https://github.com/) or [Gitlab](https://gitlab.com/) repository and change the directory to the empty git repository.
 
-### 0.2) Install it with pip
-If you do not need the newest version you can use the following pip installation to install the package.
+## 2) Download source code
+Now you could write your own script that you want to run on the cluster. For this tutorial you can do the following lines of code to get a source code:
+```bash
+mkdir source
+wget -o source/train.py https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/train.py
 ```
-conda create --name dvc_cc pip python scipy numpy matplotlib pandas pyyaml pyrsistent psutil cffi MarkupSafe Pillow
-conda activate dvc_cc
+This script gets some parameters, train a network and save tensorflow data, the model and metric files.
+![Here is an image shown that describes the input parameters and output files of this script.][get_started_pipeline.png]
 
-pip install https://github.com/deep-projects/dvc-cc/releases/download/0.4.0/dvc_cc-0.4.0-py3-none-any.whl
+## 3) Init DVC-CC
+Before you start to work with DVC-CC you need to configure DVC-CC for this project. You can do this with:
+```bash
+dvc-cc init
 ```
+If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of GPUs, set this to 1.
+
+> **More**: If you need more informations about the settings use the following [site](_settings.md).
+
+## 4) Build the DVC pipeline
+
+
+
+
+
 
 ## 1) Create your first DVC-CC-Project
 Create a **Git** repository at github or gitlab. Next go to the repository and run `dvc-cc init`. This will set interactively all information that dvc-cc needs to work. All the information describes the connection to CC, DVC and which server and docker setting do you need to run your code. As CBMI user you can use the default values. Just use your correct CBMI username and use one GPU for this script.
