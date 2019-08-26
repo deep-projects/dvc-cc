@@ -1,66 +1,46 @@
-# DVC-CC-Project
+# DVC-CC
+TODO: a simple DVC-CC-LOGO :)
+TODO: SOME DESCRIPTION
+TODO: GIF of how to use DVC-CC basic commands
 
-DVC-CC was developed for machine learning projects with the main target of reproducibility, simplicity and **scalability**.
+## Installation of DVC-CC
 
-- Reproducibility means that all experiments created in parallel or sequentially can be reproduced by you and others who have access to your GIT and DVC repository.
-- Scalability means that these scripts ensure that you can run them on your cluster system.
-- Simplicity means that it should not cause too much more workload.
+DVC-CC is written in python so you can easily install DVC-CC by using pip. We recommend that you install DVC-CC in an anaconda environment. You can install [anaconda](https://www.anaconda.com/distribution/), create, and activate an environment with the following lines:
 
-To archive this target, DVC-CC is based on the two softwares [Open-source Version Control System for Machine Learning Projects (DVC)](https://dvc.org/) and [Curious Containers (CC)](https://www.curious-containers.cc/).
-- DVC allows you to define stages that describe which command line to call, what dependencies, output, and metrics exist for this command. With the defined stages, DVC knows the pipeline of executions and ensures that changed dependencies are executed again.
-- CC is used in the backend to run your scripts in a docker on your cluster system.
-
-
-## Tutorial
-Find here the first tutorial: https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/SimpleStart.md
-
-## Install
-```
-conda create --name dvc_cc pip python scipy numpy matplotlib pandas pyyaml pyrsistent psutil cffi MarkupSafe Pillow
+### Installation with pip
+```bash
+conda create --name dvc_cc python pip
 conda activate dvc_cc
-
-pip install https://github.com/deep-projects/dvc-cc/releases/download/0.4.0/dvc_cc-0.4.0-py3-none-any.whl
 ```
 
-## Basic Usage
+The following script will install the client on your computer:
 
-### Init
-
-1. You should create a git repository
-2. Run the command: `dvc-cc init`
-3. Create a directory on a storage server and add a DVC remote to this directory. I.e.:
-    ```
-    # dvc remote add -d dvc_connection ssh://annusch@avocado01.f4.htw-berlin.de/data/ldap/jonas/test_pcam
-    dvc remote add -d dvc_connection ssh://YOURUSERNAME@YOURSERVER/PATHTODIRECTORY
-    dvc remote modify dvc_connection ask_password true
-    dvc push
-    ```
-4. check and set the settings with `dvc-cc setting all`
-
-### Define your pipeline with DVC
-
-You can use DVC to define your pipeline.
-
-```
-dvc run -d DEPENDENCY -o SOMEOUTPUT -m SOMEMETRIC.json --no-exec python train.py
+```bash
+pip install --upgrade dvc-cc
 ```
 
-### RUN the defined pipeline on the server
-```
-dvc-cc run THE_EXPERIMENT_NAME
+### Installation from source
+
+If you want to install the latest version from source you can install it with [poetry](https://poetry.eustace.io/).
+
+```bash
+git clone https://github.com/deep-projects/dvc-cc.git
+cd dvc-cc/dvc-cc
+poetry build
+pip install dvc_cc-?????.whl # replace ????? with the current version that you build in the previous step.
 ```
 
-### check status
-```
-# get an overview over all started jobs:
-dvc-cc status --all
+## Get started
+TODO
 
-# get a detailed view of the last runned job.
-dvc-cc status -d
-```
+### Overview
+TODO
+
+### Tutorials
+- [An old tutorial](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/SimpleStart.md)
+
+## Structure of this repository
 
 
 ## Acknowledgements
 The CAMELYON CNNs software is developed at CBMI (HTW Berlin - University of Applied Sciences). The work is supported by the German Federal Ministry of Education and Research (project deep.TEACHING, grant number 01IS17056 and project deep.HEALTH, grant number 13FH770IX6).
-
-
