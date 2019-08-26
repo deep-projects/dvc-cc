@@ -10,7 +10,7 @@ mkdir source
 wget -o source/train.py https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/train.py
 ```
 This script gets some parameters, train a network and save tensorflow data, the model and metric files.
-![Here is an image shown that describes the input parameters and output files of this script.][get_started_pipeline.png]
+![Here is an image shown that describes the input parameters and output files of this script.](get_started_pipeline.png)
 
 ## 3) Init DVC-CC
 Before you start to work with DVC-CC you need to configure DVC-CC for this project. You can do this with:
