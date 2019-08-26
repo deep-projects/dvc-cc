@@ -19,7 +19,7 @@ dvc-cc init
 ```
 If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of GPUs, set this to 1.
 
-> **More**: If you need more informations about the settings use the following [site](_settings.md).
+> **Even more**: On [this site](_settings.md) you can find all informations about the settings of DVC-CC.
 
 ## 4) Build the DVC pipeline
 
