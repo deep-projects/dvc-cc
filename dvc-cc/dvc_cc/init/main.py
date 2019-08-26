@@ -232,7 +232,10 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
             print("  engine: nvidia-docker", file=f)
         print("  settings:", file=f)
         if num_of_gpus > 0:
-            print("    gpus: {count: "+str(num_of_gpus)+"}", file=f)
+            print("    gpus:", file=f)
+            print("      count: "+str(num_of_gpus), file=f)
+            print("      vendor: \"nvidia\"", file=f)
+
         # TODO: ASK FOR THIS!
         print("    image:", file=f)
         print("      url: '"+docker_image+"'", file=f)
@@ -249,6 +252,6 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
         print("      url: " + engine_url, file=f)
         print("    batchConcurrencyLimit: "+str(batch_concurrency_limit), file=f)
         print("    retryIfFailed: false", file=f)
-        print("redVersion: '7'", file=f)
+        print("redVersion: '8'", file=f)
         
         

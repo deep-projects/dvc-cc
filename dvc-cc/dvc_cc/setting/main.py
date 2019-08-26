@@ -142,19 +142,26 @@ def setting_num_of_gpus():
         settings = yaml.safe_load(stream)
 
     if args.set is None:
-        if settings['container']['engine'] == 'nvidia-docker':
-            print('%23s : %s' % ('num-of-gpus' , str(settings['container']['settings']['gpus']['count'])))
+        
+
+        if 'gpus' in settings['container']['settings']:
+            if 'count' in settings['container']['settings']['gpus']:
+                print('%23s : %s' % ('num-of-gpus' , str(settings['container']['settings']['gpus']['count'])))
+            elif 'devices' in settings['container']['settings']['gpus']:
+                print('%23s : %s' % ('num-of-gpus' , len(settings['container']['settings']['gpus']['devices'])))
+            else:
+                print('ERROR: Something is wrong with the .dvc_cc/cc_config.yml. Please delete the file and run again "dvc-cc init" to recreate the configuration file.')
         else:
             print('%23s : %s' % ('num-of-gpus' , str(None)))
     else:
         if args.set <= 0:
-            settings['container']['engine'] = 'docker'
             if 'gpus' in settings['container']['settings']:            
                 settings['container']['settings']['gpus'].pop('count',None)
+                settings['container']['settings']['gpus'].pop('devices',None)
                 settings['container']['settings'].pop('gpus',None)
+                settings['container']['settings'].pop('vendor',None)
         else:
-            settings['container']['engine'] = 'nvidia-docker'
-            settings['container']['settings']['gpus'] = {'count':args.set}
+            settings['container']['settings']['gpus'] = {'count':args.set, 'vendor':"nvidia"}
         with open('.dvc_cc/cc_config.yml', 'w') as outfile:
             yaml.dump(settings, outfile)
 
