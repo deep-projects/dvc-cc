@@ -21,11 +21,44 @@ If you have access to the deep.TEACHING cluster you can leave everything to the 
 
 > **Even more**: On [this site](_settings.md) you can find all informations about the settings of DVC-CC.
 
-## 4) Build the DVC pipeline
+## 4) Build the DVC-CC hyperopt-file.
+
+!TODO
+
+```bash
+dvc-cc hyperopt new -d source/train.py \
+                    -o tensorboard \
+                    -o model.h5 \
+                    -m summary.yml \
+                    -f train.dvc \
+                    "python source/train.py --num_of_kernels {{nk}} --activation_function {{af}}"
+```
+
+!TODO: Screenshot of the setting of the parameters!
+
+| name | <sup>saved in git</sup> | <sup>saved in dvc cache</sup> | <sup>save the checksum</sup> | <sup>description</sup>                                                                                       |
+|:----:|:------------:|:------------------:|:-----------------:|---------------------------------------------------------------------------------------------------|
+|  -d  |     <sup>False</sup>    |        <sup>False</sup>       |        <sup>True</sup>       | <sup>You use this to define dependencies (inputs) or everything from what this stage depends on.</sup>       |
+|  -o  |     <sup>False</sup>    |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Large output files or folders</sup>                                                                                |
+|  -O  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Small output files or folders </sup>                                                                               |
+|  -m  |     <sup>True</sup>     |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Metrics are output files but have a special feature that you can use with `dvc metrics show`</sup>  |
+|  -M  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Metrics see above. Find more information about metrics [here](https://dvc.org/doc/commands-reference/metrics-show). </sup>  
+
+> **Even more**: Can you set all parameters? For help and a solution go to [this site](_set_all_parameters.md).
+
+> **Even more**: If you have multiple scripts (i.e., preprocessing.py, train.py and eval.py) you can create one or multiple pipelines. See [this site](_complex_pipeline.md) for more information.
+
+> **Even more**: We created here .hyperopt-files. If you do not have any hyper parameters and want to use DVC directly you can take a look at [this site](_only_dvc.md).
 
 
-
-
+#
+#
+#
+#
+#
+#
+#
+#
 
 
 ## 1) Create your first DVC-CC-Project
