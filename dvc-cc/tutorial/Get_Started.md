@@ -156,3 +156,7 @@ in the [dvc-cc github issue list](https://github.com/deep-projects/dvc-cc/issues
 - You can have live access to the output that your models create. Take a look at [this site](_live_output.md).
 - You can connect to some data per SSHFS on your branch. The cluster will use the same SSHFS connection, but currently this works only if the `data` folder was used.
 
+## Acknowledgements
+The DVC-CC software is developed at CBMI (HTW Berlin - University of Applied Sciences). The work is supported by the
+German Federal Ministry of Education and Research (project deep.TEACHING, grant number 01IS17056 and project
+deep.HEALTH, grant number 13FH770IX6).

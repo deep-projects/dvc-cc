@@ -12,4 +12,6 @@ TODO
 
 
 ## Acknowledgements
-The CAMELYON CNNs software is developed at CBMI (HTW Berlin - University of Applied Sciences). The work is supported by the German Federal Ministry of Education and Research (project deep.TEACHING, grant number 01IS17056 and project deep.HEALTH, grant number 13FH770IX6).
+The DVC-CC software is developed at CBMI (HTW Berlin - University of Applied Sciences). The work is supported by the
+German Federal Ministry of Education and Research (project deep.TEACHING, grant number 01IS17056 and project
+deep.HEALTH, grant number 13FH770IX6).
