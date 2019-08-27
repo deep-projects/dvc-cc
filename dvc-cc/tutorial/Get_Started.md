@@ -23,7 +23,7 @@ If you have access to the deep.TEACHING cluster you can leave everything to the 
 
 ## 4) Build the DVC-CC hyperopt-file.
 
-> **Even more**: <details><summary>After Execution</summary>
+<blockquote>**Even more**: <details><summary>Why do we need to define a pipeline?</summary>
 <p>
 
 **Without** DVC-CC we would calling the script multiple times with different parameters to get multiple results and compare this
@@ -53,7 +53,7 @@ and send jobs over the CC interface to the cluster.
 
 </p>
 </details>
-
+</blockquote>
 
 
 
