@@ -32,7 +32,7 @@ pip install dvc_cc-?????.whl # replace ????? with the current version that you b
 ```
 
 ## Get started
-Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/SimpleStart.md).
+Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md).
 
 ### Overview
 TODO
