@@ -23,7 +23,50 @@ If you have access to the deep.TEACHING cluster you can leave everything to the 
 
 ## 4) Build the DVC-CC hyperopt-file.
 
-!TODO
+> **Even more**: <details><summary>After Execution</summary>
+<p>
+
+**Without** DVC-CC we would calling the script multiple times with different parameters to get multiple results and compare this
+hyperparameters. I.e.:
+
+- call: "python source/train.py --num-of-kernels 32"
+- call: "python source/train.py --num-of-kernels 64"
+- call: "python source/train.py --num-of-kernels 64 --activation_function tanh"
+- ...
+
+This proceed has multiple problems that needs to solve:
+1. You need to make sure that the output of your script gets not overwritten
+    and make the name memorable.
+    - How do you make clear which parameters and input files you used?
+    - What if you want to run it multiple times?
+    - How to you make clear, how the source code looked as the output files was created?
+2. This workflow works if you run your script on one computer and start one job at a time. But if you have access to a cluster
+    you would like to run the experiments in parallel.
+    
+This two problems are the reason why DVC-CC exists. DVC-CC is a wrapper that make it easy to integrate DVC with CC.
+**DVC** can handle all problems that are described at the first point by desribing processing pipeline and saving checksumes to
+each dependency and output file, to make sure that the pipeline is unchanged. **CC** is a infrastructure software that
+used the RED file for describing a job that can be sent to a cluster where it gets exectured.
+
+You can think DVC-CC as a high level wrapper to make it easy to write everytime a reproduceable code by using DVC with GIT
+and send jobs over the CC interface to the cluster.
+
+</p>
+</details>
+
+
+
+
+
+
+
+
+All the scripts
+
+To archive our goal of a reproduceable pipeline we need to define it
+
+In this step we define the pipeline that describes what needs to be run to
+
 
 ```bash
 dvc-cc hyperopt new -d source/train.py \
