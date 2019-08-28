@@ -7,7 +7,8 @@ Create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) r
 Now you could write your script that you want to run on the cluster. For this tutorial, you can do the following lines of code to get a source code:
 ```bash
 mkdir source
-wget -o source/train.py https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/train.py
+wget -O source/train.py https://raw.githubusercontent.com/deep-projects/d
+vc-cc/master/dvc-cc/tutorial/train.py
 ```
 This script gets some parameters, train a network, and save TensorFlow data, the model and metric files.
 ![Here is an image shown that describes the input parameters and output files of this script.](get_started_pipeline.png)
@@ -17,7 +18,8 @@ Before you start to work with DVC-CC, you need to configure DVC-CC for this proj
 ```bash
 dvc-cc init
 ```
-If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of GPUs, set this to 1.
+If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of GPUs,
+set this to 1, and the username with that you can access the storage server dt1.
 
 > **Even more**: On [this site](_settings.md), you can find all the information about the settings of DVC-CC.
 
@@ -76,7 +78,7 @@ The last line is the pure command (any command that runs in the bash) that we wo
 parameters we use variable names in curly brackets, i.e., `{{nk}}`. If we run this command, it will ask use which datatype
 this parameter is and create a file in the folder ./dvc/.hyperopt that has all information given by this command.
 
-!TODO: Screenshot of the setting of the parameters!
+![You need to set the datatype for the variables nk => int and af => one_of, with the possible value: tanh and relu.](hyperopt_command.png)
 
 The DVC-CC command runs in the background `dvc run --no-exec ...` and the command from above. That means that all parameters
 are defined in the DVC documentation of [`dvc run`](https://dvc.org/doc/commands-reference/run). But for an overview, you need

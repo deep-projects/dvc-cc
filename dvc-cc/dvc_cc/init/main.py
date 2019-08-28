@@ -40,9 +40,9 @@ def main():
         print()
         ram = None
         while ram is None:
-            ram = input(bcolors.OKBLUE+'RAM in GB'+bcolors.ENDC+' (default 100): ')
+            ram = input(bcolors.OKBLUE+'RAM in GB'+bcolors.ENDC+' (default 20): ')
             if ram == '':
-                ram = 100000 # 100 GB
+                ram = 20000 # 20 GB
             elif ram.isdigit():
                 ram = int(ram)*1000
             else:
@@ -226,10 +226,7 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
 
         print("  outputs: {}", file=f)
         print("container:", file=f)
-        if num_of_gpus == 0:
-            print("  engine: docker", file=f)
-        else:
-            print("  engine: nvidia-docker", file=f)
+        print("  engine: docker", file=f)
         print("  settings:", file=f)
         if num_of_gpus > 0:
             print("    gpus:", file=f)
