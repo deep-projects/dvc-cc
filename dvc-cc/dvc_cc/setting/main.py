@@ -30,8 +30,14 @@ def get_main_git_directory_path():
 def show_all():
     with open(".dvc_cc/cc_config.yml", 'r') as stream:
         settings = yaml.safe_load(stream)
-    if settings['container']['engine'] == 'nvidia-docker':
-        print('%23s : %s' % ('num-of-gpus' , str(settings['container']['settings']['gpus']['count'])))
+
+    if 'gpus' in settings['container']['settings']:
+        if 'count' in settings['container']['settings']['gpus']:
+            print('%23s : %s' % ('num-of-gpus', str(settings['container']['settings']['gpus']['count'])))
+        elif 'devices' in settings['container']['settings']['gpus']:
+            print('%23s : %s' % ('num-of-gpus', len(settings['container']['settings']['gpus']['devices'])))
+        else:
+            print('ERROR: Something is wrong with gpu configuration in the file .dvc_cc/cc_config.yml. Please delete the file and run again "dvc-cc init" to recreate the configuration file.')
     else:
         print('%23s : %s' % ('num-of-gpus' , str(None)))
 
@@ -150,7 +156,7 @@ def setting_num_of_gpus():
             elif 'devices' in settings['container']['settings']['gpus']:
                 print('%23s : %s' % ('num-of-gpus' , len(settings['container']['settings']['gpus']['devices'])))
             else:
-                print('ERROR: Something is wrong with the .dvc_cc/cc_config.yml. Please delete the file and run again "dvc-cc init" to recreate the configuration file.')
+                print('ERROR: Something is wrong with gpu configuration in the file .dvc_cc/cc_config.yml. Please delete the file and run again "dvc-cc init" to recreate the configuration file.')
         else:
             print('%23s : %s' % ('num-of-gpus' , str(None)))
     else:

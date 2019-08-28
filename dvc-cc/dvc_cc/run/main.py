@@ -481,8 +481,8 @@ def main():
         print(bcolors.WARNING+'WARNING: You are on a DVC-CC branch.'+bcolors.ENDC)
         # TODO if the rerun command exists throw an error!
         #   print('         You should use the dvc rerun command')
-        user_input = input('Do you want to continue? [y,n]')
-        if not user_input.startswith('y'):
+        user_input = input('Do you want to continue? [y,N]')
+        if not user_input.lower().startswith('y'):
             print('You can switch to a other branch with "git checkout THE_BRANCH_NAME".')
             exit(0)
     elif startbranch.startswith('rcc_'):
@@ -568,6 +568,7 @@ def main():
                 hyperopt_draws) * args.num_of_repeats) + ' hyperoptimization pairs. Do you want to continue and start the job? [y,n]: ')
         if not user_input.lower().startswith('y'):
             print('The job was canceled')
+            exit(0)
     else:
         hyperopt_draws = [[]]
 
