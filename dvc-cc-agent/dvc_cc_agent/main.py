@@ -241,7 +241,12 @@ def main():
         command = 'git checkout ' + git_name_of_branch + ' -b ' + name_of_result_branch
     print('\t'+command)
     print(subprocess.check_output(command, shell=True).decode())
-    
+
+    if os.path.exists("requirements.txt"):
+        print('INSTALL requirements.txt with pip.')
+        command = "pip install -r requirements.txt"
+        print(subprocess.check_output(command, shell=True).decode())
+
     print('PULL FROM DVC   ' + get_time())
     command = 'dvc pull'
     print(subprocess.check_output(command, shell=True).decode())
