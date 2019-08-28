@@ -50,9 +50,9 @@ def main():
                 ram = None
 
         print()
-        docker_image = input(bcolors.OKBLUE+'Docker Image'+bcolors.ENDC+' default (docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev): ')
+        docker_image = input(bcolors.OKBLUE+'Docker Image'+bcolors.ENDC+' default (docker.io/deepprojects/dvc_repro_starter_tf2.alpha:1.2): ')
         if docker_image == '':
-            docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'
+            docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:1.2'
             docker_image_needs_credentials = False
         else:
             docker_image_needs_credentials = None
@@ -107,7 +107,7 @@ def main():
         # set default values
         num_of_gpus = 0 ##
         ram = 131072
-        docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:dev'
+        docker_image = 'docker.io/deepprojects/dvc_repro_starter_tf2.alpha:1.2'
         docker_image_needs_credentials = False
         batch_concurrency_limit = 12
         engine = 'ccagency'

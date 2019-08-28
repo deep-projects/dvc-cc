@@ -1,4 +1,4 @@
-FROM docker.io/nvidia/cuda:10.0-cudnn7-runtime-ubuntu18.04
+FROM docker.io/nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -23,21 +23,16 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade red-connector-ssh==0.7
 
 # install tensorflow
-RUN pip install tensorflow-gpu==2.0.0-beta1
+RUN pip install tensorflow-gpu==2.0.0-rc0
 
 # Some common environmenta variables that Python uses
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Install a specific version of TensorFlow
 # You may also install anything else from pip like this
 RUN pip install --no-cache-dir tensorboard
 
-#RUN pip install https://download.pytorch.org/whl/cu100/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl
-#RUN pip install torchvision
-#RUN pip install torch
-
-RUN pip install https://download.pytorch.org/whl/cu100/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
-RUN pip install https://download.pytorch.org/whl/cu100/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
+RUN pip install torch===1.2.0 torchvision===0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 RUN pip --no-cache-dir install \
         Pillow \
@@ -60,9 +55,8 @@ RUN pip --no-cache-dir install \
 
 RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector 53!'
 
-RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_agent-0.3.0-py3-none-any.whl
-
-RUN pip install https://github.com/deep-projects/dvc-cc/releases/download/dvc-cc-0.3.0/dvc_cc_connector-0.3.0-py3-none-any.whl
+RUN pip install dvc-cc-agent
+RUN pip install dvc-cc-connector
 
 WORKDIR home/cc/
 
