@@ -18,6 +18,7 @@ dvc run --no-exec -d source/train.py \
 ```
 
 The `dvc run --no-exec ...` command is the same as `dvc-cc hyperopt new ...` without using any hyperparameters, with
-the only exception that DVC-CC will always save the DVC-files in the *dvc* folder.
+the only exception that DVC-CC will always save the DVC-files in the *dvc* folder. To try new parameters your can
+just overwrite the DVC file by using the same command with different values.
 
 All DVC files created directly with DVC or with DVC-CC can be run on a cluster with CC.

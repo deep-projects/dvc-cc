@@ -2,6 +2,15 @@
 This tutorial is in work!
 ![IN WORK](work-2062096_640.jpg)
 
+
+
+# DVC-CC: Working with the Jupyter Notebook
+
+This site is an extension of the [main tutorial](Get_Started.md). Make sure you read it before you read this site.
+
+
+
+
 If you want to work with a jupyter notebook to make fast changes but run parallel larger experiments on the server you just can use DVC-CC ;-)
 
 If you call `dvc-cc run` with the `-nb` parameter it will convert all jupyter notebook to py files so that they can be executed on the server. By defining your pipeline you would just use a .py file instead of the ipynb file.
