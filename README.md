@@ -1,5 +1,5 @@
 # DVC-CC
-- TODO: a simple DVC-CC-LOGO :)
+![The DVC-CC-Logo](dvc_cc_logo.png)
 - TODO: SOME DESCRIPTION
 - TODO: GIF of how to use DVC-CC basic commands
 
