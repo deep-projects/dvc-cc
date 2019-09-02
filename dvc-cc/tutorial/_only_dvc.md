@@ -2,7 +2,7 @@
 This tutorial is in work!
 ![IN WORK](work-2062096_640.jpg)
 
-![Here is an image shown that describes the input parameters and output files of this script.](get_started_pipeline.png =100x)
+<img src="get_started_pipeline.png" alt="drawing" width="200"/>
 
 If we do not have any hyper parameter we can work easily with DVC and define the dependencies and output files of our
 script. DVC will handle everything else:
