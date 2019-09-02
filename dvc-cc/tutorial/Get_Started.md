@@ -11,7 +11,8 @@ wget -O source/train.py https://raw.githubusercontent.com/deep-projects/d
 vc-cc/master/dvc-cc/tutorial/train.py
 ```
 This script gets some parameters, train a network, and save TensorFlow data, the model and metric files.
-<img src="get_started_pipeline.png" alt="drawing" width="600"/>
+
+<img src="get_started_pipeline.png" alt="drawing" width="800"/>
 
 ## 3) Init DVC-CC
 Before you start to work with DVC-CC, you need to configure DVC-CC for this project. You can do this with:
