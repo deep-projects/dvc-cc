@@ -156,7 +156,7 @@ That's it. Now, you should have a feeling about how you can work with DVC-CC. Th
 The `--help` option should be your best friend. If you have any questions or found a bug, you can report it
 in the [dvc-cc github issue list](https://github.com/deep-projects/dvc-cc/issues).
 
-- If you would like to work with **jupyter notebook** take a look at [this site](_working_with_jupyer_notebook.md).
+- If you would like to work with **jupyter notebook** take a look at [this site](_working_with_jupyter_notebook.md).
 - DVC-CC creates a lot of branches. That means that `git branch` is bombarded with the **cc_** and **rcc_** branches
     you can use `dvc-cc git branch` to show only your working branches.
 - You can have live access to the output that your models create. Take a look at [this site](_live_output.md).
