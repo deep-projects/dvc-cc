@@ -32,21 +32,18 @@ set this to 1, and the username with that you can access the storage server dt1.
 <blockquote>**Even more**: <details><summary>Why do we need to define a pipeline?</summary>
 <p>
 
-**Without DVC-CC**: We would call the script multiple times with different parameters to get multiple results and compare this
-Hyperparameters. I.e.:
+**Without DVC-CC**: We would call the script multiple times with different parameters to get multiple results and compare these Hyperparameters. I.e.:
 
 - call: "python source/train.py --num-of-kernels 32"
 - call: "python source/train.py --num-of-kernels 64"
 - ...
 
-These proceeds has multiple problems that need to solve:
-1. You need to make sure that the output of your script gets not overwritten
-    and make the name memorable.
+These proceeds have multiple problems that need to be solved:
+1. You need to make sure that the output of your script gets not overwritten and make the name memorable.
     - How do you make clear which parameters and input files you used?
     - What if you want to run it multiple times?
-    - How do you make clear, how the source code looked as the output files was created?
-2. This workflow works if you run your script on one computer and start one job at a time. But if you have access to a cluster
-    you would like to run the experiments in parallel.
+    - How do you make clear, how the source code looked as the output files were created?
+2. If you want to run your script in parallel and not start one job at a time, you need to manage your hardware. This includes making sure that a job gets started if enough resources are free.
     
 These two problems are the reason why DVC-CC exists. DVC-CC is a wrapper that makes it easy to integrate DVC with CC.
 **DVC** can handle all problems that are described at the first point by describing the processing pipeline and saving checksums to
