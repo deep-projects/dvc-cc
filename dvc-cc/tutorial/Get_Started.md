@@ -4,15 +4,18 @@
 Create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) repository and change the directory to the empty git repository.
 
 ## 2) Download source code
-Now you could write your script that you want to run on the cluster. For this tutorial, you can do the following lines of code to get a source code:
+Now we need some source code that does some task, i.e. training a Convolutional Neural Network (CNN). For this tutorial, you can call the following lines to get source code to train a CNN in TensorFlow:
+
 ```bash
 mkdir source
 wget -O source/train.py https://raw.githubusercontent.com/deep-projects/d
 vc-cc/master/dvc-cc/tutorial/train.py
 ```
-This script gets some parameters, train a network, and save TensorFlow data, the model and metric files.
+The following graphic shows the parameters and the outputs of the script.
 
 <img src="get_started_pipeline.png" alt="drawing" width="800"/>
+
+One of the outputs is a metric file. A metric file is a special type of output that can summaries the result of the script. Typically this is a JSON file that includes the necessary numbers to compare different models. I.e., numbers like best train/validation accuracy, the smallest train/validation loss.
 
 ## 3) Init DVC-CC
 Before you start to work with DVC-CC, you need to configure DVC-CC for this project. You can do this with:
