@@ -4,7 +4,7 @@
 Create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) repository and change the directory to the empty git repository.
 
 ## 2) Download source code
-Now we need some source code that does some task, i.e. training a Convolutional Neural Network (CNN). For this tutorial, you can call the following lines to get source code to train a CNN in TensorFlow:
+Now we need some source code that does some task, i.e. training a Convolutional Neural Network (CNN). For this tutorial, you can call the following lines to get source code that trains a CNN in TensorFlow:
 
 ```bash
 mkdir source
