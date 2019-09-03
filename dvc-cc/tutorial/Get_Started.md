@@ -49,14 +49,6 @@ DVC-CC uses the software [Data Version Control (DVC)](https://dvc.org/) and [Cur
 
 We can summarize as follows: DVC-CC is a wrapper on DVC that makes it easy to integrate it into CC to solve both problems from above.
 
-
-DVC-CC use the the software [Data Version Control (DVC)](https://dvc.org/) and [Curious Containers (CC)](https://www.curious-containers.cc/).
-**DVC** can handle all problems that are described at the first point by describing the processing pipeline and saving checksums to
-each dependency and output file, to make sure that the pipeline is unchanged. **CC** is infrastructure software that
-used the RED file for describing a job that can be sent to a cluster where it gets executed.
-
-DVC-CC is a wrapper on DVC that makes it easy to integrate it into CC to solve both problems from above.
-
 </p>
 </details>
 </blockquote>
