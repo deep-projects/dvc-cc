@@ -29,7 +29,7 @@ set this to 1, and the username with that you can access the storage server dt1.
 
 ## 4) Build the DVC-CC hyperopt-file
 
-<blockquote>**Even more**: <details><summary>Why do we need to define a pipeline?</summary>
+<blockquote> **Even more**: <details><summary>Why do we need to define a pipeline?</summary>
 <p>
 
 **Without DVC-CC**: We would call the script multiple times with different parameters to get multiple results and compare these Hyperparameters. I.e.:
