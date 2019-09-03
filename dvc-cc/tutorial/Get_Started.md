@@ -44,14 +44,14 @@ These proceeds have multiple problems that need to be solved:
     - What if you want to run it multiple times?
     - How do you make clear, how the source code looked as the output files were created?
 2. If you want to run your script in parallel and not start one job at a time, you need to manage your hardware. This includes making sure that a job gets started if enough resources are free.
-    
-These two problems are the reason why DVC-CC exists. DVC-CC is a wrapper that makes it easy to integrate DVC with CC.
+
+
+DVC-CC use the the software [Data Version Control (DVC)](https://dvc.org/) and [Curious Containers (CC)](https://www.curious-containers.cc/).
 **DVC** can handle all problems that are described at the first point by describing the processing pipeline and saving checksums to
 each dependency and output file, to make sure that the pipeline is unchanged. **CC** is infrastructure software that
 used the RED file for describing a job that can be sent to a cluster where it gets executed.
 
-You can think DVC-CC as a high-level wrapper to make it easy to write every time a reproducible code by using DVC with GIT
-and send jobs over the CC interface to the cluster.
+DVC-CC is a wrapper on DVC that makes it easy to integrate it into CC to solve both problems from above.
 
 </p>
 </details>
