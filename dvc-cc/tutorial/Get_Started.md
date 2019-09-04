@@ -1,7 +1,9 @@
-# Get Started
+# Get Started with <img src="../../dvc_cc_logo.png" alt="drawing" width="100"/>
 At this site, you find a basic tutorial on how to use DVC-CC.  The demand for this basic tutorial is to keep so simple as possible. DVC-CC has much more power than it is described here. To find out more about this power you need to read also the site tutorials that you can find at the "**Even more**" clues. At the "**Behind the Scenes**" clues, you find information that technically describes what happens by using DVC-CC.
 
 If you worked through this tutorial, you should be able to know the basic command that you need to work with DVC-CC. You should then be able to adapt this to your project.
+
+
 
 
 ## 1) Create an empty GIT-Repository
