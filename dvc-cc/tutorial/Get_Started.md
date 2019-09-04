@@ -1,13 +1,39 @@
 # Get Started with <img src="../../dvc_cc_logo.png" alt="drawing" width="100"/>
-At this site, you find a basic tutorial on how to use DVC-CC.  The demand for this basic tutorial is to keep so simple as possible. DVC-CC has much more power than it is described here. To find out more about this power you need to read also the site tutorials that you can find at the "**Even more**" clues. At the "**Behind the Scenes**" clues, you find information that technically describes what happens by using DVC-CC.
+At this site, you find a basic tutorial on how to use DVC-CC.
+The demands of this basic tutorial is to be as simple as possible.
+DVC-CC has much more power than it is described here.
+To find out more about this power, you need to read also the site tutorials that you can find at the "**Even more**" 
+clues.
+If you want to learn more about the technical description of what happens when using DVC-CC, take a look at the 
+"**Behind the scenes**" clues.
 
-If you worked through this tutorial, you should be able to know the basic command that you need to work with DVC-CC. You should then be able to adapt this to your project.
+If you worked through this tutorial, you should be able to know the basic command that you need to work with DVC-CC.
+You should then be able to adapt this to your project.
 
-
-
+> **Even more**: [Here](_get_started_only_commands.md), you find only the commands of this tutorial **without text**. ;)
 
 ## 1) Create an empty GIT-Repository
-Create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) repository and change the directory to the empty git repository.
+
+GIT is well known in software development and has proven itself in practice.
+But not all concepts from software development can be transferred to machine learning tasks.
+Futurice.com compares both and write the following:
+
+> "Developing a machine learning application is even more iterative and explorative process than software engineering."
+[by Futurice.com](https://www.futurice.com/blog/differences-between-machine-learning-and-software-engineering/)
+
+In machine learning, we are dealing with large data sets and models.
+We have to deal with a lot of experiments and make sure that we can always jump back and forth between them. We also 
+need to remember which hyperparameter was used in each experiment.
+
+The software DVC, on which DVC-CC is based, is very closely connected to GIT. It works like an extension to GIT 
+for machine learning projects.
+
+This is why your task is
+- to create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) repository,
+- open a console,
+- (activate your DVC-CC anaconda environment,)
+- pull the empty git repository and
+- change the directory to your git project. 
 
 ## 2) Download source code
 Now we need some source code that does some task, i.e. training a Convolutional Neural Network (CNN). For this tutorial, you can call the following lines to get source code that trains a CNN in TensorFlow:
@@ -145,7 +171,7 @@ Now we need to pull from dvc with `dvc pull` all large files that are not stored
 available at this branch and you get all the information that you need to rerun the experiment by an external
 persona on the readme.md of this branch.
 
-## 8) Get output files from experiments
+## 8) Get output files from the experiments
 To get all output TensorBoard folders (`-f tensorboard`) that was created by the script from the
 first experiment (`-p 1`) and rename the files to have the branch name in it (`-r`) you can use the
 following command:
