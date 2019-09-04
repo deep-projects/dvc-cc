@@ -1,4 +1,3 @@
-# DVC-CC
 ![The DVC-CC-Logo](dvc_cc_logo.png)
 - TODO: SOME DESCRIPTION
 - TODO: GIF of how to use DVC-CC basic commands
