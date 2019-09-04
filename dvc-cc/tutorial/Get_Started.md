@@ -57,14 +57,27 @@ the script. Typically this is a JSON file that includes the necessary numbers to
 like best train/validation accuracy, the smallest train/validation loss, ...).
 
 ## 3) Init DVC-CC
-Before you start to work with DVC-CC, you need to configure DVC-CC for this project. You can do this with:
+Before you start to work with DVC-CC, you need to configure it for this project. You can do this with:
+
 ```bash
 dvc-cc init
 ```
+
+
+
+
 If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of GPUs,
 set this to 1, and the username with that you can access the storage server dt1.
 
 > **Even more**: On [this site](_settings.md), you can find all the information about the settings of DVC-CC.
+
+<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call `dvc-cc init`?</summary>
+<p>
+...
+</p>
+</details>
+</blockquote>
+
 
 ## 4) Build the DVC-CC hyperopt-file
 
