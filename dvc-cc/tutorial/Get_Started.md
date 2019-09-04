@@ -35,19 +35,26 @@ This is why your task is
 - pull the empty git repository and
 - change the directory to your git project. 
 
-## 2) Download source code
-Now we need some source code that does some task, i.e. training a Convolutional Neural Network (CNN). For this tutorial, you can call the following lines to get source code that trains a CNN in TensorFlow:
+## 2) Generate source code
+Now we need some source code that does some task. This can be anything that can be called from the console 
+(python script, shell script, ...).
+To get the most out of DVC-CC, you should write a source code that has *input* files/parameters and generates *output*
+ files.
+
+For this tutorial, you can download source code to train a Convolutional Neural Network (CNN) in TensorFlow:
 
 ```bash
 mkdir source
-wget -O source/train.py https://raw.githubusercontent.com/deep-projects/d
-vc-cc/master/dvc-cc/tutorial/train.py
+wget -O source/train.py https://bit.ly/2krHi8E
 ```
-The following graphic shows the parameters and the outputs of the script.
+
+The following graphic shows the *input* parameters and the *output* files/folders of the script from above:
 
 <img src="get_started_pipeline.png" alt="drawing" width="800"/>
 
-One of the outputs is a metric file. A metric file is a special type of output that can summaries the result of the script. Typically this is a JSON file that includes the necessary numbers to compare different models. I.e., numbers like best train/validation accuracy, the smallest train/validation loss.
+Here one of the outputs is a metric file. A metric file is a special type of output that can summaries the result of 
+the script. Typically this is a JSON file that includes the necessary numbers to compare different models (numbers 
+like best train/validation accuracy, the smallest train/validation loss, ...).
 
 ## 3) Init DVC-CC
 Before you start to work with DVC-CC, you need to configure DVC-CC for this project. You can do this with:

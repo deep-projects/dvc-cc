@@ -8,12 +8,11 @@
 - pull the empty git repository and
 - change the directory to your git project. 
 
-## 2) Download source code
+## 2) Generate source code
 
 ```bash
 mkdir source
-wget -O source/train.py https://raw.githubusercontent.com/deep-projects/d
-vc-cc/master/dvc-cc/tutorial/train.py
+wget -O source/train.py https://bit.ly/2krHi8E
 ```
 
 ## 3) Init DVC-CC
