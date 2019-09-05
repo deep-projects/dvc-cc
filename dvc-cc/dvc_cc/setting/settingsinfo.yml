@@ -1,0 +1,92 @@
+num_of_gpus:
+    question: "How many **GPUs** do you need each run at the cluster?"
+    dtype: "int>=0"
+    help: ""
+    default: 0
+
+ram:
+    question: "How much **RAM in GB** do you need each run at the cluster?"
+    dtype: "int>0"
+    help: ""
+    default: 20
+
+docker_image:
+    question: "Which **docker image** do you want to use?"
+    dtype:
+        - name: "large"
+          value: "docker.io/deepprojects/dvc-cc_large-dockerfile:dev"
+          help: "This docker image has Tensorflow 2 and PyTorch installed."
+        - name: "tf1"
+          value: "docker.io/deepprojects/dvc-cc_large-dockerfile:dev"
+          help: "This docker image has Tensorflow 1 installed"
+        - name: "tf2"
+          value: "docker.io/deepprojects/dvc-cc_large-dockerfile:dev"
+          help: "This docker image has TensorFlow 2 installed"
+        - name: "pytorch"
+          value: "docker.io/deepprojects/dvc-cc_large-dockerfile:dev"
+          help: "This docker image has PyTorch installed"
+        - name: "basic"
+          value: "docker.io/deepprojects/dvc-cc_large-dockerfile:dev"
+          help: "This docker image has only the minimal software installed."
+        - name: "other"
+          dtype: "string"
+          help: "Please set the path to the image, i.e. docker.io/deepprojects/dvc-cc_large-dockerfile:dev."
+    help: ""
+    default: "large"
+
+dvc_server_url:
+    question: "What is the **url to the DVC-Server**?"
+    dtype: "string"
+    help: ""
+
+dvc_server_path:
+    question: "What is the **path oo the DVC-Server**?"
+    dtype: "string"
+    help: ""
+
+dvc_server_username:
+    question: "What is the **username for the DVC-Server**?"
+    dtype: "string"
+    help: ""
+
+backend:
+
+    question: "Which backend do you want to use?"
+    help: ""
+    default: "cc"
+
+    dtype:
+        - name: "cc"
+          value: "cc"
+          help: "Use 'CC' for using Curious Containers as backend."
+
+          batch_concurrency_limit:
+              question: "How many jobs can be started in parallel?"
+              dtype: "int>0"
+              help: ""
+              default: 12
+
+          engine_name:
+              question: "What is the **name of the engine**?"
+              dtype: "string"
+              help: ""
+
+          engine_url:
+              question: "What is the **url of the engine**?"
+              dtype: "string"
+              help: ""
+
+          dvc_server_url:
+              question: "What is the **url to the DVC-Server**?"
+              dtype: "string"
+              help: ""
+
+          dvc_server_path:
+              question: "What is the **path oo the DVC-Server**?"
+              dtype: "string"
+              help: ""
+
+          dvc_server_username:
+              question: "What is the **username for the DVC-Server**?"
+              dtype: "string"
+              help: ""
