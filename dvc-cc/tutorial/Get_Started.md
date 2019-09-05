@@ -63,17 +63,21 @@ Before you start to work with DVC-CC, you need to configure it for this project.
 dvc-cc init
 ```
 
+This command will ask you to set all necessary parameters to work on your cluster. You can use "--help" to
+get a information for this parameter.
+
+> **Even more**: On [this site](_settings.md), you can find all the information about the settings of DVC-CC and a 
+filled example for the students of the HTW you can find [here](_settings_htwexample.md).
+
+<!--
+If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of 
+GPUs, set this to 1, and the username with that you can access the storage server dt1.
+-->
 
 
-
-If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of GPUs,
-set this to 1, and the username with that you can access the storage server dt1.
-
-> **Even more**: On [this site](_settings.md), you can find all the information about the settings of DVC-CC.
-
-<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call `dvc-cc init`?</summary>
+<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call "dvc-cc init"?</summary>
 <p>
-...
+TODO: ...
 </p>
 </details>
 </blockquote>
@@ -126,6 +130,13 @@ dvc-cc hyperopt new -d source/train.py \
 The last line is the pure command (any command that runs in the bash) that we would also use without DVC-CC, but instead of writing hard-coded values for the
 parameters we use variable names in curly brackets, i.e., `{{nk}}`. If we run this command, it will ask use which datatype
 this parameter is and create a file in the folder ./dvc/.hyperopt that has all information given by this command.
+
+<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call "dvc-cc hyperopt new"?</summary>
+<p>
+TODO: ...
+</p>
+</details>
+</blockquote>
 
 ![You need to set the datatype for the variables nk => int and af => one_of, with the possible value: tanh and relu.](hyperopt_command.png)
 
@@ -183,7 +194,7 @@ to cancel all not finished jobs.
 
 ## 7) The result branch
 If the job succeeded, a resulting branch is created. Now we take a look at a resulting branch. All result branches start
-with **rcc_JobID_TheNameOfThisExperiment** and were created remotely. So we need first do a `git pull` to get the new
+with **rcc_JobID_TheNameOfTheExperiment** and were created remotely. So we need first do a `git pull` to get the new
 branches. And can now check out to one of the result branches with ´git checkout rcc_...´, with ... the name of the
 branch. On Linux you can use tab for auto-complete.
 
