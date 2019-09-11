@@ -102,9 +102,9 @@ def main():
             engine_url = 'https://agency.f4.htw-berlin.de/dt'
 
         print()
-        dvc_remote_server = input('The remote '+bcolors.OKBLUE+'DVC server'+bcolors.ENDC+' that you want use (default: avocado01.f4.htw-berlin.de): ')
+        dvc_remote_server = input('The remote '+bcolors.OKBLUE+'DVC server'+bcolors.ENDC+' that you want use (default: dt1.f4.htw-berlin.de): ')
         if dvc_remote_server == '':
-            dvc_remote_server = 'avocado01.f4.htw-berlin.de'
+            dvc_remote_server = 'dt1.f4.htw-berlin.de'
         print()
 
 
@@ -130,7 +130,7 @@ def main():
         batch_concurrency_limit = 12
         engine = 'ccagency'
         engine_url = 'https://agency.f4.htw-berlin.de/dt'
-        dvc_remote_server = 'avocado01.f4.htw-berlin.de'
+        dvc_remote_server = 'dt1.f4.htw-berlin.de'
         dvc_remote_path = gitrepo + '/' + gitowner + '/' + gitname
         dvc_remote_user = ''
 
