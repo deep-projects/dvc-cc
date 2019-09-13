@@ -7,6 +7,9 @@ from dvc_cc.cli_modes import cli_modes
 from dvc_cc.git.main import main as git_main
 from dvc_cc.git.main import DESCRIPTION as GIT_DESCRIPTION
 
+from dvc_cc.dvc.main import main as dvc_main
+from dvc_cc.dvc.main import DESCRIPTION as DVC_DESCRIPTION
+
 from dvc_cc.run.main import main as run_main
 from dvc_cc.run.main import DESCRIPTION as run_DESCRIPTION
 
@@ -46,6 +49,7 @@ MODES = OrderedDict([
     # TODO: This should be the rerun-part!
     #('run-all-defined', {'main': run_all_defined_main, 'description': RUN_ALL_DEFINED_DESCRIPTION}),
     ('git', {'main': git_main, 'description': GIT_DESCRIPTION}),
+    ('dvc', {'main': dvc_main, 'description': DVC_DESCRIPTION}),
     ('status', {'main': status_main, 'description': STATUS_DESCRIPTION}),
     ('cancel', {'main': cancel_main, 'description': CANCEL_DESCRIPTION}),
     ('live-output', {'main': live_output_main, 'description': LIVE_OUTPUT_DESCRIPTION}),
