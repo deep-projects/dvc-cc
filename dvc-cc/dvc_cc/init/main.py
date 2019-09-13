@@ -74,7 +74,7 @@ def main():
         print('     - "tf1", if you want to work with TensorFlow 1.4.')
         print('     - "torch", if you want to work with PyTorch 1.2.')
         print('     - "large", if you want to work with PyTorch 1.2 or/and TensorFlow 2.0.')
-        print('     - "basic", if you want install it by your self via the Requirements.txt.')
+        print('     - "basic", if you want install it by yourself via the Requirements.txt.')
         print('   You can also enter a URL to your own Docker Image.')
         print('   If you need more informations take a look at the following site: https://bit.ly/2mgbiVK')
         docker_image = input(bcolors.OKBLUE+'\tDocker Image'+bcolors.ENDC+' (default: "large"): ')

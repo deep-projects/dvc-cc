@@ -63,21 +63,24 @@ Before you start to work with DVC-CC, you need to configure it for this project.
 dvc-cc init
 ```
 
-This command will ask you to set all necessary parameters to work on your cluster. You can use "--help" to
-get a information for this parameter.
+This command will ask you to set all necessary parameters to work on your cluster. To change the settings you can 
+rerun the `dvc-cc init` command.
 
-> **Even more**: On [this site](_settings.md), you can find all the information about the settings of DVC-CC and a 
-filled example for the students of the HTW you can find [here](_settings_htwexample.md).
+If you have access to the deep.TEACHING cluster you can leave everything to the default values, except
 
-<!--
-If you have access to the deep.TEACHING cluster you can leave everything to the default value, except the number of 
-GPUs, set this to 1, and the username with that you can access the storage server dt1.
--->
+- the number of  GPUs, set this to 1, and
+- the username, set this to your matriculation number s0XXXXXX.
 
+> **Even more**: On [this site](_settings.md), you can find all the information about the settings of DVC-CC.
 
 <blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call "dvc-cc init"?</summary>
 <p>
-TODO: ...
+
+The first step of DVC-CC is to ask you for the necessary parameters. If you abort during this (with CTRL+C), nothing 
+will happen. After setting the parameters, it calls "dvc init" if this is not yet a DVC-git repository.
+It describes the remote connection to the DVC server in the dvc/config-file and creates the remote DVC folder at
+the DVC storage server. Finally, all settings for curious containers gets saved in the RED format in the
+file .dvc_cc/cc_config.yml.
 </p>
 </details>
 </blockquote>
@@ -88,7 +91,9 @@ TODO: ...
 <blockquote><b>Even more</b>: <details><summary>Why do we need to define a pipeline?</summary>
 <p>
 
-**Without DVC-CC**: We would call the script multiple times with different parameters to get multiple results and compare these Hyperparameters. I.e.:
+To understand it lets take a look at the workflow **without DVC-CC**: We would call the script multiple times with 
+different parameters to get multiple 
+results and compare these Hyperparameters. I.e.:
 
 - call: "python source/train.py --num-of-kernels 32"
 - call: "python source/train.py --num-of-kernels 64"
@@ -111,12 +116,7 @@ We can summarize as follows: DVC-CC is a wrapper on DVC that makes it easy to in
 
 In the next step, we define the processing pipeline that describes what needs to be called. For this, we use the DVC-CC syntax,
 which has just minor changes to the DVC syntax. These minor changes make it possible to create hyperparameters.
-
-> **Even more**: You can also use pure DVC syntax. For more information, take a look at [this site](_only_dvc.md).
-
-
-The pipeline that we want to describes consists of multiple stages. We need to define the stages and with the stages
-all dependencies and output files. By defining the dependencies and output files, DVC can manage the pipeline independently.
+With the following command, we define one stage from the pipeline.
 
 ```bash
 dvc-cc hyperopt new -d source/train.py \
@@ -126,39 +126,50 @@ dvc-cc hyperopt new -d source/train.py \
                     -f train.dvc \
                     "python source/train.py --num_of_kernels {{nk}} --activation_function {{af}}"
 ```
+![You need to set the datatype for the variables nk => int and af => one_of, with the possible value: tanh and relu.](hyperopt_command.png)
 
 The last line is the pure command (any command that runs in the bash) that we would also use without DVC-CC, but instead of writing hard-coded values for the
 parameters we use variable names in curly brackets, i.e., `{{nk}}`. If we run this command, it will ask use which datatype
 this parameter is and create a file in the folder ./dvc/.hyperopt that has all information given by this command.
 
-<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call "dvc-cc hyperopt new"?</summary>
-<p>
-TODO: ...
-</p>
-</details>
-</blockquote>
-
-![You need to set the datatype for the variables nk => int and af => one_of, with the possible value: tanh and relu.](hyperopt_command.png)
-
-The DVC-CC command runs in the background `dvc run --no-exec ...` and the command from above. That means that all parameters
-are defined in the DVC documentation of [`dvc run`](https://dvc.org/doc/commands-reference/run). But for an overview, you need
-to know that -f is the filename that is used for the new file in the folder ./dvc/.hyperopt. The parameters
--d (dependency), -o (output) and -m (metric) describes the pipeline and if one of them is changed or missing DVC knows that
+The DVC-CC command runs in the background `dvc run --no-exec ...`. That means that all parameters
+are defined in the DVC documentation of [`dvc run`](https://dvc.org/doc/commands-reference/run).
+The parameters `-d` (dependency), `-o` (output) and `-m` (metric) describes the pipeline and if one of them is 
+changed or missing DVC knows that
 this stage needs to reproduce. For an overview, take a look in the following table:
 
 
 | name | <sup>saved in git</sup> | <sup>saved in dvc cache</sup> | <sup>save the checksum</sup> | <sup>description</sup>                                                                                       |
 |:----:|:------------:|:------------------:|:-----------------:|---------------------------------------------------------------------------------------------------|
-|  -d  |     <sup>False</sup>    |        <sup>False</sup>       |        <sup>True</sup>       | <sup>You use this to define dependencies (inputs) or everything from what this stage depends on.</sup>       |
-|  -o  |     <sup>False</sup>    |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Large output files or folders</sup>                                                                                |
-|  -O  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Small output files or folders </sup>                                                                               |
-|  -m  |     <sup>True</sup>     |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Metrics are output files but have a special feature that you can use with `dvc metrics show`</sup>  |
-|  -M  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Metrics see above. Find more information about metrics [here](https://dvc.org/doc/commands-reference/metrics-show). </sup>  
+|  `-d`  |     <sup>False</sup>    |        <sup>False</sup>       |        <sup>True</sup>       | <sup>You use this to define dependencies (inputs) or everything from what this stage depends on.</sup>       |
+|  `-o`  |     <sup>False</sup>    |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Large output files or folders</sup>                                                                                |
+|  `-O`  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Small output files or folders </sup>                                                                               |
+|  `-m`  |     <sup>True</sup>     |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Metrics are output files but have a special feature that you can use with `dvc metrics show`</sup>  |
+|  `-M`  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Metrics see above. Find more information about metrics [here](https://dvc.org/doc/commands-reference/metrics-show). </sup>  
 
-> **Even more**: Can you set all the parameters? For help and a solution go to [this site](_set_all_parameters.md).
+In the command above we also use `-f` to define the stage name. The stage file is in this location:
+in `./dvc/.hyperopt/train.hyperopt`.
 
-> **Even more**: Here we only defined one stage. Of course, you could define complex pipelines with this technique. 
-See [this site](_complex_pipeline.md) for more information.
+<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call "dvc-cc hyperopt new"?</summary>
+<p>
+
+TODO: ...
+
+</p>
+</details>
+</blockquote>
+
+> **Even more**: Here we only define two parameters of our script. Can you set all the parameters? For help and a 
+solution go to [this site](_set_all_parameters.md).
+
+> **Even more**: Here we only defined one stage. Of course, a complex pipeline can have multiple stages. See [this 
+site](_complex_pipeline.md) for an example.
+
+> **Even more**: DVC-CC will work with special files from DVC-CC (.hyperopt-files) and DVC files perfectly. This 
+means you can also use pure DVC syntax. For more information, take a look at [this site](_only_dvc.md).
+
+
+
 
 ## 5) Run the script in the cluster
 We have right now our pipeline defined and can run our script in the cloud. For this we need to push everything to git:
@@ -173,16 +184,26 @@ dvc-cc run the_name_of_this_experiment
 ```
 This command will ask you how to set your hyperparameters. You can use one value (i.e. `32`) or use multiple values with
 a comma-separated (i.e. `32,64`) to run multiple experiments. You can also use grid-search or random-search for finding
-the best parameters. Take a look [here] _run_hyper_optimization.md), if you want to find out more about this hyper optimization.
+the best parameters. Take a look [here](_run_hyper_optimization.md), if you want to find out more about this hyper 
+optimization.
 
-> **Even more**: The DVC-CC run command has a lot of parameters (i.e. to run the same experiments multiple times). If you
-want to find out more about this use the command `dvc-cc run --help`.
+<blockquote><b>Behind the scenes</b>: <details><summary>What happens if you call "dvc-cc run"?</summary>
+<p>
 
 `dvc-cc run` will take care of your pipeline and creates new branches that start with **cc_**. These new branches are
 input branches that will be used to execute your code. This means that you can work continuously on your branch and do
 not need to wait that the job has finished. CC will take care to scale your experiment and make sure that the right
 hardware is used to run the script in a docker container. After the experiment finished, it will be automatically
 created a resulting branch that starts with **rcc_**.
+
+</p>
+</details>
+</blockquote>
+
+
+
+> **Even more**: The DVC-CC run command has a lot of parameters (i.e. to run the same experiments multiple times). If you
+want to find out more about this use the command `dvc-cc run --help`.
 
 ## 6) Check jobs
 But before we take a look at the result branch, we will check the job that we started with `dvc-cc status` we get the
@@ -195,7 +216,7 @@ to cancel all not finished jobs.
 ## 7) The result branch
 If the job succeeded, a resulting branch is created. Now we take a look at a resulting branch. All result branches start
 with **rcc_JobID_TheNameOfTheExperiment** and were created remotely. So we need first do a `git pull` to get the new
-branches. And can now check out to one of the result branches with ´git checkout rcc_...´, with ... the name of the
+branches. And can now check out to one of the result branches with `git checkout rcc_...` , with ... the name of the
 branch. On Linux you can use tab for auto-complete.
 
 Now we need to pull from dvc with `dvc pull` all large files that are not stored in git. Now all output files are
