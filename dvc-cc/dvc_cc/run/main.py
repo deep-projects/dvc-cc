@@ -579,10 +579,11 @@ def main():
         # Create an input branch! #
         ###########################
         exp_name = exp_id + '_' + args.experimentname
-        subprocess.call(['git', 'checkout', '-b', exp_name])
+        print(bcolors.BOLD+'Create an input git-branch: ' + exp_name + bcolors.ENDC)
+        subprocess.call(['git', 'checkout','-q', '-b', exp_name])
         #print(['git', 'push', '-u', 'origin', exp_name+':'+exp_name])
         #TODO: THIS THROWS ALWAYS A MERGE REQUEST ????
-        subprocess.call(['git', 'push', '-u', 'origin', exp_name+':'+exp_name])
+        subprocess.call(['git', 'push', '-q','-u', 'origin', exp_name+':'+exp_name])
 
         #############################
         # CONVERT Jupyter Notebooks #
@@ -593,10 +594,11 @@ def main():
         else:
             created_pyfiles_from_jupyter = []
         for f in created_pyfiles_from_jupyter:
-            subprocess.call(['git', 'add', f])
+            subprocess.call(['git', 'add', f]) #TODO: build quite mode!
+            print(bcolors.BOLD + 'The following file was created from a jupyter notebook: ' + f + bcolors.ENDC)
         if args.jupyter_notebook_to_py:
-            subprocess.call(['git', 'commit','-m', 'Convert Jupyter Notebooks to Py-File.'])
-            subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
+            subprocess.call(['git', 'commit','-q','-m', 'Convert Jupyter Notebooks to Py-File.'])
+            subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
 
         #####################################################
         # TODO: SAVE the Hyperopt-Values and the VC!        #
@@ -615,13 +617,14 @@ def main():
             draw = hyperopt_draws[i]
             if len(draw) > 0: # one or more hyperparameters was set!
                 branch_name = branch_names[i]
-                subprocess.call(['git', 'checkout', '-b', branch_name])
+                subprocess.call(['git', 'checkout', '-q', '-b', branch_name])
+                print(bcolors.BOLD + 'Create an hyperopt-input git-branch: ' + branch_name + bcolors.ENDC)
 
                 # TODO: HYPEROPT-FILES TO DVC WITH SETTED PARAMETERS #
                 vc.set_values_for_hyperopt_files(draw)
                 subprocess.call(['git', 'add', '-A'])
-                subprocess.call(['git', 'commit', '-m', 'Convert DVC-CC-Hyperopt-Files to DVC-Files.'])
-                subprocess.call(['git', 'push', '-u', 'origin', branch_name + ':' + branch_name])
+                subprocess.call(['git', 'commit', '-q', '-m', 'Convert DVC-CC-Hyperopt-Files to DVC-Files.'])
+                subprocess.call(['git', 'push', '-q', '-u', 'origin', branch_name + ':' + branch_name])
 
             else:
                 branch_name = exp_name
@@ -629,7 +632,7 @@ def main():
             cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats, args.live_output_files, args.live_output_update_frequence)
 
             if len(draw) > 0:  # one or more hyperparameters was set!
-                subprocess.call(['git', 'checkout', exp_name])
+                subprocess.call(['git', 'checkout', '-q', exp_name])
 
             if os.path.exists('.dvc_cc/cc_ids.yml'):
                 with open('.dvc_cc/cc_ids.yml', 'r') as f:
@@ -645,9 +648,10 @@ def main():
             with open('.dvc_cc/cc_ids.yml', 'w') as f:
                 yaml.dump(loaded_yml, f)
 
+            print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
             subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
-            subprocess.call(['git', 'commit', '-m', 'Push CC-ID'])
-            subprocess.call(['git', 'push', '-u', 'origin', exp_name + ':' + exp_name])
+            subprocess.call(['git', 'commit', '-q','-m', 'Push CC-ID'])
+            subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
 
     finally:
         ##########################

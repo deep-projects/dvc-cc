@@ -77,8 +77,7 @@ def main():
         print('     - "basic", if you want install it by your self via the Requirements.txt.')
         print('   You can also enter a URL to your own Docker Image.')
         print('   If you need more informations take a look at the following site: https://bit.ly/2mgbiVK')
-        docker_image = input(bcolors.OKBLUE+'\tDocker Image'+bcolors.ENDC+' default ('
-                                                        '"large" := docker.io/deepprojects/dvc-cc_large:dev): ')
+        docker_image = input(bcolors.OKBLUE+'\tDocker Image'+bcolors.ENDC+' (default: "large"): ')
         if docker_image == '' or docker_image.lower() == 'large':
             docker_image = 'docker.io/deepprojects/dvc-cc_large:dev'
             docker_image_needs_credentials = False
@@ -106,7 +105,7 @@ def main():
                 else:
                     print(bcolors.FAIL+'\tWarning: Did not understand your answer. Please use y or n.'+bcolors.ENDC)
                     docker_image_needs_credentials = None
-
+        print('You will use the Docker Image: '+ docker_image)
         print()
         batch_concurrency_limit = None
         print('The batch concurrency limit describes how many jobs you can start in parallel.')

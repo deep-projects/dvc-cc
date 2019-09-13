@@ -47,6 +47,8 @@ def show_all():
     print('%23s : %s' % ('retry-if-failed' , str(settings['execution']['settings']['retryIfFailed'])))
     print('%23s : %s' % ('engine' , str(settings['execution']['engine'])))
     print('%23s : %s' % ('engine-url' , str(settings['execution']['settings']['access']['url'])))
+    print()
+    print('If you want help by reconfiguration the settings, please call "dvc-cc init".')
 
 def setting_ram():
     parser = ArgumentParser(description='Show or set the RAM.')
@@ -178,6 +180,7 @@ TITLE = 'tools'
 DESCRIPTION = 'DVC-CC (C) 2019  Jonas Annuscheit. This software is distributed under the AGPL-3.0 LICENSE.'
 MODES = OrderedDict([
     ('all', {'main': show_all, 'description': 'Show all setting information.'}),
+    ('--all', {'main': show_all, 'description': 'Show all setting information.'}),
     ('ram', {'main': setting_ram, 'description': ''}),
     ('docker-image', {'main': setting_docker_image, 'description': 'Show or set the docker image.'}),
     ('batch-concurrency-limit', {'main': setting_batch_concurrency_limit, 'description': 'Show or set the batch concurrency limit.'}),
