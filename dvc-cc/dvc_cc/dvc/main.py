@@ -30,7 +30,7 @@ def main():
             else:
                 list_of_hyperopt_files = []
 
-            subprocess.call(sys.argv)
+            subprocess.call(['dvc']+sys.argv[1:])
 
         finally:
             #############################
