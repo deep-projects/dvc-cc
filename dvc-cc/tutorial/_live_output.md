@@ -12,7 +12,7 @@ storage server to the folder **tmp_live_output**. In this folder, you can access
 grouped in folders.
 
 If you are in the right folder of your experiment you find a file that includes the std-output of the dvc-cc-agent
-script that also runs your code.
+ script that also runs your code.
 
 > **Warning**: In the current version the live output will be never deleted. If you run out of space you just could
     delete this files. In future versions, this could be done automatically.

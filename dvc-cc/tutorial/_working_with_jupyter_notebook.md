@@ -1,12 +1,23 @@
-# Sorry
-This tutorial is in work!
-![IN WORK](work-2062096_640.jpg)
-
-
-
-# DVC-CC: Working with the Jupyter Notebook
-
 This site is an extension of the [main tutorial](Get_Started.md). Make sure you read it before you read this site.
+
+# DVC-CC: Working with the Jupyter-Notebook
+
+DVC-CC can handle Jupyter-Notebooks very well. So if you want to program and debug in Jupyter-Notebooks and run longer
+experiments with different settings on the cluster, DVC-CC is the right software for you. You can work with 
+Jupyter-Notebook locally. If you want that this script run on the server, DVC-CC will convert all the 
+Jupyter-Notebooks to Py-Files in the command `dvc-cc run`. The only thing that you need to do is to use the flag `-nb`.
+
+The basic idea is allow you to work with Jupyter-Notebooks local and if you want to run this script on the server,
+ 
+ convert the Jupyter-Notebooks to Py-Files if the script should run at the cluster.
+
+The Idea is to convert automaticly convert the Jupyter-Notebooks to py-files in the `cc_` and `rcc_` branches of 
+DVC-CC. That DVC-CC can do this for you, you need to use the `-nb` flag on the `dvc-cc run` command. Everything else 
+will handle DVC-CC for you.
+
+You can also hide or include cells so that they
+
+
 
 
 
