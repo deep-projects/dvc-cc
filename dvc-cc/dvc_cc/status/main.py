@@ -152,6 +152,9 @@ def main():
         requesting_string,
         auth=auth
     )
+
+    r.raise_for_status()
+
     all_time_experiments = pandas.DataFrame(r.json())
 
 

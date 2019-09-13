@@ -83,11 +83,12 @@ callbacks = [
 ################
 ### TRAIN MODEL
 ################
-model.fit(x_train, y_train, epochs=args.epochs, batch_size=args.batch_size, validation_split=0.1,callbacks=callbacks)
+model.fit(x_train, y_train, epochs=args.epochs, batch_size=args.batch_size, validation_split=0.1,
+          callbacks=callbacks, verbose=2)
 ################
 ### TEST MODEL
 ################
-model.evaluate(x_test, y_test)
+model.evaluate(x_test, y_test, verbose=2)
 
 ################
 ### SAVE SUMMARY

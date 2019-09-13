@@ -2,7 +2,7 @@
 
 set -eu
 
-IMAGE=docker.io/deepprojects/dvc-cc_large-dockerfile:dev
+IMAGE=docker.io/deepprojects/dvc-cc_basic:dev
 
 docker build --pull -t ${IMAGE} .
 docker push ${IMAGE}

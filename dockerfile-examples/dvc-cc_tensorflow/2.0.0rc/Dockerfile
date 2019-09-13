@@ -1,4 +1,4 @@
-FROM docker.io/deepprojects/dvc-cc_basic-dockerfile:dev
+FROM docker.io/deepprojects/dvc-cc_basic:dev
 
 # Often used libraries
 RUN pip --no-cache-dir install \
@@ -21,5 +21,5 @@ RUN pip --no-cache-dir install \
         pandas
 
 # install tensorflow
-RUN pip install tensorflow-gpu==1.14
+RUN pip install tensorflow-gpu==2.0.0-rc0
 RUN pip install --no-cache-dir tensorboard

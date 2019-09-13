@@ -25,7 +25,7 @@ RUN pip install --upgrade red-connector-ssh==0.7
 # Some common environmenta variables that Python uses
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-RUN pip install dvc-cc-agent
+RUN pip install dvc-cc-agent==0.8.1
 RUN pip install dvc-cc-connector
 
 WORKDIR home/cc/

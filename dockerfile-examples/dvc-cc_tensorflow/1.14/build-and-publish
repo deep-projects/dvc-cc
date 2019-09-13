@@ -2,7 +2,7 @@
 
 set -eu
 
-IMAGE=docker.io/deepprojects/dvc-cc_tensorflow-dockerfile:2.0.0rc
+IMAGE=docker.io/deepprojects/dvc-cc_tensorflow:1.14
 
 docker build --pull -t ${IMAGE} .
 docker push ${IMAGE}

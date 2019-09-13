@@ -2,7 +2,7 @@
 
 set -eu
 
-IMAGE=docker.io/deepprojects/dvc-cc_pytorch-dockerfile:1.2
+IMAGE=docker.io/deepprojects/dvc-cc_large:dev
 
 docker build --pull -t ${IMAGE} .
 docker push ${IMAGE}

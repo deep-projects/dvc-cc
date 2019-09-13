@@ -342,7 +342,7 @@ def main():
     num_of_tries = 1
     while pushed_successfull == False:
         try:
-            command = 'git push -u origin ' + name_of_result_branch + ':' + name_of_result_branch
+            command = 'git push --repo='+git_complete_path_to_repo+' -u origin ' + name_of_result_branch + ':' + name_of_result_branch
             if num_of_tries >= 2:
                 command = command + '_' + str(num_of_tries)
 

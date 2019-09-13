@@ -1,4 +1,4 @@
-FROM docker.io/deepprojects/dvc-cc_basic-dockerfile:dev
+FROM docker.io/deepprojects/dvc-cc_basic:dev
 
 # Often used libraries
 RUN pip --no-cache-dir install \
@@ -20,6 +20,6 @@ RUN pip --no-cache-dir install \
         seaborn \
         pandas
 
-# install tensorflow
-RUN pip install tensorflow-gpu==2.0.0-rc0
-RUN pip install --no-cache-dir tensorboard
+# install pytorch
+RUN pip install torch===1.2.0 torchvision===0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
+
