@@ -159,7 +159,7 @@ def main():
             dvc_folder_default_value = '/data/ldap/Data-Version-Control-Cache/' + gitrepo + '/' + gitowner + '/' + \
                                        gitname
         else:
-            dvc_folder_default_value = gitrepo + '/' + gitowner + '/' + gitname
+            dvc_folder_default_value = '~/' + gitrepo + '/' + gitowner + '/' + gitname
         dvc_remote_path = input('\tThe remote '+bcolors.OKBLUE+'DVC folder'+bcolors.ENDC+' that you want use ('
                                                                                          'default: '+dvc_folder_default_value+'): ')
         if dvc_remote_path == '':
@@ -183,7 +183,7 @@ def main():
         engine = 'ccagency'
         engine_url = 'https://agency.f4.htw-berlin.de/dt'
         dvc_remote_server = 'dt1.f4.htw-berlin.de'
-        dvc_remote_path = gitrepo + '/' + gitowner + '/' + gitname
+        dvc_remote_path = '~/' + gitrepo + '/' + gitowner + '/' + gitname
         dvc_remote_user = ''
 
     # Change the directory to the main git directory.
@@ -199,6 +199,10 @@ def main():
     except:
         subprocess.call(['dvc', 'init'])
         dvcrepo = DVCRepo('.')
+
+    if dvc_remote_path.startswith('~'):
+        dvc_remote_path = 'home/'+ dvc_remote_user + dvc_remote_path[1:]
+
 
     # set remote dvc connection
     if dvc_remote_user == '':
