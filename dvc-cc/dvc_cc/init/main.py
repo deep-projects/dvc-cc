@@ -201,7 +201,10 @@ def main():
         dvcrepo = DVCRepo('.')
 
     if dvc_remote_path.startswith('~'):
-        dvc_remote_path = '/home/'+ dvc_remote_user + dvc_remote_path[1:]
+        if dvc_remote_server == 'dt1.f4.htw-berlin.de':
+            dvc_remote_path = '/mnt/md0/' + dvc_remote_user + dvc_remote_path[1:]
+        else:
+            dvc_remote_path = '/home/'+ dvc_remote_user + dvc_remote_path[1:]
 
 
     # set remote dvc connection
