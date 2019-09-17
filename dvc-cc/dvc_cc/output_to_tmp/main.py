@@ -91,10 +91,10 @@ def main():
                         help='A regex of the name of the branches to be included in the search.')
     parser.add_argument('-eb','--exclude-regex-name-of-branch', type=str, default = None,
                         help='A regex of the name of the branch that are excluded.')
-    parser.add_argument('-p', '--list-of-pos',
+    parser.add_argument('-pos', '--list-of-pos',
                         help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.',
                         nargs="+", type=str)
-    parser.add_argument('-o','--path-to-output', type=str, default = None,
+    parser.add_argument('-p','--path-to-output', type=str, default = None,
                         help='The path where you want save the files.')
     parser.add_argument('-o', '--original-name', dest='original_name', action='store_true', default=False,
                         help='In default, the branch name is added to the file or folder name. If this parameter is '
@@ -104,7 +104,7 @@ def main():
                         help='Print all files that are copied.')
     parser.add_argument('-d', '--download-stages', dest='download_stages', action='store_true', default=False,
                         help='Download a stage if the file is not in the local cache.')
-    parser.add_argument('--forbid-dir', dest='forbid_dir', action='store_true', default=False,
+    parser.add_argument('-fd','--forbid-dir', dest='forbid_dir', action='store_true', default=False,
                         help='If this parameter is set, then it will ignore output folders.')
     parser.add_argument('-ns','--no-save', dest='no_save', action='store_true', default=False,
                         help='If true, it will not create a folder or link the file. This parameter is helpfull if it is used with --debug to test your regular expressions.')

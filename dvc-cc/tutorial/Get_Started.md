@@ -225,10 +225,9 @@ persona on the readme.md of this branch.
 
 ## 8) Get output files from the experiments
 To get all output TensorBoard folders (`-f tensorboard`) that was created by the script from the
-first experiment (`-p 1`) and rename the files to have the branch name in it (`-r`) you can use the
-following command:
+first experiment (`-pos 1`) and download the stages (`-d`) you can use the following command:
 ```
-dvc-cc output-to-tmp --allow-dir -f tensorboard -d -p 1 -r
+dvc-cc output-to-tmp -f tensorboard -d -pos 1
 ```
 
 ## 9) And more informations
