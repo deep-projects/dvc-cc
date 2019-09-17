@@ -54,14 +54,17 @@ def show_nodes(auth,execution_engine):
             used_ram += i['ram']
 
         used_ram = used_ram / 1000.
-        n['ram'] = n['ram'] / 1000.
 
-        if used_ram / 0.9 + 0.1 > n['ram']:
-            ram = bcolors.FAIL + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
-        elif used_ram / 0.75 + 0.1 > n['ram']:
-            ram = bcolors.WARNING + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
+        if n['ram'] is not None:
+            n['ram'] = n['ram'] / 1000.
+            if used_ram / 0.9 + 0.1 > n['ram']:
+                ram = bcolors.FAIL + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
+            elif used_ram / 0.75 + 0.1 > n['ram']:
+                ram = bcolors.WARNING + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
+            else:
+                ram = bcolors.OKGREEN + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram']))
         else:
-            ram = bcolors.OKGREEN + str(int(used_ram)) + bcolors.ENDC + '/' + str(int(n['ram'])) 
+            ram = bcolors.FAIL + '-' + bcolors.ENDC + '/' + bcolors.FAIL + '-' + bcolors.ENDC
 
         if 'gpus' in n:
             gpus = []
