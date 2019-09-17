@@ -452,8 +452,7 @@ def main():
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout. Warning: Untracked changes could be lost!', default=False, action='store_true')
     parser.add_argument('-r','--num-of-repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
-    parser.add_argument('--not-ipynb-to-py', help='If this paramer is set, than it will NOT convert all '
-                                                               'jupyter notebook files to py files.', default=False,
+    parser.add_argument('--not-ipynb-to-py', help='If this paramer is set, than it will NOT convert all jupyter notebook files to py files.', default=False,
                         action='store_true')
     parser.add_argument('-l','--live_output_files',
                         help='Comma separated string list of files that should be included to the live output for example: "tensorboard,output.json" This could track a tensorboard folder and a output.json file.')
@@ -498,7 +497,7 @@ def main():
     if len(args.experimentname) == 1:
         args.experimentname = args.experimentname[0]
     else:
-        args.experimentname = ''.join([e.capitalize()  for e in args.experimentname])
+        args.experimentname = ''.join([e.capitalize() for e in args.experimentname])
 
     #################################################################################
     # Do a DVC-checkout to delete all files that was not created with DVC repro/run #
