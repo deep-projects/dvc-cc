@@ -96,14 +96,16 @@ def main():
                         nargs="+", type=str)
     parser.add_argument('-o','--path-to-output', type=str, default = None,
                         help='The path where you want save the files.')
-    parser.add_argument('-r', '--rename-file', dest='rename_file', action='store_true', default=False,
-                        help='If true, the branch name is added to the file name of the destination.')
+    parser.add_argument('-o', '--original-name', dest='original_name', action='store_true', default=False,
+                        help='In default, the branch name is added to the file or folder name. If this parameter is '
+                             'set,  it will use the original name of the file or folder. If the file exists multiple'
+                             'times and this parameter is set, then it will use indices at the end of the file or folder names.')
     parser.add_argument('--debug', dest='debug', action='store_true', default=False,
                         help='Print all files that are copied.')
     parser.add_argument('-d', '--download-stages', dest='download_stages', action='store_true', default=False,
                         help='Download a stage if the file is not in the local cache.')
-    parser.add_argument('--allow-dir', dest='allow_dir', action='store_true', default=False,
-                        help='If dir outputs should be included or not.')
+    parser.add_argument('--forbid-dir', dest='forbid_dir', action='store_true', default=False,
+                        help='If this parameter is set, then it will ignore output folders.')
     parser.add_argument('-ns','--no-save', dest='no_save', action='store_true', default=False,
                         help='If true, it will not create a folder or link the file. This parameter is helpfull if it is used with --debug to test your regular expressions.')
     parser.add_argument('-nw','--no-print-of-warnings', dest='no_warning', action='store_true', default=False,
@@ -184,13 +186,15 @@ def main():
                     #TODO: repo.stages is very slow!
                     for stage in repo.stages():
                         for out in stage.outs:
-                            valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)
+                            valid_msg = check_out_if_its_valid(out, args.regex_name_of_file,
+                                                               args.exclude_regex_name_of_file, not args.forbid_dir)
                             print('\t\t\t',out, valid_msg)
                             if valid_msg == 'not_in_local_cache' and args.download_stages:
                                 g.pull()
                                 repo.pull(stage.relpath)
                                 time.sleep(1)
-                                valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)
+                                valid_msg = check_out_if_its_valid(out, args.regex_name_of_file,
+                                                                   args.exclude_regex_name_of_file, not args.forbid_dir)
                                 print(valid_msg)
                             if valid_msg == 'valid':
                                 outs.append(out)
@@ -206,7 +210,7 @@ def main():
                 # create a link for each output file of interest in the current branch
                 for out, branch_name in zip(outs, branch_names):
                     # create the output file name
-                    if args.rename_file:
+                    if not args.original_name:
                         out_filename = branch_name + '_' + str(out).replace('/','_')
                     else:
                         out_filename = str(out).replace('/','_')
