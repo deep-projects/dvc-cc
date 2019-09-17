@@ -154,8 +154,7 @@ def main():
 
         print()
         print('Here you can enter the folder where you want to store the DVC files on the DVC Storage Server.')
-        if engine_url == 'https://agency.f4.htw-berlin.de/cc' or engine_url == \
-                'https://agency.f4.htw-berlin.de/cctest':
+        if dvc_remote_server == 'avocado01.f4.htw-berlin.de':
             dvc_folder_default_value = '/data/ldap/Data-Version-Control-Cache/' + gitrepo + '/' + gitowner + '/' + \
                                        gitname
         else:
