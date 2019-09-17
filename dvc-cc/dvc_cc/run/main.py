@@ -452,7 +452,9 @@ def main():
     parser.add_argument('-f','--dvc-files', help='The DVC files that you want to execute. If this is not set, it will search for all DVC files in this repository and use this. You can set multiple dvc files with: "first_file.dvc,second_file.dvc" or you can use "first_file.dvc|second_file.dvc" to run in a row the files in the same branch.')
     parser.add_argument('-y','--yes', help='If this paramer is set, than it will not ask if some files are not commited or it the remote is not on the last checkout. Warning: Untracked changes could be lost!', default=False, action='store_true')
     parser.add_argument('-r','--num-of-repeats', type=int, help='If you want to repeat the job multiple times, than you can set this value to a larger value than 1.', default=1)
-    parser.add_argument('-nb','--jupyter-notebook-to-py', help='If this paramer is set, than it will convert all jupyter notebook files to py files.', default=False, action='store_true')
+    parser.add_argument('--not-ipynb-to-py', help='If this paramer is set, than it will NOT convert all '
+                                                               'jupyter notebook files to py files.', default=False,
+                        action='store_true')
     parser.add_argument('-l','--live_output_files',
                         help='Comma separated string list of files that should be included to the live output for example: "tensorboard,output.json" This could track a tensorboard folder and a output.json file.')
     parser.add_argument('-lf','--live_output_update_frequence', type=int,
@@ -589,14 +591,17 @@ def main():
         # CONVERT Jupyter Notebooks #
         #############################
         # convert jupyter notebooks to py-files.
-        if args.jupyter_notebook_to_py:
+
+
+
+        if not args.not_ipynb_to_py:
             created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(project_dir)
         else:
             created_pyfiles_from_jupyter = []
         for f in created_pyfiles_from_jupyter:
             subprocess.call(['git', 'add', f]) #TODO: build quite mode!
             print(bcolors.BOLD + 'The following file was created from a jupyter notebook: ' + f + bcolors.ENDC)
-        if args.jupyter_notebook_to_py:
+        if not args.not_ipynb_to_py:
             subprocess.call(['git', 'commit','-q','-m', 'Convert Jupyter Notebooks to Py-File.'])
             subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
 
