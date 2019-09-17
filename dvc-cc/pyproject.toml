@@ -30,5 +30,3 @@ dvc-cc = 'dvc_cc.main:main'
 [build-system]
 requires = ["poetry>=0.14.11"]
 build-backend = "poetry.masonry.api"
-
-OGI1MGJl
