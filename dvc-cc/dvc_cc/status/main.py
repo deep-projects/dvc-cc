@@ -41,8 +41,10 @@ def show_nodes(auth,execution_engine):
     for n in nodes:
         if n['state'] == 'online':
             state = bcolors.OKGREEN + 'online' + bcolors.ENDC
+        elif n['state'] is not None:
+            state = bcolors.FAIL + n['state'] + bcolors.ENDC
         else:
-            state = bcolors.FAIL + n['state'] + bcolors.FAIL
+            state = bcolors.FAIL + 'None' + bcolors.ENDC
 
         #if 'gpus' in n:
         #    # its a gpu server
