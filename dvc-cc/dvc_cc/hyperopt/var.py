@@ -31,7 +31,7 @@ def main():
     args = parser.parse_args()
 
     # go to the main git directory.
-    os.chdir(get_main_git_directory_path())
+    os.chdir(Path(get_main_git_directory_path()))
 
     if not os.path.exists('dvc'):
         os.mkdir('dvc')

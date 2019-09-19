@@ -24,7 +24,7 @@ def main():
     
     project_dir = get_main_git_directory_path()
 
-    os.chdir(project_dir)
+    os.chdir(Path(project_dir))
     
     gitrepo = GITRepo('.')
     dvcrepo = DVCRepo('.')

@@ -186,7 +186,7 @@ def main():
         dvc_remote_user = ''
 
     # Change the directory to the main git directory.
-    os.chdir(get_main_git_directory_path())
+    os.chdir(Path(get_main_git_directory_path()))
     
     gitrepo = GITRepo('.')
     try:

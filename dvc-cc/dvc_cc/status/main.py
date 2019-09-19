@@ -111,7 +111,7 @@ def main():
     args = parser.parse_args()
     
     # Change the directory to the main git directory.
-    os.chdir(get_main_git_directory_path())
+    os.chdir(Path(get_main_git_directory_path()))
 
     uname = keyring.get_password('red', 'agency_username')
     pw = keyring.get_password('red', 'agency_password')
