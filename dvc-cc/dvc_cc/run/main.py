@@ -463,8 +463,8 @@ def main():
     args = parser.parse_args()
     
     project_dir = get_main_git_directory_path()
-
-    os.chdir(project_dir)
+    print('TEST:project_dir:'+project_dir)
+    #os.chdir(project_dir)
     
     gitrepo = GITRepo('.')
 
