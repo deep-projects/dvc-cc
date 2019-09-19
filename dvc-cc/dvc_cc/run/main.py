@@ -556,7 +556,7 @@ def main():
     vc = VariableCache()
 
     for f in list_of_hyperopt_files:
-        f = 'dvc/.hyperopt/' + f
+        f = Path('dvc/.hyperopt/' + f)
         vc.register_dvccc_file(f)
 
     ###################################
