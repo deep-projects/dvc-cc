@@ -13,6 +13,8 @@ import datetime
 import pandas
 import time
 import numpy as np
+import getpass
+from pathlib import Path
 
 class bcolors:
     HEADER = '\033[95m'
@@ -85,7 +87,7 @@ def show_nodes(auth,execution_engine):
                             ))
 
 def read_execution_engine():
-    with open('.dvc_cc/cc_config.yml') as f:
+    with open(Path('.dvc_cc/cc_config.yml')) as f:
         y = yaml.safe_load(f.read())
     return y['execution']['settings']['access']['url']
 
@@ -115,7 +117,7 @@ def main():
     pw = keyring.get_password('red', 'agency_password')
     if uname == None:
         uname = input('Please specifiy the agency_username: ')
-        pw = input('Please specifiy the agency_password: ')
+        pw = getpass.getpass()
         save = input('Do you want to save it? [y/n]')
         if save.lower().startswith('y'):
             keyring.set_password('red', 'agency_username', uname)
@@ -130,7 +132,7 @@ def main():
         exit(0)
 
     if os.path.exists('.dvc_cc/cc_all_ids.yml'):
-        with open(".dvc_cc/cc_all_ids.yml", 'r') as stream:
+        with open(Path(".dvc_cc/cc_all_ids.yml"), 'r') as stream:
             try:
                 experiments = yaml.safe_load(stream)
             except yaml.YAMLError as exc:

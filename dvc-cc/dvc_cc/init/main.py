@@ -3,7 +3,7 @@ import subprocess
 from subprocess import check_output
 import os
 from dvc_cc.bcolors import *
-
+from pathlib import Path
 
 SCRIPT_NAME = 'dvc-cc init'
 TITLE = 'tools'
@@ -238,7 +238,7 @@ def main():
 
 
 def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url):
-    with open('.dvc_cc/cc_config.yml',"w") as f:
+    with open(Path('.dvc_cc/cc_config.yml'), 'w') as f:
         print("cli:", file=f)
         print("  baseCommand: [dvc-cc-agent]", file=f)
         print("  class: CommandLineTool", file=f)

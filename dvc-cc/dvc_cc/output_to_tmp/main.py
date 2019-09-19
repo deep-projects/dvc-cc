@@ -11,6 +11,7 @@ import subprocess
 import time
 import numpy as np
 import getpass
+from pathlib import Path
 
 DESCRIPTION = 'This script gives you the possibility to get all output files that match some regex over different branches and saves them in a tmp folder.'
 
@@ -32,7 +33,7 @@ def create_output_dir(root_dir, path_to_output = None):
 
     # Create folder and write them to .gitignore
     os.mkdir(path_to_output)
-    f= open(os.path.join(root_dir, '.gitignore'),"a+")
+    f= open(Path(os.path.join(root_dir, '.gitignore')),"a+")
     f.write('\n'+path_to_output)
     f.close()
     subprocess.call(['git', 'add', '.gitignore'])

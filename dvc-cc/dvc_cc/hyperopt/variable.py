@@ -1,5 +1,6 @@
 import re
 from dvc_cc.bcolors import *
+from pathlib import Path
 
 class Variable:
 
@@ -159,7 +160,7 @@ class VariableCache:
         :param name_of_textfile:
         :return:
         """
-        with open(name_of_textfile, 'r') as f:
+        with open(Path(name_of_textfile),'r') as f:
             content = f.read()
 
         if name_of_textfile not in self.filename_dict:
@@ -193,7 +194,7 @@ class VariableCache:
         :return:
         """
         for filename in self.filename_dict:
-            with open(filename, 'r') as f:
+            with open(Path(filename), 'r') as f:
                 content = f.read()
 
             start_pos = 0
@@ -207,7 +208,7 @@ class VariableCache:
                     v = Variable.search_varname_in_list(self.list_of_all_variables, varname)
                     content = content[:start_pos] + str(v) + content[end_pos+2:]
                     start_pos += 2
-            with open(filename, 'w') as f:
+            with open(Path(filename), 'w') as f:
                 print(content, file=f)
 
 
@@ -218,7 +219,7 @@ class VariableCache:
         :return:
         """
         for filename in self.filename_dict:
-            with open(filename, 'r') as f:
+            with open(Path(filename), 'r') as f:
                 content = f.read()
 
             start_pos = 0
@@ -237,6 +238,6 @@ class VariableCache:
                         content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
                     start_pos += 2
 
-            with open('dvc/'+filename[14:-9]+'.dvc', 'w') as f:
+            with open(Path('dvc/'+filename[14:-9]+'.dvc'), 'w') as f:
                 print(content, file=f)
 

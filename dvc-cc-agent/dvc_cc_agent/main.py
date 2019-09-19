@@ -340,7 +340,6 @@ def main():
     print('PUSH TO GIT   ' + get_time())
     pushed_successfull = False
     num_of_tries = 1
-
     while pushed_successfull == False:
         try:
             command = 'git push --repo='+git_complete_path_to_repo+' -u origin ' + name_of_result_branch + ':' + name_of_result_branch

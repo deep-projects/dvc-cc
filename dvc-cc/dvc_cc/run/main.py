@@ -19,11 +19,11 @@ import requests
 from dvc_cc.hyperopt.variable import *
 from dvc_cc.hyperopt.hyperoptimizer import *
 import uuid
-
+from pathlib import Path
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker on the CC server.'
 
 def read_execution_engine():
-    with open('.dvc_cc/cc_config.yml') as f:
+    with open(Path('.dvc_cc/cc_config.yml')) as f:
         y = yaml.safe_load(f.read())
     return y['execution']['settings']['access']['url']
 
@@ -70,14 +70,14 @@ def get_mount_values_for_a_direcotry(path):
 def get_dvcurl():
     dvc_url = []
     try:
-      with open(".dvc/config","r") as fi:
+      with open(Path(".dvc/config"),"r") as fi:
         for ln in fi:
             if ln.startswith("url = "):
               dvc_url.append(ln)
     except:
       print('No .dvc/config was found.')
     try:
-      with open(".dvc/config.local","r") as fi:
+      with open(Path(".dvc/config.local"),"r") as fi:
         for ln in fi:
             if ln.startswith("url = "):
               dvc_url.append(ln)
@@ -170,7 +170,7 @@ def all_jupyter_notebook_to_py_files(project_dir):
     return created_files
 
 def jupyter_notebook_to_py_file(root, file_name):
-    with open(root+'/'+file_name) as f:
+    with open(Path(root+'/'+file_name)) as f:
         notebook = json.load(f)
 
     cells = notebook["cells"]
@@ -231,7 +231,7 @@ def jupyter_notebook_to_py_file(root, file_name):
     source = re.sub('\n\n# In\[[0-9\ ]*\]:\n\n\n', '\n#%%\n', source)
 
     output_name = root+'/'+file_name[:-6]+'.py'
-    with open(output_name, 'w') as fh:
+    with open(Path(output_name), 'w') as fh:
         print(source, file=fh)
 
     return output_name
@@ -282,7 +282,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
         paths.append(path)
 
         print(path)
-        with open(path, "w") as f:
+        with open(Path(path), "w") as f:
             # print("batches:", file=f)
             print("  - inputs:", file=f)
             print("      git_authentication_json:", file=f)
@@ -351,13 +351,13 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
 
     # CREATE THE COMPLETE RED-YML
     if no_exec == False:
-        with open('.dvc_cc/tmp.red.yml', "w") as f:
+        with open(Path('.dvc_cc/tmp.red.yml'), "w") as f:
             print("batches:", file=f)
             for i in range(num_of_repeats):
                 for path in paths:
-                    with open(path, "r") as r:
+                    with open(Path(path), "r") as r:
                         print(r.read(), file=f)
-            with open('.dvc_cc/cc_config.yml', "r") as r:
+            with open(Path('.dvc_cc/cc_config.yml'), "r") as r:
                 print(r.read(), file=f)
 
         # EXECUTE THE RED-YML
@@ -639,7 +639,7 @@ def main():
                 subprocess.call(['git', 'checkout', '-q', exp_name])
 
             if os.path.exists('.dvc_cc/cc_ids.yml'):
-                with open('.dvc_cc/cc_ids.yml', 'r') as f:
+                with open(Path('.dvc_cc/cc_ids.yml'), 'r') as f:
                     loaded_yml = yaml.safe_load(f)
             else:
                 loaded_yml = {}
@@ -649,7 +649,7 @@ def main():
             else:
                 loaded_yml[branch_name] = [cc_id]
 
-            with open('.dvc_cc/cc_ids.yml', 'w') as f:
+            with open(Path('.dvc_cc/cc_ids.yml'), 'w') as f:
                 yaml.dump(loaded_yml, f)
 
             print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
@@ -666,12 +666,12 @@ def main():
 
         if loaded_yml is not None:
             if os.path.exists('.dvc_cc/cc_all_ids.yml'):
-                with open('.dvc_cc/cc_all_ids.yml', 'r') as f:
+                with open(Path('.dvc_cc/cc_all_ids.yml'), 'r') as f:
                     loaded_yml2 = yaml.safe_load(f)
             else:
                 loaded_yml2 = {}
             loaded_yml2.update(loaded_yml)
-            with open('.dvc_cc/cc_all_ids.yml', 'w') as f:
+            with open(Path('.dvc_cc/cc_all_ids.yml'), 'w') as f:
                 yaml.dump(loaded_yml2, f)
 
             subprocess.call(['git', 'add', '.dvc_cc/cc_all_ids.yml'])
@@ -703,6 +703,6 @@ def main():
 #   }]
 #}
 #
-#with open(path, 'w') as f:
+#with open(Path(path), 'w') as f:
 #  yaml.dump(red, f)
 #

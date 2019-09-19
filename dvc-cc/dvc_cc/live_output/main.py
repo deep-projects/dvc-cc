@@ -5,6 +5,8 @@ from argparse import ArgumentParser
 import subprocess
 import shutil
 from dvc_cc.bcolors import *
+from pathlib import Path
+
 DESCRIPTION = 'With this script you can mount or unmount the live output directory.'
 
 def get_gitinformation():
@@ -24,14 +26,14 @@ def get_gitinformation():
 def get_dvcurl():
     dvc_url = []
     try:
-      with open(".dvc/config.local","r") as fi:
+      with open(Path(".dvc/config.local"), "r") as fi:
         for ln in fi:
             if ln.startswith("url = ") or ln.startswith("url="):
               dvc_url.append(ln)
     except:
         print('No .dvc/config.local was found.')
         try:
-          with open(".dvc/config","r") as fi:
+          with open(Path(".dvc/config"), "r") as fi:
             for ln in fi:
                 if ln.startswith("url =") or ln.startswith("url="):
                   dvc_url.append(ln)
@@ -61,7 +63,7 @@ def main():
             _, git_owner, git_name = get_gitinformation()
             dvc_url = get_dvcurl()
             command = 'sshfs ' + dvc_url + '/' +  git_owner + '/' + git_name + ' tmp_live_output'
-            with open('.gitignore', "a+") as f:
+            with open(Path('.gitignore'), "a+") as f:
                 f.write('\ntmp_live_output')
             print(command)
             subprocess.call(command.split(' '))

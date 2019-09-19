@@ -10,7 +10,7 @@ import configparser
 
 import numpy as np
 import subprocess
-
+from pathlib import Path
 DESCRIPTION = 'This script starts the jobs that are already defined with "dvc-cc run" but run with the parameter "--no-exec".'
 
 def get_main_git_directory_path():
@@ -33,7 +33,7 @@ def main():
     subprocess.call(['git', 'push', 'origin', '--tags'])
 
     if os.path.exists('.dvc_cc/cc_agency_experiments.yml'):
-        with open(".dvc_cc/cc_agency_experiments.yml", 'r') as stream:
+        with open(Path(".dvc_cc/cc_agency_experiments.yml"), 'r') as stream:
             try:
                 experiments = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
@@ -49,12 +49,12 @@ def main():
                 start_an_experiment = True
                 paths.extend(experiments[k]['files'])
                 # write all to tmp.red.yml
-                with open('.dvc_cc/tmp.red.yml',"w") as f:
+                with open(Path('.dvc_cc/tmp.red.yml'), 'w') as f:
                     print("batches:", file=f)
                     for path in paths:
-                        with open(path,"r") as r:
+                        with open(Path(path),"r") as r:
                             print(r.read(), file=f)
-                    with open('.dvc_cc/cc_config.yml',"r") as r:
+                    with open(Path('.dvc_cc/cc_config.yml'),"r") as r:
                         print(r.read(), file=f)
 
                 # execute faice
@@ -66,7 +66,7 @@ def main():
                 # write cc_id to cc_agency_experiments.yml
                 experiments[k]['id'] = cc_id
         if start_an_experiment:
-            with open('.dvc_cc/cc_agency_experiments.yml', 'w') as outfile:
+            with open(Path('.dvc_cc/cc_agency_experiments.yml'), 'w') as outfile:
                 yaml.dump(experiments, outfile, default_flow_style=False)
 
         # push the ids
