@@ -118,8 +118,8 @@ def main():
         pw = input('Please specifiy the agency_password: ')
         save = input('Do you want to save it? [y/n]')
         if save.lower().startswith('y'):
-            keyring.get_password('red', 'agency_username', uname)
-            keyring.get_password('red', 'agency_password', pw)
+            keyring.set_password('red', 'agency_username', uname)
+            keyring.set_password('red', 'agency_password', pw)
     auth = (uname, pw)
         
 

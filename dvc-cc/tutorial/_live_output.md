@@ -17,8 +17,7 @@ If you are in the right folder of your experiment you find a file that includes 
 > **Warning**: In the current version the live output will be never deleted. If you run out of space you just could
     delete this files. In future versions, this could be done automatically.
 
-If the job is done, we can always take a look at the output with `dvc-cc status -d` or by success, you can take a
-look at the result branch to get the std-output.
+If the job is done, you can take a look at the result branch to get the std-output.
 
 ## Other output
 If your script generates live output data (i.e., writes every epoch of training some data, like tensorboard), then you could
