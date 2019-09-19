@@ -508,6 +508,12 @@ def main():
     #####################################
     # Rename the hyperopt-files to .dvc #
     #####################################
+    print('os.path.exists(dvc):', os.path.exists('dvc'))
+    print('os.path.exists(Path(dvc/.hyperopt))', os.path.exists(Path('dvc/.hyperopt')))
+    print(os.listdir(Path('dvc/.hyperopt')))
+    print([f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')])
+    print()
+    print()
     if os.path.exists('dvc') and os.path.exists(Path('dvc/.hyperopt')):
         list_of_hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
         for f in list_of_hyperopt_files:
