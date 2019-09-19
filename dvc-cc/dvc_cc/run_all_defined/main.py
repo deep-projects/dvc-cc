@@ -32,8 +32,8 @@ def main():
     subprocess.call(['git', 'push'])
     subprocess.call(['git', 'push', 'origin', '--tags'])
 
-    if os.path.exists('.dvc_cc/cc_agency_experiments.yml'):
-        with open(Path(".dvc_cc/cc_agency_experiments.yml"), 'r') as stream:
+    if os.path.exists(Path('.dvc_cc/cc_agency_experiments.yml')):
+        with open(Path('.dvc_cc/cc_agency_experiments.yml'), 'r') as stream:
             try:
                 experiments = yaml.safe_load(stream)
             except yaml.YAMLError as exc:

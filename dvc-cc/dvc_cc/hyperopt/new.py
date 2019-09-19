@@ -28,7 +28,7 @@ def main():
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
     
-    if not os.path.exists('dvc/.hyperopt'):
+    if not os.path.exists(Path('dvc/.hyperopt')):
         os.mkdir('dvc/.hyperopt')
 
     if len(sys.argv) == 1:

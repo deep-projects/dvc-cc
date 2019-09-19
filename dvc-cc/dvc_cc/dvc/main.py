@@ -3,6 +3,7 @@ import os
 from dvc_cc.bcolors import *
 import subprocess
 from subprocess import check_output
+from pathlib import Path
 
 SCRIPT_NAME = 'dvc-cc dvc'
 TITLE = 'tools'
@@ -23,8 +24,8 @@ def main():
             #####################################
             # Rename the hyperopt-files to .dvc #
             #####################################
-            if os.path.exists('dvc') and os.path.exists('dvc/.hyperopt'):
-                list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
+            if os.path.exists('dvc') and os.path.exists(Path('dvc/.hyperopt')):
+                list_of_hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
                 for f in list_of_hyperopt_files:
                     os.rename('dvc/.hyperopt/' + f, 'dvc/' + f[:-9] + '.dvc')
             else:
@@ -37,7 +38,7 @@ def main():
             # Rename the hyperopt-files #
             #############################
             for f in list_of_hyperopt_files:
-                if os.path.exists('dvc/'+f[:-9]+'.dvc'):
-                    os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
+                if os.path.exists(Path('dvc/'+f[:-9]+'.dvc')):
+                    os.rename(Path('dvc/'+f[:-9]+'.dvc'), Path('dvc/.hyperopt/' + f))
                 else:
-                    print(bcolors.WARNING+'Warning: File ' + 'dvc/'+f[:-9]+'.dvc' + ' not found.'+bcolors.ENDC)
+                    print(bcolors.WARNING+'Warning: File ' + Path('dvc/'+f[:-9]+'.dvc') + ' not found.'+bcolors.ENDC)

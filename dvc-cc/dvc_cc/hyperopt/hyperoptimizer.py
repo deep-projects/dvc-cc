@@ -3,6 +3,7 @@ from dvc_cc.hyperopt.variable import *
 import re
 import numpy as np
 from dvc_cc.bcolors import *
+from pathlib import Path
 
 class HyperOptimizerBase:
     is_global = False
@@ -190,7 +191,7 @@ class RegexFileSearch(HyperOptimizerBase):
                         if re.match(regex, f):
                             matched_files.append(f)
                     else:
-                        f = root + '/' + f
+                        f = Path(root + '/' + f)
                         if re.match(regex, f):
                             matched_files.append(f)
 

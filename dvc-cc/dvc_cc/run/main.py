@@ -508,10 +508,10 @@ def main():
     #####################################
     # Rename the hyperopt-files to .dvc #
     #####################################
-    if os.path.exists('dvc') and os.path.exists('dvc/.hyperopt'):
-        list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
+    if os.path.exists('dvc') and os.path.exists(Path('dvc/.hyperopt')):
+        list_of_hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
         for f in list_of_hyperopt_files:
-            os.rename('dvc/.hyperopt/' + f, 'dvc/'+f[:-9]+'.dvc')
+            os.rename(Path('dvc/.hyperopt/' + f), Path('dvc/'+f[:-9]+'.dvc'))
     else:
         list_of_hyperopt_files = []
 
@@ -538,10 +538,10 @@ def main():
         # Rename the hyperopt-files #
         #############################
         for f in list_of_hyperopt_files:
-            if os.path.exists('dvc/'+f[:-9]+'.dvc'):
-                os.rename('dvc/'+f[:-9]+'.dvc', 'dvc/.hyperopt/' + f)
+            if os.path.exists(Path('dvc/'+f[:-9]+'.dvc')):
+                os.rename(Path('dvc/'+f[:-9]+'.dvc'), Path('dvc/.hyperopt/' + f))
             else:
-                print(bcolors.WARNING+'Warning: File ' + 'dvc/'+f[:-9]+'.dvc' + ' not found.'+bcolors.ENDC)
+                print(bcolors.WARNING+'Warning: File ' + Path('dvc/'+f[:-9]+'.dvc') + ' not found.'+bcolors.ENDC)
 
     ####################################
     # Error if no DVC-file was defined #
@@ -638,7 +638,7 @@ def main():
             if len(draw) > 0:  # one or more hyperparameters was set!
                 subprocess.call(['git', 'checkout', '-q', exp_name])
 
-            if os.path.exists('.dvc_cc/cc_ids.yml'):
+            if os.path.exists(Path('.dvc_cc/cc_ids.yml')):
                 with open(Path('.dvc_cc/cc_ids.yml'), 'r') as f:
                     loaded_yml = yaml.safe_load(f)
             else:
@@ -665,7 +665,7 @@ def main():
         subprocess.call(['git', 'checkout', startbranch])
 
         if loaded_yml is not None:
-            if os.path.exists('.dvc_cc/cc_all_ids.yml'):
+            if os.path.exists(Path('.dvc_cc/cc_all_ids.yml')):
                 with open(Path('.dvc_cc/cc_all_ids.yml'), 'r') as f:
                     loaded_yml2 = yaml.safe_load(f)
             else:

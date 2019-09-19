@@ -229,7 +229,7 @@ def main():
         os.mkdir('.dvc_cc')
     
     # create the config file.    
-    if os.path.exists('.dvc_cc/cc_config.yml'):
+    if os.path.exists(Path('.dvc_cc/cc_config.yml')):
         os.remove('.dvc_cc/cc_config.yml')
 
     create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url)

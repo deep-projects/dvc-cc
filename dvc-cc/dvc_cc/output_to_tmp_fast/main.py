@@ -27,8 +27,8 @@ def create_output_dir(root_dir, path_to_output = None):
     """
     if path_to_output is None:
         path_to_output = 'tmp_' + str(random.getrandbits(32))
-    if os.path.exists(path_to_output):
-        print('Error the path '+ path_to_output +' already exists. First remove this folder.')
+    if os.path.exists(Path(path_to_output)):
+        print('Error the path '+ Path(path_to_output) +' already exists. First remove this folder.')
         return None
 
     # Create folder and write them to .gitignore

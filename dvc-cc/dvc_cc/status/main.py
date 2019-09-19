@@ -131,8 +131,8 @@ def main():
         show_nodes(auth,execution_engine)
         exit(0)
 
-    if os.path.exists('.dvc_cc/cc_all_ids.yml'):
-        with open(Path(".dvc_cc/cc_all_ids.yml"), 'r') as stream:
+    if os.path.exists(Path('.dvc_cc/cc_all_ids.yml')):
+        with open(Path('.dvc_cc/cc_all_ids.yml'), 'r') as stream:
             try:
                 experiments = yaml.safe_load(stream)
             except yaml.YAMLError as exc:

@@ -12,7 +12,7 @@ from argparse import ArgumentParser
 import datetime
 from dvc_cc.hyperopt.variable import *
 import subprocess
-
+from pathlib import Path
 from dvc_cc.bcolors import *
 
 def get_main_git_directory_path():
@@ -36,19 +36,19 @@ def main():
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
 
-    if not os.path.exists('dvc/.hyperopt'):
-        os.mkdir('dvc/.hyperopt')
+    if not os.path.exists(Path('dvc/.hyperopt')):
+        os.mkdir(Path('dvc/.hyperopt'))
 
     ######################
     # Read all Variables #
     ######################
     vc = VariableCache()
-    if os.path.exists('dvc') and os.path.exists('dvc/.hyperopt'):
-        list_of_hyperopt_files = [f for f in os.listdir('dvc/.hyperopt') if f.endswith('.hyperopt')]
+    if os.path.exists('dvc') and os.path.exists(Path('dvc/.hyperopt')):
+        list_of_hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
     else:
         list_of_hyperopt_files = []
     for f in list_of_hyperopt_files:
-        f = 'dvc/.hyperopt/' + f
+        f = Path('dvc/.hyperopt/' + f)
         vc.register_dvccc_file(f)
 
     if args.name_of_variable.upper() == 'ALL':
