@@ -20,6 +20,8 @@ conda create --name dvc_cc python pip
 conda activate dvc_cc
 ```
 
+If `conda activate dvc_cc` does not work, try `source activate dvc_cc`.
+
 ### Installation with pip
 The following script will install the client on your computer:
 
