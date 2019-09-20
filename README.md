@@ -1,6 +1,19 @@
 ![The DVC-CC-Logo](dvc_cc_logo.png)
-- TODO: SOME DESCRIPTION
-- TODO: GIF of how to use DVC-CC basic commands
+
+DVC-CC is a wrapper for using the tool [**D**ata **V**ersion **C**ontrol (DVC)](www.dvc.org) to make it possible to 
+use DVC to run your script in a cloud. To make this idea possible, we wrote a script that is part of a docker image 
+that can:
+
+1. download a git repository,
+2. download all required files with your DVC storage server,
+3. execute your script, and
+4. push the results to GIT and to your DVC storage server.
+
+To assign the right hardware for your need in the cloud, we use
+[**C**urious **C**ontainers (CC)](https://www.curious-containers.cc/). This Software runs on our cloud and manages the
+ cloud.
+
+- TODO: GIF or/and YouTube of how to use DVC-CC basic commands
 
 ## Installation of DVC-CC
 
