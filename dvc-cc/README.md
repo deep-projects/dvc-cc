@@ -58,12 +58,3 @@ Install DVC-CC and take a look at [this tutorial](tutorial/Get_Started.md).
 The DVC-CC software is developed at CBMI (HTW Berlin - University of Applied Sciences). The work is supported by the
 German Federal Ministry of Education and Research (project deep.TEACHING, grant number 01IS17056 and project
 deep.HEALTH, grant number 13FH770IX6).
-
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/MUQfKFzIOeU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
-
-[[embed url=http://www.youtube.com/watch?v=6YbBmqUnoQM]]
