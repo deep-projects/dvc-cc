@@ -1,4 +1,4 @@
-![The DVC-CC-Logo](dvc_cc_logo.png)
+![The DVC-CC-Logo](../dvc_cc_logo.png)
 
 
 - TODO: SOME DESCRIPTION
@@ -36,9 +36,9 @@ pip install dvc_cc-?????.whl # replace ????? with the current version that you b
 Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md).
 
 ### Tutorials
-- [Working with jupyter notebooks](dvc-cc/tutorial/_working_with_jupyter_notebook.md)
-- [working with sshfs](dvc-cc/tutorial/_working_with_sshfs.md)
-- <del>[An old tutorial](dvc-cc/tutorial/SimpleStart.md)</del>
+- [Working with jupyter notebooks](tutorial/_working_with_jupyter_notebook.md)
+- [working with sshfs](tutorial/_working_with_sshfs.md)
+- <del>[An old tutorial](tutorial/SimpleStart.md)</del>
 
 ## Structure of this repository
 

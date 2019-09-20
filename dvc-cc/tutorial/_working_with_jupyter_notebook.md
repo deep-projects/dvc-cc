@@ -16,7 +16,8 @@ main tutorial.
 This means that you will also use `.py` file endings for you `.ipynb`-file in the `dvc-cc hyperopt new` or `dvc run 
 --no-exec` command. If you have the same source as in the [main tutorial](Get_Started.md) you don't need 
 anything to change. All commands from the main tutorial work the same. You can test it with the same source code just
-in form of a jupyter notebook, by using `TODO` instead of `wget -O source/train.py https://bit.ly/2krHi8E` and do the
+in form of a jupyter notebook, by using `wget -O source/train.ipynb https://bit.ly/2mn49ms` instead of
+`wget -O source/train.py https://bit.ly/2krHi8E` and do the
 same commands from the [main tutorial](Get_Started.md).
 
 If you tried the above you will detect some problems. For example the source code `args = parser.parse_args()` from 
@@ -28,11 +29,11 @@ by including comment out source code with `"""dvc-cc-show` (or short `"""dcs`) o
 `#dvc-cc-hide` (or short `#dch`). For an 
 example see the following Jupyter Notebook and the py file that was converted by DVC-CC from the Jupyter Notebook:
 
-
+!TODO: IMAGE !!!
 
 With the following command you can download the Jupyter Notebook that is shown above:
 ```
-wget -O source/train.py https://bit.ly/2krHi8E
+wget -O source/train.ipynb https://bit.ly/2kmYV9E
 ```
 
 
