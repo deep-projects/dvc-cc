@@ -30,6 +30,9 @@ example see the following Jupyter Notebook and the py file that was converted by
 
 
 
-[Here](TODO) you can download the Jupyter Notebook that is shown above.
+With the following command you can download the Jupyter Notebook that is shown above:
+```
+wget -O source/train.py https://bit.ly/2krHi8E
+```
 
 
