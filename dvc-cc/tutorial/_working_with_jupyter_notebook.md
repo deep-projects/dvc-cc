@@ -29,7 +29,7 @@ by including comment out source code with `"""dvc-cc-show` (or short `"""dcs`) o
 `#dvc-cc-hide` (or short `#dch`). For an 
 example see the following Jupyter Notebook and the py file that was converted by DVC-CC from the Jupyter Notebook:
 
-!TODO: IMAGE !!!
+<img src="train2.ipynb.jpg" alt="drawing" width="600"/>
 
 With the following command you can download the Jupyter Notebook that is shown above:
 ```
