@@ -1,14 +1,46 @@
-# The DVC-CC client
-In this subrepository the [DVC-CC](https://github.com/deep-projects/dvc-cc) client is defined. The client is needed to define hyper optimization and push your jobs to [Curious Containers CC](https://www.curious-containers.cc/).
+![The DVC-CC-Logo](dvc_cc_logo.png)
+
+
+- TODO: SOME DESCRIPTION
+- TODO: GIF of how to use DVC-CC basic commands
+
+## Installation of DVC-CC
+
+DVC-CC is written in python so you can easily install DVC-CC by using pip. We recommend that you install DVC-CC in an [anaconda](https://www.anaconda.com/distribution/) environment.
+You can create, and activate an environment with the following lines:
+
+```bash
+conda create --name dvc_cc python pip
+conda activate dvc_cc
+```
+
+### Installation with pip
+The following script will install the client on your computer:
+
+```bash
+pip install --upgrade dvc-cc
+```
+
+### Installation from source
+
+If you want to install the latest version from source you can install it with [poetry](https://poetry.eustace.io/).
+
+```bash
+git clone https://github.com/deep-projects/dvc-cc.git
+cd dvc-cc/dvc-cc
+poetry build
+pip install dvc_cc-?????.whl # replace ????? with the current version that you build in the previous step.
+```
 
 ## Get started
-TODO
-
-### Overview
-TODO
+Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md).
 
 ### Tutorials
-- [An old tutorial](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/SimpleStart.md)
+- [Working with jupyter notebooks](dvc-cc/tutorial/_working_with_jupyter_notebook.md)
+- [working with sshfs](dvc-cc/tutorial/_working_with_sshfs.md)
+- <del>[An old tutorial](dvc-cc/tutorial/SimpleStart.md)</del>
+
+## Structure of this repository
 
 
 ## Acknowledgements

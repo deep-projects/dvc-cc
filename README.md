@@ -33,11 +33,10 @@ pip install dvc_cc-?????.whl # replace ????? with the current version that you b
 ## Get started
 Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md).
 
-### Overview
-TODO
-
 ### Tutorials
-- [An old tutorial](dvc-cc/tutorial/SimpleStart.md)
+- [Working with jupyter notebooks](dvc-cc/tutorial/_working_with_jupyter_notebook.md)
+- [working with sshfs](dvc-cc/tutorial/_working_with_sshfs.md)
+- <del>[An old tutorial](dvc-cc/tutorial/SimpleStart.md)</del>
 
 ## Structure of this repository
 
