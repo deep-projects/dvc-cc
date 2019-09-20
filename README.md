@@ -44,6 +44,9 @@ Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md
 ### Tutorials
 - [Working with jupyter notebooks](dvc-cc/tutorial/_working_with_jupyter_notebook.md)
 - [working with sshfs](dvc-cc/tutorial/_working_with_sshfs.md)
+- [DVC-CC Settings](dvc-cc/tutorial/_settings.md)
+- [Working with pure DVC syntax](dvc-cc/tutorial/_only_dvc.md)
+- [Using live output](dvc-cc/tutorial/live_output.md)
 - <del>[An old tutorial](dvc-cc/tutorial/SimpleStart.md)</del>
 
 ## Structure of this repository

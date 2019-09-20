@@ -41,11 +41,14 @@ pip install dvc_cc-?????.whl # replace ????? with the current version that you b
 ```
 
 ## Get started
-Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md).
+Install DVC-CC and take a look at [this tutorial](tutorial/Get_Started.md).
 
 ### Tutorials
 - [Working with jupyter notebooks](tutorial/_working_with_jupyter_notebook.md)
 - [working with sshfs](tutorial/_working_with_sshfs.md)
+- [DVC-CC Settings](tutorial/_settings.md)
+- [Working with pure DVC syntax](tutorial/_only_dvc.md)
+- [Using live output](tutorial/live_output.md)
 - <del>[An old tutorial](tutorial/SimpleStart.md)</del>
 
 ## Structure of this repository
@@ -55,3 +58,10 @@ Install DVC-CC and take a look at [this tutorial](dvc-cc/tutorial/Get_Started.md
 The DVC-CC software is developed at CBMI (HTW Berlin - University of Applied Sciences). The work is supported by the
 German Federal Ministry of Education and Research (project deep.TEACHING, grant number 01IS17056 and project
 deep.HEALTH, grant number 13FH770IX6).
+
+
+<iframe width="560" height="315"
+src="https://www.youtube.com/embed/MUQfKFzIOeU" 
+frameborder="0" 
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+allowfullscreen></iframe>
