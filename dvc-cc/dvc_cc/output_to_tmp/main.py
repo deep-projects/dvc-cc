@@ -27,13 +27,13 @@ def create_output_dir(root_dir, path_to_output = None):
     """
     if path_to_output is None:
         path_to_output = 'tmp_' + str(random.getrandbits(32))
-    if os.path.exists(Path(path_to_output)):
+    if os.path.exists(str(Path(path_to_output))):
         print('Error the path '+ path_to_output +' already exists. First remove this folder.')
         return None
 
     # Create folder and write them to .gitignore
     os.mkdir(path_to_output)
-    f= open(Path(os.path.join(root_dir, '.gitignore')),"a+")
+    f= open(str(Path(os.path.join(root_dir, '.gitignore'))),"a+")
     f.write('\n'+path_to_output)
     f.close()
     subprocess.call(['git', 'add', '.gitignore'])

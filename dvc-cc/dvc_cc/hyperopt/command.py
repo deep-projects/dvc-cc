@@ -22,13 +22,13 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def get_main_git_directory_path():
+def get_main_git_directory_Path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
 
 def show_all():
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
     if settings['container']['engine'] == 'nvidia-docker':
         print('%23s : %s' % ('num-of-gpus' , str(settings['container']['settings']['gpus']['count'])))
@@ -47,14 +47,14 @@ def setting_ram():
     parser.add_argument('--set',help='Set the RAM in GB.', type=int, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
         print('%23s : %s GB' % ('ram' , str(int(settings['container']['settings']['ram']/1000))))
     else:
         settings['container']['settings']['ram'] = int(args.set * 1000)
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 def setting_docker_image():
@@ -62,14 +62,14 @@ def setting_docker_image():
     parser.add_argument('--set',help='Set the docker image.', type=str, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
         print('%23s : %s' % ('docker-image' , str(settings['container']['settings']['image']['url'])))
     else:
         settings['container']['settings']['image']['url'] = args.set
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 def setting_batch_concurrency_limit():
@@ -77,14 +77,14 @@ def setting_batch_concurrency_limit():
     parser.add_argument('--set',help='Set the batch concurrency limit.', type=int, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
         print('%23s : %s' % ('batch-concurrency-limit' , str(settings['execution']['settings']['batchConcurrencyLimit'])))
     else:
         settings['execution']['settings']['batchConcurrencyLimit'] = args.set
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 def setting_engine():
@@ -92,14 +92,14 @@ def setting_engine():
     parser.add_argument('--set',help='Set the engine.', type=str, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
         print('%23s : %s' % ('engine' , str(settings['execution']['engine'])))
     else:
         settings['execution']['engine'] = args.set
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 def setting_engine_url():
@@ -107,14 +107,14 @@ def setting_engine_url():
     parser.add_argument('--set',help='Set the engine URL.', type=str, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
         print('%23s : %s' % ('engine-url' , str(settings['execution']['settings']['access']['url'])))
     else:
         settings['execution']['settings']['access']['url'] = args.set
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 
@@ -123,14 +123,14 @@ def setting_retry_if_failed():
     parser.add_argument('--set',help='Set the setting: Retry if failed.', type=bool, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
         print('%23s : %s' % ('retry-if-failed' , str(settings['execution']['settings']['retryIfFailed'])))
     else:
         settings['execution']['settings']['retryIfFailed'] = args.set
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 def setting_num_of_gpus():
@@ -138,7 +138,7 @@ def setting_num_of_gpus():
     parser.add_argument('--set',help='Set the number of GPUs.', type=int, default=None)
     args = parser.parse_args()
 
-    with open(Path(".dvc_cc/cc_config.yml"), 'r') as stream:
+    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
         settings = yaml.safe_load(stream)
 
     if args.set is None:
@@ -155,7 +155,7 @@ def setting_num_of_gpus():
         else:
             settings['container']['engine'] = 'nvidia-docker'
             settings['container']['settings']['gpus'] = {'count':args.set}
-        with open(Path('.dvc_cc/cc_config.yml'), 'w') as outfile:
+        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
 

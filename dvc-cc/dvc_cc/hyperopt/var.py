@@ -15,7 +15,7 @@ import subprocess
 from pathlib import Path
 from dvc_cc.bcolors import *
 
-def get_main_git_directory_path():
+def get_main_git_directory_Path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
@@ -31,24 +31,24 @@ def main():
     args = parser.parse_args()
 
     # go to the main git directory.
-    os.chdir(Path(get_main_git_directory_path()))
+    #os.chdir(str(Path(get_main_git_directory_Path())))
 
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
 
-    if not os.path.exists(Path('dvc/.hyperopt')):
-        os.mkdir(Path('dvc/.hyperopt'))
+    if not os.path.exists(str(Path('dvc/.hyperopt'))):
+        os.mkdir(str(Path('dvc/.hyperopt')))
 
     ######################
     # Read all Variables #
     ######################
     vc = VariableCache()
-    if os.path.exists('dvc') and os.path.exists(Path('dvc/.hyperopt')):
-        list_of_hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
+    if os.path.exists('dvc') and os.path.exists(str(Path('dvc/.hyperopt'))):
+        list_of_hyperopt_files = [f for f in os.listdir(str(Path('dvc/.hyperopt'))) if f.endswith('.hyperopt')]
     else:
         list_of_hyperopt_files = []
     for f in list_of_hyperopt_files:
-        f = Path('dvc/.hyperopt/' + f)
+        f = str(Path('dvc/.hyperopt/' + f))
         vc.register_dvccc_file(f)
 
     if args.name_of_variable.upper() == 'ALL':

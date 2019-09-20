@@ -191,7 +191,7 @@ class RegexFileSearch(HyperOptimizerBase):
                         if re.match(regex, f):
                             matched_files.append(f)
                     else:
-                        f = Path(root + '/' + f)
+                        f = str(Path(root + '/' + f))
                         if re.match(regex, f):
                             matched_files.append(f)
 

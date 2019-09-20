@@ -23,11 +23,11 @@ from pathlib import Path
 DESCRIPTION = 'This script starts one or multiple dvc jobs in a docker on the CC server.'
 
 def read_execution_engine():
-    with open(Path('.dvc_cc/cc_config.yml')) as f:
+    with open(str(Path('.dvc_cc/cc_config.yml'))) as f:
         y = yaml.safe_load(f.read())
     return y['execution']['settings']['access']['url']
 
-def get_main_git_directory_path():
+def get_main_git_directory_Path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
@@ -70,14 +70,14 @@ def get_mount_values_for_a_direcotry(path):
 def get_dvcurl():
     dvc_url = []
     try:
-      with open(Path(".dvc/config"),"r") as fi:
+      with open(str(Path(".dvc/config")),"r") as fi:
         for ln in fi:
             if ln.startswith("url = "):
               dvc_url.append(ln)
     except:
       print('No .dvc/config was found.')
     try:
-      with open(Path(".dvc/config.local"),"r") as fi:
+      with open(str(Path(".dvc/config.local")),"r") as fi:
         for ln in fi:
             if ln.startswith("url = "):
               dvc_url.append(ln)
@@ -170,7 +170,7 @@ def all_jupyter_notebook_to_py_files(project_dir):
     return created_files
 
 def jupyter_notebook_to_py_file(root, file_name):
-    with open(Path(root+'/'+file_name)) as f:
+    with open(str(Path(root+'/'+file_name))) as f:
         notebook = json.load(f)
 
     cells = notebook["cells"]
@@ -231,7 +231,7 @@ def jupyter_notebook_to_py_file(root, file_name):
     source = re.sub('\n\n# In\[[0-9\ ]*\]:\n\n\n', '\n#%%\n', source)
 
     output_name = root+'/'+file_name[:-6]+'.py'
-    with open(Path(output_name), 'w') as fh:
+    with open(str(Path(output_name)), 'w') as fh:
         print(source, file=fh)
 
     return output_name
@@ -282,7 +282,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
         paths.append(path)
 
         print(path)
-        with open(Path(path), "w") as f:
+        with open(str(Path(path)), "w") as f:
             # print("batches:", file=f)
             print("  - inputs:", file=f)
             print("      git_authentication_json:", file=f)
@@ -351,13 +351,13 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
 
     # CREATE THE COMPLETE RED-YML
     if no_exec == False:
-        with open(Path('.dvc_cc/tmp.red.yml'), "w") as f:
+        with open(str(Path('.dvc_cc/tmp.red.yml')), "w") as f:
             print("batches:", file=f)
             for i in range(num_of_repeats):
                 for path in paths:
-                    with open(Path(path), "r") as r:
+                    with open(str(Path(path)), "r") as r:
                         print(r.read(), file=f)
-            with open(Path('.dvc_cc/cc_config.yml'), "r") as r:
+            with open(str(Path('.dvc_cc/cc_config.yml')), "r") as r:
                 print(r.read(), file=f)
 
         # EXECUTE THE RED-YML
@@ -462,8 +462,8 @@ def main():
 
     args = parser.parse_args()
     
-    project_dir = get_main_git_directory_path()
-    os.chdir(Path(project_dir))
+    project_dir = get_main_git_directory_Path()
+    #os.chdir(str(Path(project_dir)))
     
     gitrepo = GITRepo('.')
 
@@ -507,10 +507,10 @@ def main():
     #####################################
     # Rename the hyperopt-files to .dvc #
     #####################################
-    if os.path.exists('dvc') and os.path.exists(Path('dvc/.hyperopt')):
-        list_of_hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
+    if os.path.exists('dvc') and os.path.exists(str(Path('dvc/.hyperopt'))):
+        list_of_hyperopt_files = [f for f in os.listdir(str(Path('dvc/.hyperopt'))) if f.endswith('.hyperopt')]
         for f in list_of_hyperopt_files:
-            os.rename(Path('dvc/.hyperopt/' + f), Path('dvc/'+f[:-9]+'.dvc'))
+            os.rename(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
     else:
         list_of_hyperopt_files = []
 
@@ -537,10 +537,10 @@ def main():
         # Rename the hyperopt-files #
         #############################
         for f in list_of_hyperopt_files:
-            if os.path.exists(Path('dvc/'+f[:-9]+'.dvc')):
-                os.rename(Path('dvc/'+f[:-9]+'.dvc'), Path('dvc/.hyperopt/' + f))
+            if os.path.exists(str(Path('dvc/'+f[:-9]+'.dvc'))):
+                os.rename(str(Path('dvc/'+f[:-9]+'.dvc')), str(Path('dvc/.hyperopt/' + f)))
             else:
-                print(bcolors.WARNING+'Warning: File ' + Path('dvc/'+f[:-9]+'.dvc') + ' not found.'+bcolors.ENDC)
+                print(bcolors.WARNING+'Warning: File ' + str(Path('dvc/'+f[:-9]+'.dvc')) + ' not found.'+bcolors.ENDC)
 
     ####################################
     # Error if no DVC-file was defined #
@@ -555,7 +555,7 @@ def main():
     vc = VariableCache()
 
     for f in list_of_hyperopt_files:
-        f = Path('dvc/.hyperopt/' + f)
+        f = str(Path('dvc/.hyperopt/' + f))
         vc.register_dvccc_file(f)
 
     ###################################
@@ -637,8 +637,8 @@ def main():
             if len(draw) > 0:  # one or more hyperparameters was set!
                 subprocess.call(['git', 'checkout', '-q', exp_name])
 
-            if os.path.exists(Path('.dvc_cc/cc_ids.yml')):
-                with open(Path('.dvc_cc/cc_ids.yml'), 'r') as f:
+            if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
+                with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
                     loaded_yml = yaml.safe_load(f)
             else:
                 loaded_yml = {}
@@ -648,7 +648,7 @@ def main():
             else:
                 loaded_yml[branch_name] = [cc_id]
 
-            with open(Path('.dvc_cc/cc_ids.yml'), 'w') as f:
+            with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
                 yaml.dump(loaded_yml, f)
 
             print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
@@ -664,13 +664,13 @@ def main():
         subprocess.call(['git', 'checkout', startbranch])
 
         if loaded_yml is not None:
-            if os.path.exists(Path('.dvc_cc/cc_all_ids.yml')):
-                with open(Path('.dvc_cc/cc_all_ids.yml'), 'r') as f:
+            if os.path.exists(str(Path('.dvc_cc/cc_all_ids.yml'))):
+                with open(str(Path('.dvc_cc/cc_all_ids.yml')), 'r') as f:
                     loaded_yml2 = yaml.safe_load(f)
             else:
                 loaded_yml2 = {}
             loaded_yml2.update(loaded_yml)
-            with open(Path('.dvc_cc/cc_all_ids.yml'), 'w') as f:
+            with open(str(Path('.dvc_cc/cc_all_ids.yml')), 'w') as f:
                 yaml.dump(loaded_yml2, f)
 
             subprocess.call(['git', 'add', '.dvc_cc/cc_all_ids.yml'])
@@ -702,6 +702,6 @@ def main():
 #   }]
 #}
 #
-#with open(Path(path), 'w') as f:
+#with open(str(Path(path), 'w') as f:
 #  yaml.dump(red, f)
 #

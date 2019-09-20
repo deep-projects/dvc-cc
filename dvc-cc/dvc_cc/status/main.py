@@ -27,7 +27,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-def get_main_git_directory_path():
+def get_main_git_directory_Path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
@@ -87,7 +87,7 @@ def show_nodes(auth,execution_engine):
                             ))
 
 def read_execution_engine():
-    with open(Path('.dvc_cc/cc_config.yml')) as f:
+    with open(str(Path('.dvc_cc/cc_config.yml'))) as f:
         y = yaml.safe_load(f.read())
     return y['execution']['settings']['access']['url']
 
@@ -111,7 +111,7 @@ def main():
     args = parser.parse_args()
     
     # Change the directory to the main git directory.
-    os.chdir(Path(get_main_git_directory_path()))
+    #os.chdir(str(Path(get_main_git_directory_Path())))
 
     uname = keyring.get_password('red', 'agency_username')
     pw = keyring.get_password('red', 'agency_password')
@@ -131,8 +131,8 @@ def main():
         show_nodes(auth,execution_engine)
         exit(0)
 
-    if os.path.exists(Path('.dvc_cc/cc_all_ids.yml')):
-        with open(Path('.dvc_cc/cc_all_ids.yml'), 'r') as stream:
+    if os.path.exists(str(Path('.dvc_cc/cc_all_ids.yml'))):
+        with open(str(Path('.dvc_cc/cc_all_ids.yml')), 'r') as stream:
             try:
                 experiments = yaml.safe_load(stream)
             except yaml.YAMLError as exc:

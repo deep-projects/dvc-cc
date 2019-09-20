@@ -12,7 +12,7 @@ DESCRIPTION = 'Scripts to initial a dvc-cc repository. It throws an exception, i
 from dvc.repo import Repo as DVCRepo
 from git import Repo as GITRepo
  
-def get_main_git_directory_path():
+def get_main_git_directory_Path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
@@ -186,7 +186,7 @@ def main():
         dvc_remote_user = ''
 
     # Change the directory to the main git directory.
-    os.chdir(Path(get_main_git_directory_path()))
+    #os.chdir(str(Path(get_main_git_directory_str(Path()))
     
     gitrepo = GITRepo('.')
     try:
@@ -229,7 +229,7 @@ def main():
         os.mkdir('.dvc_cc')
     
     # create the config file.    
-    if os.path.exists(Path('.dvc_cc/cc_config.yml')):
+    if os.path.exists(str(Path('.dvc_cc/cc_config.yml'))):
         os.remove('.dvc_cc/cc_config.yml')
 
     create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url)
@@ -238,7 +238,7 @@ def main():
 
 
 def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url):
-    with open(Path('.dvc_cc/cc_config.yml'), 'w') as f:
+    with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as f:
         print("cli:", file=f)
         print("  baseCommand: [dvc-cc-agent]", file=f)
         print("  class: CommandLineTool", file=f)

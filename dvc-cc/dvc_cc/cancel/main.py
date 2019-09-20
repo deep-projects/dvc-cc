@@ -8,7 +8,7 @@ from pathlib import Path
 DESCRIPTION = 'Cancel jobs that are running or registered on a CC server.'
 
 def read_execution_engine():
-    with open(Path('.dvc_cc/cc_config.yml')) as f:
+    with open(str(Path('.dvc_cc/cc_config.yml'))) as f:
         y = yaml.safe_load(f.read())
     return y['execution']['settings']['access']['url']
 

@@ -6,7 +6,7 @@ import uuid
 import os
 from dvc_cc.bcolors import *
 from pathlib import Path
-def get_main_git_directory_path():
+def get_main_git_directory_Path():
     gitrepo = GITRepo('.')
     git_path = gitrepo.common_dir.split('/.git')[0]
     return git_path
@@ -23,13 +23,13 @@ DESCRIPTION = 'Use this to define your pipeline with or without hyperparameters.
 def main():
 
     # go to the main git directory.
-    os.chdir(Path(get_main_git_directory_path()))
+    #os.chdir(str(Path(get_main_git_directory_str(Path()))
 
     if not os.path.exists('dvc'):
         os.mkdir('dvc')
     
-    if not os.path.exists(Path('dvc/.hyperopt')):
-        os.mkdir(Path('dvc/.hyperopt'))
+    if not os.path.exists(str(Path('dvc/.hyperopt'))):
+        os.mkdir(str(Path('dvc/.hyperopt')))
 
     if len(sys.argv) == 1:
         print(DESCRIPTION)
@@ -37,9 +37,9 @@ def main():
 
     # get all existent variables
     vc = VariableCache()
-    hyperopt_files = [f for f in os.listdir(Path('dvc/.hyperopt')) if f.endswith('.hyperopt')]
+    hyperopt_files = [f for f in os.listdir(str(Path('dvc/.hyperopt'))) if f.endswith('.hyperopt')]
     for f in hyperopt_files:
-        vc.register_dvccc_file(Path('dvc/.hyperopt/'+f))
+        vc.register_dvccc_file(str(Path('dvc/.hyperopt/'+f)))
 
     # create the dvc file
     found_user_filename = False
@@ -54,10 +54,10 @@ def main():
     if found_user_filename:
         subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])
     else:
-        output_filename = Path('dvc/'+ str(uuid.uuid4())+'.dvc')
+        output_filename = str(Path('dvc/'+ str(uuid.uuid4())+'.dvc'))
         subprocess.call(['dvc', 'run', '--no-exec', '-f', output_filename] + sys.argv[1:])
 
-    new_hyperopt_filename = Path('dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt')
+    new_hyperopt_filename = str(Path('dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt'))
     os.rename(output_filename, new_hyperopt_filename)
 
     try:
@@ -68,7 +68,7 @@ def main():
         raise ki
     vc.update_dvccc_files()
 
-    subprocess.call(['git', 'add', Path('dvc/.hyperopt/*')])
+    subprocess.call(['git', 'add', str(Path('dvc/.hyperopt/*'))])
 
 
 
