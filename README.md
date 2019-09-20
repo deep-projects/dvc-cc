@@ -4,7 +4,13 @@
 
 ## Installation of DVC-CC
 
-DVC-CC is written in python so you can easily install DVC-CC by using pip. We recommend that you install DVC-CC in an [anaconda](https://www.anaconda.com/distribution/) environment.
+DVC-CC is written in python so you can easily install DVC-CC by using pip.
+We recommend that you install DVC-CC in a conda environment.
+You can use [anaconda](https://www.anaconda.com/distribution/) or miniconda.
+For windows user We recommend
+[this website](https://www.earthdatascience.org/workshops/setup-earth-analytics-python/setup-git-bash-conda/)
+to install miniconda.
+
 You can create, and activate an environment with the following lines:
 
 ```bash
