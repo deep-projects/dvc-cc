@@ -47,7 +47,7 @@ def main():
     for i in range(len(sys.argv)-1):
         if sys.argv[i] == '-f':
             found_user_filename = True
-            sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_')
+            sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_').replace('\\\\', '_')
             output_filename = sys.argv[i+1]
 
 

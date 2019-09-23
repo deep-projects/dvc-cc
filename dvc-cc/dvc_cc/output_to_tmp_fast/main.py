@@ -150,9 +150,9 @@ def main():
                 for out, branch_name in zip(outs, branch_names):
                     # create the output file name
                     if args.rename_file:
-                        out_filename = branch_name + '_' + str(out).replace('/','_')
+                        out_filename = branch_name + '_' + str(out).replace('/','_').replace('\\\\','_')
                     else:
-                        out_filename = str(out).replace('/','_')
+                        out_filename = str(out).replace('/','_').replace('\\\\','_')
                     out_filepath = os.path.join(repo.root_dir, path_to_output, out_filename) 
                     
                     file_was_already_saved = False
