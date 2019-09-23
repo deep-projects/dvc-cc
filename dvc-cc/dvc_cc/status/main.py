@@ -240,7 +240,7 @@ def main():
     if args.show_ids == False:
         df['experimentId'] = '...'+df['experimentId'].apply(lambda x: x[-3:])
         df['_id'] = '...'+df['_id'].apply(lambda x: str(x)[-3:])
-    df['registrationTime'] = df['registrationTime'].apply(lambda x: time.ctime(int(x)))
+    df['registrationTime'] = df['registrationTime'].apply(lambda x: time.ctime(int(x)) if x==x else None)
     df['state'] = df['state'].replace(['succeeded', 'cancelled','failed','processing'],[bcolors.OKGREEN+'succeeded'+bcolors.ENDC,bcolors.WARNING+'cancelled'+bcolors.ENDC,bcolors.FAIL+'failed'+bcolors.ENDC,bcolors.OKBLUE+'processing'+bcolors.ENDC])
 
     if args.detail_unchanged:
