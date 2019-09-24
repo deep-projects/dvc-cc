@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dvc-cc"
-version = "0.8.27"
+version = "0.8.28"
 description = "This connector is used to combine the work of CC (www.curious-containers.cc) and DVC (Open-source Version Control System for Machine Learning Projects)."
 authors = ["Jonas Annuscheit <annusch@htw-berlin.de>"]
 license = "AGPL-3.0"

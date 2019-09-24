@@ -338,7 +338,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
             print("              writable: True", file=f)
             print("              dirPath: '" + dvc_path + "'", file=f)
 
-            print("      dvc_file_to_execute: '" + dvcfiles_to_execute + "'", file=f)
+            print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\','/') + "'", file=f)
             if live_output_files is not None:
                 print("      live_output_files: '" + live_output_files + "'", file=f)
                 print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
