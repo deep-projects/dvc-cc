@@ -45,7 +45,7 @@ def create_output_dir(root_dir, path_to_output = None):
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('path-to-output',
+    parser.add_argument('path_to_output',
                         help='The path to the output/metric file or folder that you want get.', type=str)
     parser.add_argument('-p', '--list-of-pos',
                         help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.',
