@@ -28,7 +28,7 @@ def create_output_dir(root_dir, path_to_output = None):
     if path_to_output is None:
         path_to_output = 'tmp_' + str(random.getrandbits(32))
     if os.path.exists(str(Path(path_to_output))):
-        print('Error the path '+ str(Path(path_to_output)) +' already exists. First remove this folder.')
+        print('Error the path '+ path_to_output +' already exists. First remove this folder.')
         return None
 
     # Create folder and write them to .gitignore
@@ -44,13 +44,73 @@ def create_output_dir(root_dir, path_to_output = None):
 
 
 
+def check_out_if_its_valid(out, regex_name_of_file=None, ex_regex_name_of_file=None, allow_dir=False):
+    """ This function checks if a given file is a file of interest or not.
+
+    Args:
+        out (dvc.out): The output file that needs to be checked
+        regex_name_of_file (str): The regex that should match the out if its a file of interest.
+        ex_regex_name_of_file (str): The regex that should NOT match the out if its a file of interest.
+        allow_dir (bool): If false, output dir are never of interest and will always return false.
+
+    Returns:
+        str: The status of the file. It can be 'valid', 'not_of_interest', 'not_created' or 'not_in_local_cache'
+    """
+    possible_status_messages = ['valid', 'not_of_interest', 'not_created', 'not_in_local_cache']
+
+    if out.isdir() and not allow_dir:
+        return possible_status_messages[1]
+
+    # check if file does not match regex. If is_a_valid_file is still True, than this is a file of interest.
+    if regex_name_of_file is not None:
+        if not re.match(regex_name_of_file, str(out)):
+            return possible_status_messages[1]
+
+    if ex_regex_name_of_file is not None:
+        if re.match(ex_regex_name_of_file, str(out)):
+            return possible_status_messages[1]
+
+    if out.use_cache == False:
+        return possible_status_messages[1]
+
+    if out.checksum is None:
+        return possible_status_messages[2]
+    
+    if not out.exists:
+        return possible_status_messages[3]
+
+    return possible_status_messages[0]
+
+
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('path_to_dvc_file', type=str, default = None,
-                        help='The path to the dvc file.')
-    parser.add_argument('the_output_filename', type=str, default = None,
-                        help='The path to the dvc file.')
-
+    parser.add_argument('-f','--regex-name-of-file', type=str, default = None,
+                        help='A regex of the name of the files that you want to find.')
+    parser.add_argument('-ef','--exclude-regex-name-of-file', type=str, default = None,
+                        help='A regex of the name of the file that are excluded.')
+    parser.add_argument('-b','--regex-name-of-branch', type=str, default = None,
+                        help='A regex of the name of the branches to be included in the search.')
+    parser.add_argument('-eb','--exclude-regex-name-of-branch', type=str, default = None,
+                        help='A regex of the name of the branch that are excluded.')
+    parser.add_argument('-pos', '--list-of-pos',
+                        help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.',
+                        nargs="+", type=str)
+    parser.add_argument('-p','--path-to-output', type=str, default = None,
+                        help='The path where you want save the files.')
+    parser.add_argument('-o', '--original-name', dest='original_name', action='store_true', default=False,
+                        help='In default, the branch name is added to the file or folder name. If this parameter is '
+                             'set,  it will use the original name of the file or folder. If the file exists multiple'
+                             'times and this parameter is set, then it will use indices at the end of the file or folder names.')
+    parser.add_argument('--debug', dest='debug', action='store_true', default=False,
+                        help='Print all files that are copied.')
+    parser.add_argument('-d', '--download-stages', dest='download_stages', action='store_true', default=False,
+                        help='Download a stage if the file is not in the local cache.')
+    parser.add_argument('-fd','--forbid-dir', dest='forbid_dir', action='store_true', default=False,
+                        help='If this parameter is set, then it will ignore output folders.')
+    parser.add_argument('-ns','--no-save', dest='no_save', action='store_true', default=False,
+                        help='If true, it will not create a folder or link the file. This parameter is helpfull if it is used with --debug to test your regular expressions.')
+    parser.add_argument('-nw','--no-print-of-warnings', dest='no_warning', action='store_true', default=False,
+                        help='If true, it will not print warning if a file is not created or not in the local cache.')
     args = parser.parse_args()
 
     repo = DVCRepo()
@@ -127,13 +187,15 @@ def main():
                     #TODO: repo.stages is very slow!
                     for stage in repo.stages():
                         for out in stage.outs:
-                            valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)
+                            valid_msg = check_out_if_its_valid(out, args.regex_name_of_file,
+                                                               args.exclude_regex_name_of_file, not args.forbid_dir)
                             print('\t\t\t',out, valid_msg)
                             if valid_msg == 'not_in_local_cache' and args.download_stages:
                                 g.pull()
                                 repo.pull(stage.relpath)
                                 time.sleep(1)
-                                valid_msg = check_out_if_its_valid(out, args.regex_name_of_file, args.exclude_regex_name_of_file, args.allow_dir)
+                                valid_msg = check_out_if_its_valid(out, args.regex_name_of_file,
+                                                                   args.exclude_regex_name_of_file, not args.forbid_dir)
                                 print(valid_msg)
                             if valid_msg == 'valid':
                                 outs.append(out)
@@ -149,7 +211,7 @@ def main():
                 # create a link for each output file of interest in the current branch
                 for out, branch_name in zip(outs, branch_names):
                     # create the output file name
-                    if args.rename_file:
+                    if not args.original_name:
                         out_filename = branch_name + '_' + str(out).replace('/','_').replace('\\\\','_')
                     else:
                         out_filename = str(out).replace('/','_').replace('\\\\','_')
