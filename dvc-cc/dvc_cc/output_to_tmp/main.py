@@ -94,6 +94,6 @@ def main():
     all_branches = np.unique(all_branches)
 
     for b in all_branches:
-        if b.split('_')[1] in list_of_allowed_dvccc_ids:
+        if list_of_allowed_dvccc_ids is None or b.split('_')[1] in list_of_allowed_dvccc_ids:
             repo.get('.', args.path_to_output,outputdir + '/' + b, b)
 
