@@ -101,3 +101,4 @@ def main():
                 repo.get('.', args.path_to_output,out=outputdir + '/' + b[:-4], rev=b)
             else:
                 repo.get('.', args.path_to_output,out=outputdir + '/' + b, rev=b)
+        print('Found ' + len(os.listdir('.')) + ' files or folders.')
