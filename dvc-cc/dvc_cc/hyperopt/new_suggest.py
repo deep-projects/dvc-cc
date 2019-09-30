@@ -77,7 +77,6 @@ def search_for_argparse_parameter(command):
         for p in params[1:]:
             p = p.strip()
             if p.startswith('type='):
-                print('\t'+p[5:])
                 if p[5:] == 'int':
                     dtype = 'int'
                 elif p[5:] == 'float':
