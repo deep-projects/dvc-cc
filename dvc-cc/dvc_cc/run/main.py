@@ -132,7 +132,13 @@ def get_leafs_that_need_to_reproduce():
     from dvc.repo import Repo as DVCRepo
     dvcrepo = DVCRepo('.')
 
-    G = dvcrepo.pipelines()[0]
+    print(dvcrepo.pipelines)
+
+    try:
+        G = dvcrepo.pipelines[0]
+    except:
+        # OLDER DVC-VERSION !
+        G = dvcrepo.pipelines()[0]
     # Get all leaf files.
     leafs = [[x] for x in G.nodes() if G.in_degree(x) == 0]
     status_of_leafs = [dvcrepo.status(targets=f, with_deps=True) for f in leafs]
