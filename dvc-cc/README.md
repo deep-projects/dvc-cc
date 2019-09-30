@@ -61,7 +61,7 @@ Install DVC-CC and take a look at [this tutorial](tutorial/Get_Started.md).
 - [working with sshfs](tutorial/_working_with_sshfs.md)
 - [DVC-CC Settings](tutorial/_settings.md)
 - [Working with pure DVC syntax](tutorial/_only_dvc.md)
-- [Using live output](tutorial/live_output.md)
+- [Using live output](tutorial/_live_output.md)
 - <del>[An old tutorial](tutorial/SimpleStart.md)</del>
 
 ## Structure of this repository
