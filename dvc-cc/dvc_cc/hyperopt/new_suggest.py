@@ -107,10 +107,10 @@ def main():
         for filename in filenames:
             content = []
             path = dirpath+'/'+filename
-            if filename.endswith('.py'):
+            if filename.endswith('.py') and dirpath.find('.ipynb_checkpoints') == -1:
                 with open(str(Path(path))) as f:
                     content = f.readlines()
-            elif filename.endswith('.ipynb'):
+            elif filename.endswith('.ipynb') and dirpath.find('.ipynb_checkpoints') == -1:
                 path = path[:-6] + '.py'
                 content = jupyter_notebook_to_source(dirpath,filename).split('\n')
 
