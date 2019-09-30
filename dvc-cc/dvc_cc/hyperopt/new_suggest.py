@@ -77,13 +77,18 @@ def search_for_argparse_parameter(command):
         for p in params[1:]:
             p = p.strip()
             if p.startswith('type='):
-                if p[5:] == 'int':
+                if p[5:].startswith('int'):
                     dtype = 'int'
-                elif p[5:] == 'float':
+                elif p[5:].startswith('float'):
                     dtype = 'float'
 
             if p.startswith('default='):
-                print('dvc-cc hyperopt var --set ' + p[8:] + ' ' + shortname)
+                p = p[8:]
+                if p[0] == '\'':
+                    p = p[1:p[1:].find('\'')]
+                if p[-1] == ')':
+                    p = p[:-1]
+                print('dvc-cc hyperopt var --set ' + p + ' ' + shortname)
 
 
         var = '{{' + shortname
