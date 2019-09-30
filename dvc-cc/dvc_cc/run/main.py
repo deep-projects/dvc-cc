@@ -131,9 +131,6 @@ def check_git_repo(args):
 def get_leafs_that_need_to_reproduce():
     from dvc.repo import Repo as DVCRepo
     dvcrepo = DVCRepo('.')
-
-    print(dvcrepo.pipelines)
-
     try:
         G = dvcrepo.pipelines[0]
     except:

@@ -81,6 +81,11 @@ def search_for_argparse_parameter(command):
                     dtype = 'int'
                 elif p[5:] == 'float':
                     dtype = 'float'
+
+            if p.startswith('default='):
+                print('dvc-cc hyperopt var --set ' + p[8:] + ' ' + shortname)
+
+
         var = '{{' + shortname
         if dtype != '':
             var = var + ':' + dtype
@@ -140,8 +145,14 @@ def main():
                         outputs.append(output)
 
             if file_contains_argparser:
-                params = list(np.unique(params))
-                outputs = list(np.unique(outputs))
+                #params = list(np.unique(params))
+                indexes = np.unique(params, return_index=True)[1]
+                params = [params[index] for index in sorted(indexes)]
+
+                #outputs = list(np.unique(outputs))
+                indexes = np.unique(outputs, return_index=True)[1]
+                outputs = [outputs[index] for index in sorted(indexes)]
+
 
                 if filename.endswith('.py'):
                     filename = filename[:-3]+'.dvc'
