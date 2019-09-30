@@ -6,7 +6,7 @@ import uuid
 import os
 from dvc_cc.bcolors import *
 from pathlib import Path
-
+from dvc_cc.run.jupyter_notebook_to_source import jupyter_notebook_to_source
 DESCRIPTION = 'This command guesses the "dvc-cc hyperopt new" commands that might interest you. ' \
               'This is a simple implementation that you must review and correct.'
 
@@ -42,6 +42,8 @@ def search_for_argparse_parameter(command):
     else:
         None
 
+def read_content_of_jupyter_notebook(file):
+
 def main():
     for (dirpath, dirnames, filenames) in os.walk('.'):
         for filename in filenames:
@@ -50,6 +52,9 @@ def main():
             if filename.endswith('.py'):
                 with open(str(Path(path))) as f:
                     content = f.readlines()
+            elif filename.endswith('.ipynb'):
+                path = path[:-6] + '.py'
+                content = jupyter_notebook_to_source(dirpath,filename).split('\n')
 
             # this variable is used to save lines, if a command goes over several lines.
             saved_lines = ''
@@ -84,5 +89,5 @@ def main():
                 print('                    -f '+filename[:-3]+'.dvc'+' \\')
                 print('                    \'python '+path[2:]+' '+' '.join(params)+'\'')
                 print()
-
-
+    print()
+    print(bcolors.HEADER+'This is a simple implementation that you must review and correct.'+bcolors.ENDC)
