@@ -6,6 +6,9 @@ from dvc_cc.bcolors import  *
 from dvc_cc.hyperopt.new import main as new_main
 from dvc_cc.hyperopt.new import DESCRIPTION as NEW_DESCRIPTION
 
+from dvc_cc.hyperopt.new_suggest import main as new_suggest_main
+from dvc_cc.hyperopt.new_suggest import DESCRIPTION as NEW_SUGGEST_DESCRIPTION
+
 from dvc_cc.hyperopt.var import main as variable_main
 from dvc_cc.hyperopt.var import DESCRIPTION as VARIABLE_DESCRIPTION
 
@@ -18,6 +21,7 @@ DESCRIPTION = 'With '+bcolors.OKBLUE+'dvc-cc hyperopt'+bcolors.ENDC+' you can cr
               +bcolors.OKBLUE+'dvc-cc run'+bcolors.ENDC+'.'
 MODES = OrderedDict([
     ('new', {'main': new_main, 'description': NEW_DESCRIPTION}),
+    ('new-suggest', {'main': new_suggest_main, 'description': NEW_SUGGEST_DESCRIPTION}),
     #('stage', {'main': stage_main, 'description': STAGE_DESCRIPTION}),
     ('var', {'main': variable_main, 'description': VARIABLE_DESCRIPTION}),
     #('command', {'main': command_main, 'description': COMMAND_DESCRIPTION}),
