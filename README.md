@@ -40,6 +40,8 @@ The following script will install the client on your computer:
 pip install --upgrade dvc-cc
 ```
 
+If you have problems on windows with "win32file", you need to install pywin32 with `conda install -c anaconda pywin32`.
+
 ### Installation from source
 
 If you want to install the latest version from source you can install it with [poetry](https://poetry.eustace.io/).

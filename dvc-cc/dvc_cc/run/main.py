@@ -278,7 +278,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
 
     for i in range(len(dvc_files)):
         dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
-        path = '.dvc_cc/' + branch_name + '/' + dvcfiles_to_execute.replace(",", "_").replace('/', '___') + '.yml'
+        path = '.dvc_cc/' + branch_name + '/' + dvcfiles_to_execute.replace(",", "_").replace('/', '___').replace('\\\\', '___') + '.yml'
         paths.append(path)
 
         print(path)
@@ -338,7 +338,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
             print("              writable: True", file=f)
             print("              dirPath: '" + dvc_path + "'", file=f)
 
-            print("      dvc_file_to_execute: '" + dvcfiles_to_execute + "'", file=f)
+            print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\','/') + "'", file=f)
             if live_output_files is not None:
                 print("      live_output_files: '" + live_output_files + "'", file=f)
                 print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
@@ -427,7 +427,8 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
         elif v.vartype == 'int':
             values = intarray_to_shortstr(hyperopt_draws[:, i])
         else:
-            values = [hyperopt_draws[j, i].lower().replace('/', '_').replace(' ', '') for j in range(len(hyperopt_draws))]
+            values = [hyperopt_draws[j, i].lower().replace('/', '_').replace('\\\\', '_').replace(' ', '') for j in
+                                                                                    range(len(hyperopt_draws))]
             values = strarray_to_shortstr(values)
         values = [v.varname.upper() + var for var in values]
 
@@ -492,7 +493,8 @@ def main():
     ############################
     # Check the Experimentname #
     ############################
-    args.experimentname = args.experimentname.replace('/',' ').replace('_',' ').replace('\\',' ').replace(';',' ').replace('.',' ').split(' ')
+    args.experimentname = args.experimentname.replace('/',' ').replace('_',' ').replace('\\\\',' ')\
+                                                        .replace(';',' ').replace('.',' ').split(' ')
     if len(args.experimentname) == 1:
         args.experimentname = args.experimentname[0]
     else:
