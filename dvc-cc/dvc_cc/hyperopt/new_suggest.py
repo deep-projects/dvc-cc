@@ -42,8 +42,6 @@ def search_for_argparse_parameter(command):
     else:
         None
 
-def read_content_of_jupyter_notebook(file):
-
 def main():
     for (dirpath, dirnames, filenames) in os.walk('.'):
         for filename in filenames:
