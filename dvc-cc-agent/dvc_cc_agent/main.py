@@ -11,7 +11,7 @@ def get_command_list_in_right_order():
     from dvc.repo import Repo as DVCRepo
     dvcrepo = DVCRepo('.')
 
-    G = dvcrepo.pipelines()[0]
+    G = dvcrepo.pipelines[0]
 
     all_nodes = []
     while len(G.nodes()) > 0: 
@@ -103,7 +103,7 @@ def get_all_dvc_files_that_are_not_needed(dvc_filenames):
     from dvc.repo import Repo
     import networkx as nx
     dvcrepo = Repo('.')
-    pipelines = dvcrepo.pipelines()
+    pipelines = dvcrepo.pipelines
     descendants_stages = dvc_filenames.copy()
 
     for G in pipelines:
