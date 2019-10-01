@@ -71,7 +71,7 @@ def main():
         print('Please enter the Docker Image in which your script get executed at the cluster.')
         print('   You can choose from the following:')
         print('     - "tf2", if you want to work with TensorFlow 2.0.')
-        print('     - "tf1", if you want to work with TensorFlow 1.4.')
+        print('     - "tf1", if you want to work with TensorFlow 1.5.')
         print('     - "torch", if you want to work with PyTorch 1.2.')
         print('     - "large", if you want to work with PyTorch 1.2 or/and TensorFlow 2.0.')
         print('     - "basic", if you want install it by yourself via the Requirements.txt.')
@@ -82,16 +82,16 @@ def main():
             docker_image = 'docker.io/deepprojects/dvc-cc_large:dev'
             docker_image_needs_credentials = False
         elif docker_image.lower() == 'tf2':
-            docker_image = 'docker.io/deepprojects/dvc-cc_tensorflow:2.0.0rc'
+            docker_image = 'docker.io/deepprojects/dvc-cc_tensorflow:2.0'
             docker_image_needs_credentials = False
         elif docker_image.lower() == 'tf1':
-            docker_image = 'docker.io/deepprojects/dvc-cc_tensorflow:1.14'
+            docker_image = 'docker.io/deepprojects/dvc-cc_tensorflow:1.15'
             docker_image_needs_credentials = False
         elif docker_image.lower() == 'torch':
             docker_image = 'docker.io/deepprojects/dvc-cc_pytorch:1.2'
             docker_image_needs_credentials = False
         elif docker_image.lower() == 'basic':
-            docker_image = 'docker.io/deepprojects/dvc-cc_basic:dev'
+            docker_image = 'docker.io/deepprojects/dvc-cc_basic:10.0'
             docker_image_needs_credentials = False
         else:
             docker_image_needs_credentials = None
