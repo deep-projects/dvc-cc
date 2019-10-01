@@ -158,7 +158,9 @@ def main():
     if args.dvc_file_to_execute is None:
         dvc_files_to_execute = None
     else:
-        dvc_files_to_execute = args.dvc_file_to_execute.split(',')
+        dvc_files_to_execute = args.dvc_file_to_execute.replace('\'', '').replace('\"', '').replace('[', '').replace(
+            ']', '')
+        dvc_files_to_execute = dvc_files_to_execute.split(',')
     
     print('SET GIT GLOBAL CONFIGURATIONS   ' + get_time())
     command = 'git config --global user.email ' + git_own_email
@@ -225,6 +227,8 @@ def main():
     command = 'git pull'
     print(subprocess.check_output(command, shell=True).decode())
 
+
+
     print('SWITCH GIT BRANCH   ' + get_time())
     is_tag = git_name_of_branch.startswith('tag/')
     if is_tag:
@@ -232,7 +236,9 @@ def main():
     if dvc_files_to_execute is None:
         name_of_result_branch  = 'r' + git_name_of_branch
     else:
-        name_of_result_branch = 'r' + git_name_of_branch + '___' + str(dvc_files_to_execute).replace('/','_').replace(',','_').replace('[','').replace(']','').replace(' ','')
+        name_of_result_branch = 'r' + git_name_of_branch + '___' + ('_'.join(dvc_files_to_execute)).replace('/',
+                                                                                                     '_').replace(','
+                                                                                                                  '','_').replace('[','').replace(']','').replace(' ','').replace('\'','').replace('\"','')
     if is_tag:
         command = 'git checkout tag/' + git_name_of_branch + ' -b ' + name_of_result_branch
     else:
@@ -242,10 +248,11 @@ def main():
     print('\t'+command)
     print(subprocess.check_output(command, shell=True).decode())
 
-    if os.path.exists("requirements.txt"):
-        print('INSTALL requirements.txt with pip.')
-        command = "pip install -r requirements.txt"
-        print(subprocess.check_output(command, shell=True).decode())
+    for filename in os.listdir():
+        if filename.lower() == 'requirements' or  filename.lower() == 'requirements.txt':
+            print('INSTALL '+filename+' with pip.')
+            command = "pip install -r " + filename
+            print(subprocess.check_output(command, shell=True).decode())
 
     print('PULL FROM DVC   ' + get_time())
     command = 'dvc pull'
@@ -332,11 +339,23 @@ def main():
     print('COMMIT AT DVC   ' + get_time())
     command = "dvc commit --force"
     print(subprocess.check_output(command, shell=True).decode())
-    
+
     print('PUSH TO DVC   ' + get_time())
-    command = "dvc push"
-    print(subprocess.check_output(command, shell=True).decode())
-    
+    pushed_successfull = False
+    num_of_tries = 0
+    while pushed_successfull == False:
+        try:
+            command = "dvc push"
+            print(subprocess.check_output(command, shell=True).decode())
+            pushed_successfull = True
+        except:
+            if num_of_tries < 5:
+                # TODO: Smarter way would be to ask already used indexing.
+                num_of_tries += 1
+                print('Failed ' + str(num_of_tries) + ' (of max 5 tries) to push to dvc.')
+            else:
+                raise ValueError('It was tried 5 times to push to the remote dvc. This was not possible.')
+
     print('PUSH TO GIT   ' + get_time())
     pushed_successfull = False
     num_of_tries = 1
