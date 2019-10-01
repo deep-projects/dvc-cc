@@ -20,6 +20,6 @@ RUN pip --no-cache-dir install \
         seaborn \
         pandas
 
-# install pytorch
-RUN pip install torch torchvision
-
+# install tensorflow
+RUN pip install tensorflow-gpu
+RUN pip install --no-cache-dir tensorboard
