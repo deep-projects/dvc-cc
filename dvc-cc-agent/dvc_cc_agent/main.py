@@ -20,7 +20,7 @@ def get_command_list_in_right_order():
         for node in next:
             G.remove_node(node)
     all_nodes
-    stages = sorted(dvcrepo.stages(), key=lambda s: all_nodes.index(s.relpath))
+    stages = sorted(dvcrepo.stages, key=lambda s: all_nodes.index(s.relpath))
 
     commandlist = ''
     for s in stages:
@@ -113,7 +113,7 @@ def get_all_dvc_files_that_are_not_needed(dvc_filenames):
         except:
             continue
 
-    all_stages = [s.relpath for s in dvcrepo.stages()]
+    all_stages = [s.relpath for s in dvcrepo.stages]
     return [s for s in all_stages if s not in descendants_stages]
 
 def main():
