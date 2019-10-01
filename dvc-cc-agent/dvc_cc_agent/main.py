@@ -254,6 +254,9 @@ def main():
             command = "pip install -r " + filename
             print(subprocess.check_output(command, shell=True).decode())
 
+    print('FETCH FROM DVC   ' + get_time())
+    command = 'dvc fetch'
+    print(subprocess.check_output(command, shell=True).decode())
     print('PULL FROM DVC   ' + get_time())
     command = 'dvc pull'
     print(subprocess.check_output(command, shell=True).decode())
