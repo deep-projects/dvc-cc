@@ -95,10 +95,10 @@ def main():
 
     for b in all_branches:
         if list_of_allowed_dvccc_ids is None or int(b.split('_')[1]) in list_of_allowed_dvccc_ids:
-            print('dvc get : ','.', args.path_to_output,outputdir + '/' + b, b)
+            print('dvc get : ','.', args.path_to_output,str(Path(outputdir + '/' + b)), b)
 
             if b.endswith('.dvc'):
-                repo.get('.', args.path_to_output,out=outputdir + '/' + b[:-4], rev=b)
+                repo.get('.', args.path_to_output,out=str(Path(outputdir + '/' + b[:-4])), rev=b)
             else:
-                repo.get('.', args.path_to_output,out=outputdir + '/' + b, rev=b)
-        print('Found ' + len(os.listdir('.')) + ' files or folders.')
+                repo.get('.', args.path_to_output,out=str(Path(outputdir + '/' + b)), rev=b)
+    print('Found ' + str(len(os.listdir(str(Path(outputdir))))) + ' files or folders.')
