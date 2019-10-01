@@ -76,15 +76,16 @@ def main():
                     if b not in all_branches_local:
                         print('git checkout '+ b)
                         _ = check_output(['git', 'checkout', b])
-                        print('\t\ŧI CHECKOUT THE DATA')
-                        repo.checkout()
+
                         if argv[1] == '-d':
                             print('\t\ŧI PULL THE DATA')
                             repo.pull()
+                            print('\t\ŧI CHECKOUT THE DATA')
+                            repo.checkout()
         finally:
             print('git checkout ' + git_name_of_branch)
             _ = check_output(['git', 'checkout', git_name_of_branch])
-            repo.checkout()
+            repo.pull()
     else:
         subprocess.call(['git'] + argv)
         subprocess.call(['dvc', 'checkout'])
