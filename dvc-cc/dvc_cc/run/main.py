@@ -367,6 +367,7 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
     # TODO: USE PARAMS FOR THIS: + '___' + str(draw)[1:-1].replace(',','_').replace(' ','').replace('[','').replace(']','').replace('-','')
     hyperopt_draws = np.array(hyperopt_draws)
     result = []
+    result_only_values = []
     for i in range(len(list_of_variables)):
         v = list_of_variables[i]
         if v.vartype == 'float':
@@ -377,15 +378,39 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
             values = [hyperopt_draws[j, i].lower().replace('/', '_').replace('\\\\', '_').replace(' ', '') for j in
                                                                                     range(len(hyperopt_draws))]
             values = strarray_to_shortstr(values)
-        values = [v.varname.upper() + var for var in values]
+        values_with_name = [v.varname.upper().replace('_','').replace('-','') + var for var in values]
+        if len(np.unique(values_with_name)) > 1:
+            result.append(values_with_name)
+            result_only_values.append(values)
 
-        result.append(values)
+    if len(result) == 0:
+        return [ exp_name ]
 
     result = list(map(list, zip(*result)))
 
     batch_names = []
     for i in range(len(result)):
-        batch_names.append(exp_name + '_' + '_'.join(result[i]))
+        batch_append = False
+        batch_name = exp_name + '_' + '_'.join(result[i])
+        if len(batch_name) < 50:
+            batch_names.append(batch_name)
+            batch_append = True
+        if batch_append == False:
+            # try reducing the exp name
+            batch_name = exp_name[:18] + '_' + '_'.join(result[i])
+            if len(batch_name) < 50:
+                batch_names.append(batch_name)
+                batch_append = True
+        if batch_append == False:
+            # try reducing the exp name + only_values
+            batch_name = exp_name[:18] + '_' + '_'.join(result_only_values[i])
+            if len(batch_name) < 50:
+                batch_names.append(batch_name)
+                batch_append = True
+        if batch_append == False:
+            # use reduced exp name + index
+            batch_name = exp_name[:18] + '_' + str(i)
+            batch_names.append(batch_name)
 
     return batch_names
 
