@@ -101,4 +101,6 @@ def main():
                 repo.get('.', args.path_to_output,out=str(Path(outputdir + '/' + b[:-4])), rev=b)
             else:
                 repo.get('.', args.path_to_output,out=str(Path(outputdir + '/' + b)), rev=b)
+    print()
     print('Found ' + str(len(os.listdir(str(Path(outputdir))))) + ' files or folders.')
+    print('If files are missing, please use "dvc-cc git sync -d" to get new result branches and repeat this command.')

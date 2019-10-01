@@ -201,8 +201,8 @@ def main():
     print('EXISTS PATH TO SCRIPT?: ', str(os.path.exists('/home/cc/.pyenv/versions/3.7.2/lib/python3.7/site-packages/dvc_cc_agent/start_dvc_repro.sh')))
 
     #TODO: JUST A TEST
-    command = 'ls -il ' + sshfs_dvc_remote_directory
-    print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
+    #command = 'ls -il ' + sshfs_dvc_remote_directory
+    #print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
 
     print('CD TO PATH   ' + get_time())
     print('\t chdir: repo')
