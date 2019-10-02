@@ -77,15 +77,22 @@ def main():
                         print('git checkout '+ b)
                         _ = check_output(['git', 'checkout', b])
 
+                        print('\t\ŧI CHECKOUT THE DATA')
+                        repo.checkout()
                         if argv[1] == '-d':
                             print('\t\ŧI PULL THE DATA')
-                            repo.pull()
-                            print('\t\ŧI CHECKOUT THE DATA')
-                            repo.checkout()
+                            try:
+                                repo.pull()
+                            except:
+                                print('Some files are missing.')
         finally:
             print('git checkout ' + git_name_of_branch)
             _ = check_output(['git', 'checkout', git_name_of_branch])
-            repo.pull()
+            repo.checkout()
+            try:
+                repo.pull()
+            except:
+                print('Some files are missing.')
     else:
         subprocess.call(['git'] + argv)
         subprocess.call(['dvc', 'checkout'])

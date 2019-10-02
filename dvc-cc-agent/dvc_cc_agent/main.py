@@ -251,7 +251,7 @@ def main():
     for filename in os.listdir():
         if filename.lower() == 'requirements' or  filename.lower() == 'requirements.txt':
             print('INSTALL '+filename+' with pip.')
-            command = "pip install --no-cache-dir --user -r " + filename
+            command = "pip install --user -r " + filename
             print(subprocess.check_output(command, shell=True).decode())
 
     print('PULL FROM DVC   ' + get_time())
