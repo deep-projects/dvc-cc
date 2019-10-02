@@ -1,7 +1,7 @@
 FROM docker.io/deepprojects/dvc-cc_basic:10.0
 
 # Often used libraries
-RUN pip --no-cache-dir install \
+RUN pip install --no-cache-dir --user \
         Pillow \
         h5py \
         ipykernel \
@@ -21,5 +21,5 @@ RUN pip --no-cache-dir install \
         pandas
 
 # install tensorflow
-RUN pip install tensorflow-gpu==1.15.0rc1
-RUN pip install --no-cache-dir tensorboard
+RUN pip install --no-cache-dir --user tensorflow-gpu==1.15.0rc1
+RUN pip install --no-cache-dir --user tensorboard
