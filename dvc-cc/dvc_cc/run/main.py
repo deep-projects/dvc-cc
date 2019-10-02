@@ -387,6 +387,7 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
         return [ exp_name ]
 
     result = list(map(list, zip(*result)))
+    result_only_values = list(map(list, zip(*result_only_values)))
 
     batch_names = []
     for i in range(len(result)):
