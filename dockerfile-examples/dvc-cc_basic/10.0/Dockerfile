@@ -23,7 +23,6 @@ ENV PATH="${PATH}:/home/cc/.local/bin"
 # Some common environmenta variables that Python uses
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# For the direcotry connector
 RUN pip install --user --no-cache-dir red-connector-ssh==1.0
 RUN pip install --user --no-cache-dir git+https://github.com/efiop/dvc@2506
 RUN pip install --user --no-cache-dir dvc-cc-agent==0.8.8

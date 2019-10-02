@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "dvc-cc-connector"
-version = "0.8.0"
+version = "0.8.1"
 description = ""
 authors = ["Jonas <jonas.annuscheit@gmail.com>"]
 license = "AGPL-3.0"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 argparse = "^1.4"
 pyjson = "^1.3"
 
