@@ -181,7 +181,10 @@ def main():
                     print(branch)
                     g.checkout(branch)
                     #TODO: This would be nice, but its too sloow!
-                    repo.checkout()
+                    try:
+                        repo.checkout()
+                    except:
+                        print('Some files are missing.')
 
                     print('\tIt is a branch of interest!')
                     #TODO: repo.stages is very slow!
@@ -256,7 +259,10 @@ def main():
     # return always to the starting branch!
     finally:
         g.checkout(starting_branch)
-        repo.checkout()
+        try:
+            repo.checkout()
+        except:
+            print('Some files are missing.')
 
 
 
