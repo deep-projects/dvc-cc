@@ -1,5 +1,4 @@
 FROM docker.io/nvidia/cuda:10.0-cudnn7-runtime-ubuntu18.04
-
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update \
@@ -12,26 +11,22 @@ RUN apt-get install -y python3 python3-pip
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python
 RUN ln -s /usr/bin/pip3 /usr/local/bin/pip
 
-RUN pip install --upgrade pip
+RUN pip install --upgrade --no-cache-dir pip
+
+#RUN chmod 777 -R /usr/local/lib/python3.6/dist-packages/
 
 # switch user
 USER cc
 
-# install python via pyenv
-#ENV PATH /home/cc/.pyenv/bin:/home/cc/.pyenv/shims:${PATH}
-#RUN curl https://pyenv.run | bash \
-#&& pyenv install 3.7.2 \
-#&& pyenv global 3.7.2
-
-#RUN pip install --upgrade pip
-
-# For the direcotry connector
-RUN pip install --user --upgrade red-connector-ssh==1.0
+ENV PATH="${PATH}:/home/cc/.local/bin"
 
 # Some common environmenta variables that Python uses
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-RUN pip3 install dvc-cc-agent
-RUN pip install dvc-cc-connector
+# For the direcotry connector
+RUN pip install --user --no-cache-dir red-connector-ssh==1.0
+RUN pip install --user --no-cache-dir git+https://github.com/efiop/dvc@2506
+RUN pip install --user --no-cache-dir dvc-cc-agent==0.8.8
+RUN pip install --user --no-cache-dir dvc-cc-connector==0.8.1
 
 WORKDIR home/cc/
