@@ -1,35 +1,34 @@
 # Get Started with <img src="../../dvc_cc_logo.png" alt="drawing" width="100"/>
 At this site, you find a basic tutorial on how to use DVC-CC.
-The demands of this basic tutorial is to be as simple as possible.
-DVC-CC has much more power than it is described here.
-To find out more about this power, you need to read also the site tutorials that you can find at the "**Even more**" 
-clues.
+This tutorial is intended to be as simple as possible
+
+DVC-CC has many more features than described in this tutorial. To find out more about these features, check out the 
+additional tutorials at the "**Even more**" clues.
 If you want to learn more about the technical description of what happens when using DVC-CC, take a look at the 
 "**Behind the scenes**" clues.
 
-If you worked through this tutorial, you should be able to know the basic command that you need to work with DVC-CC.
-You should then be able to adapt this to your project.
+After this tutorial, you should be able to know the basic command that you need to work with DVC-CC and adapt this to 
+your project.
 
 > **Even more**: [Here](_get_started_only_commands.md), you find only the commands of this tutorial **without text**. ;)
 
 ## 1) Create an empty GIT-Repository
 
 GIT is well known in software development and has proven itself in practice.
-But not all concepts from software development can be transferred to machine learning tasks.
-Futurice.com compares both and write the following:
+But not all concepts from software development can be transferred to machine learning tasks:
 
 > "Developing a machine learning application is even more iterative and explorative process than software engineering."
 [by Futurice.com](https://www.futurice.com/blog/differences-between-machine-learning-and-software-engineering/)
 
 In machine learning, we are dealing with large data sets and models.
 We have to deal with a lot of experiments and make sure that we can always jump back and forth between them. We also 
-need to remember which hyperparameter was used in each experiment.
+need to remember which hyperparameters were used in each experiment.
 
 The software DVC, on which DVC-CC is based, is very closely connected to GIT. It works like an extension to GIT 
 for machine learning projects.
 
-This is why your task is
-- to create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) repository,
+Your first task is now to
+- create an empty [GitHub](https://github.com/) or [GitLab](https://gitlab.com/) repository,
 - open a console,
 - (activate your DVC-CC anaconda environment,)
 - pull the empty git repository and
@@ -136,7 +135,7 @@ The DVC-CC command runs in the background `dvc run --no-exec ...`. That means th
 are defined in the DVC documentation of [`dvc run`](https://dvc.org/doc/commands-reference/run).
 The parameters `-d` (dependency), `-o` (output) and `-m` (metric) describes the pipeline and if one of them is 
 changed or missing DVC knows that
-this stage needs to reproduce. For an overview, take a look in the following table:
+this stage needs to reproduce. For an overview, take a look at the following table:
 
 
 | name | <sup>saved in git</sup> | <sup>saved in dvc cache</sup> | <sup>save the checksum</sup> | <sup>description</sup>                                                                                       |
@@ -172,7 +171,7 @@ means you can also use pure DVC syntax. For more information, take a look at [th
 
 
 ## 5) Run the script in the cluster
-We have right now our pipeline defined and can run our script in the cloud. For this we need to push everything to git:
+Right now, we have defined and can run our script on the remote cluster. For this we need to push everything to git:
 ```bash
 git add -A
 git commit -m "build the pipeline for the first test run with DVC-CC"
@@ -206,7 +205,7 @@ created a resulting branch that starts with **rcc_**.
 want to find out more about this use the command `dvc-cc run --help`.
 
 ## 6) Check jobs
-But before we take a look at the result branch, we will check the job that we started with `dvc-cc status` we get the
+Before we take a look at the result branch, we will check the job that we started with `dvc-cc status` we get the
 last job that was launched, with `dvc-cc status -p 1` we get all jobs that have the ID 1, or
 with `dvc-cc status -p 1 -d` we get a detailed view of the jobs with the ID 1.
 
@@ -216,15 +215,16 @@ to cancel all not finished jobs.
 ## 7) The result branch
 If the job succeeded, a resulting branch is created. Now we take a look at a resulting branch. All result branches start
 with **rcc_JobID_TheNameOfTheExperiment** and were created remotely. So we need first do a `git pull` to get the new
-branches. And can now check out to one of the result branches with `git checkout rcc_...` , with ... the name of the
-branch. On Linux you can use tab for auto-complete.
+branches. After the pull, we can switch (checkout) to one of the result branches with `git checkout rcc_...` , with ... the name of the
+branch. (Hint: On Linux, use the tabulator-key for autocompletion, so you do not have to type in the whole branch name manually, which is error-prone.)
 
-Now we need to pull from dvc with `dvc pull` all large files that are not stored in git. Now all output files are
-available at this branch and you get all the information that you need to rerun the experiment by an external
+Now we need to pull from dvc with `dvc pull` all large files that are stored to the fileserver we specified earlier.
+Now all output files are available at this branch and you get all the information that you need to rerun the 
+experiment by an external
 persona on the readme.md of this branch.
 
 ## 8) Get output files from the experiments
-To get all output TensorBoard folders (`-f tensorboard`) that was created by the script from the
+To get all output TensorBoard folders (`-f tensorboard`) that were created by the script from the
 first experiment (`-pos 1`) and download the stages (`-d`) you can use the following command:
 ```
 dvc-cc output-to-tmp -f tensorboard -d -pos 1
@@ -238,7 +238,7 @@ in the [dvc-cc github issue list](https://github.com/deep-projects/dvc-cc/issues
 - If you would like to work with **jupyter notebook** take a look at [this site](_working_with_jupyter_notebook.md).
 - DVC-CC creates a lot of branches. That means that `git branch` is bombarded with the **cc_** and **rcc_** branches
     you can use `dvc-cc git branch` to show only your working branches.
-- You can have live access to the output that your models create. Take a look at [this site](_live_output.md).
+- For live access to the output that your experiments create, take a look at [this site](_live_output.md).
 - You can connect to some data per SSHFS on your branch. The cluster will use the same SSHFS connection, but currently,
     this works only if the `data` folder was used. [Here](_working_with_sshfs.md) you can read more about it.
 

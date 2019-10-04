@@ -42,7 +42,7 @@ def main():
 
         print()
         print('Please enter the number of GPUs that you want on the cluster. Hint: In the most Deep Learning '
-              'scripts, you want to use 1 GPU in the docke container.')
+              'scripts, you want to use 1 GPU in the docker container.')
         num_of_gpus = None
         while num_of_gpus is None:
             num_of_gpus = input(bcolors.OKBLUE+'\tNumber of GPUs'+bcolors.ENDC+' (default 0): ')
@@ -68,7 +68,7 @@ def main():
                 ram = None
 
         print()
-        print('Please enter the Docker Image in which your script get executed at the cluster.')
+        print('Please enter the Docker Image in which your script gets executed at the cluster.')
         print('   You can choose from the following:')
         print('     - "tf2", if you want to work with TensorFlow 2.0.')
         print('     - "tf1", if you want to work with TensorFlow 1.5.')

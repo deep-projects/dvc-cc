@@ -18,6 +18,18 @@ RUN pip install --upgrade --no-cache-dir pip
 # switch user
 USER cc
 
+# In the new DVC version it is also possible to use python 3.7 with
+#  install python via pyenv
+#  #ENV PATH /home/cc/.pyenv/bin:/home/cc/.pyenv/shims:${PATH}
+#  #
+#  #RUN curl https://pyenv.run | bash \
+#  #&& pyenv install 3.7.2 \
+#  #&& pyenv global 3.7.2
+#  #
+#  #RUN pip install --upgrade pip
+#
+# See this file:https://github.com/deep-projects/dvc-cc/blob/6feaae3e3b2ce3bc98cf306fb39fc3d007e8eed3/dockerfile-examples/dvc-cc_basic/10.0/Dockerfile
+
 ENV PATH="${PATH}:/home/cc/.local/bin"
 
 # Some common environmenta variables that Python uses

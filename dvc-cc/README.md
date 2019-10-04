@@ -54,15 +54,15 @@ pip install dvc_cc-?????.whl # replace ????? with the current version that you b
 ```
 
 ## Get started
-Install DVC-CC and take a look at [this tutorial](tutorial/Get_Started.md).
+Install DVC-CC and take a look at [this tutorial](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/Get_Started.md).
 
 ### Tutorials
-- [Working with jupyter notebooks](tutorial/_working_with_jupyter_notebook.md)
-- [working with sshfs](tutorial/_working_with_sshfs.md)
-- [DVC-CC Settings](tutorial/_settings.md)
-- [Working with pure DVC syntax](tutorial/_only_dvc.md)
-- [Using live output](tutorial/_live_output.md)
-- <del>[An old tutorial](tutorial/SimpleStart.md)</del>
+- [Working with jupyter notebooks](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/_working_with_jupyter_notebook.md)
+- [working with sshfs](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/_working_with_sshfs.md)
+- [DVC-CC Settings](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/_settings.md)
+- [Working with pure DVC syntax](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/_only_dvc.md)
+- [Using live output](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/_live_output.md)
+- <del>[An old tutorial](https://github.com/deep-projects/dvc-cc/blob/master/dvc-cc/tutorial/SimpleStart.md)</del>
 
 ## Structure of this repository
 

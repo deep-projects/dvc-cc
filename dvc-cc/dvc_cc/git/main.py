@@ -42,6 +42,7 @@ def main():
                 print(line)
     elif sys.argv[1] == 'sync':
         repo = DVCRepo()
+
         if (len(argv) > 2 and argv[1] == '-d') or (len(argv) == 3 and argv[2] == '-d'):
             remote_name = repo.config.config['core']['remote']
             remote_settings = repo.config.config['remote "' + remote_name + '"']
@@ -55,6 +56,8 @@ def main():
             loop = True
         else:
             loop = False
+
+        _ = check_output(['git', 'stash'])
 
         try:
             is_first_iteration = True
@@ -86,6 +89,7 @@ def main():
             print('git checkout ' + git_name_of_branch)
             _ = check_output(['git', 'checkout', git_name_of_branch])
             repo.pull()
+            _ = check_output(['git', 'stash', 'apply'])
     else:
         subprocess.call(['git'] + argv)
         subprocess.call(['dvc', 'checkout'])

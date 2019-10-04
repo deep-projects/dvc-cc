@@ -649,6 +649,7 @@ def main():
 
             subprocess.call(['git', 'add', '.dvc_cc/cc_all_ids.yml'])
             subprocess.call(['git', 'commit', '-m', 'Update .dvc_cc/cc_all_ids.yml'])
+            subprocess.call(['git', 'push'])
 
 
 
