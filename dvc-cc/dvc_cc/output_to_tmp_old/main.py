@@ -181,18 +181,24 @@ def main():
                     print(branch)
                     g.checkout(branch)
                     #TODO: This would be nice, but its too sloow!
-                    repo.checkout()
+                    try:
+                        repo.checkout()
+                    except:
+                        print('Some files are missing.')
 
                     print('\tIt is a branch of interest!')
                     #TODO: repo.stages is very slow!
-                    for stage in repo.stages():
+                    for stage in repo.stages:
                         for out in stage.outs:
                             valid_msg = check_out_if_its_valid(out, args.regex_name_of_file,
                                                                args.exclude_regex_name_of_file, not args.forbid_dir)
                             print('\t\t\t',out, valid_msg)
                             if valid_msg == 'not_in_local_cache' and args.download_stages:
                                 g.pull()
-                                repo.pull(stage.relpath)
+                                try:
+                                    repo.pull(stage.relpath)
+                                except:
+                                    print('Some files are missing.')
                                 time.sleep(1)
                                 valid_msg = check_out_if_its_valid(out, args.regex_name_of_file,
                                                                    args.exclude_regex_name_of_file, not args.forbid_dir)
@@ -253,7 +259,10 @@ def main():
     # return always to the starting branch!
     finally:
         g.checkout(starting_branch)
-        repo.checkout()
+        try:
+            repo.checkout()
+        except:
+            print('Some files are missing.')
 
 
 

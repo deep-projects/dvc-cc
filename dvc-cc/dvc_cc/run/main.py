@@ -387,6 +387,7 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
         return [ exp_name ]
 
     result = list(map(list, zip(*result)))
+    result_only_values = list(map(list, zip(*result_only_values)))
 
     batch_names = []
     for i in range(len(result)):
@@ -476,7 +477,10 @@ def main():
     # Do a DVC-checkout to delete all files that was not created with DVC repro/run #
     #   TODO: This does not work currently! https://github.com/iterative/dvc/issues/2146
     #################################################################################
-    subprocess.call(['dvc', 'checkout'])
+    try:
+        subprocess.call(['dvc', 'checkout'])
+    except:
+        print('Some files are missing.')
 
     #####################################
     # Rename the hyperopt-files to .dvc #

@@ -74,22 +74,39 @@ def main():
                 all_branches_local = [i[2:] for i in all_branches if len(i.split('/')) == 1]
                 all_branches_remote = [i.split('/')[-1] for i in all_branches if len(i.split('/')) > 1]
 
-
                 for b in all_branches_remote:
                     if b not in all_branches_local:
                         print('git checkout '+ b)
                         _ = check_output(['git', 'checkout', b])
 
-                        if argv[1] == '-d':
-                            print('\t\ŧI PULL THE DATA')
-                            repo.pull()
-                            print('\t\ŧI CHECKOUT THE DATA')
+                        print('\t\ŧI CHECKOUT THE DATA')
+
+                        try:
                             repo.checkout()
+                        except:
+                            print('Some files are missing.')
+
+                        if len(argv) >= 2 and argv[1] == '-d':
+                            print('\t\ŧI PULL THE DATA')
+                            try:
+                                repo.pull()
+                            except:
+                                print('Some files are missing.')
         finally:
             print('git checkout ' + git_name_of_branch)
             _ = check_output(['git', 'checkout', git_name_of_branch])
-            repo.pull()
+            try:
+                repo.checkout()
+            except:
+                print('Some files are missing.')
+            try:
+                repo.pull()
+            except:
+                print('Some files are missing.')
             _ = check_output(['git', 'stash', 'apply'])
     else:
         subprocess.call(['git'] + argv)
-        subprocess.call(['dvc', 'checkout'])
+        try:
+            subprocess.call(['dvc', 'checkout'])
+        except:
+            print('Some files are missing.')
