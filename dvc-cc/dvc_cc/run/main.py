@@ -653,7 +653,11 @@ def main():
 
             subprocess.call(['git', 'add', '.dvc_cc/cc_all_ids.yml'])
             subprocess.call(['git', 'commit', '-m', 'Update .dvc_cc/cc_all_ids.yml'])
-            subprocess.call(['git', 'push'])
+            try:
+                subprocess.call(['git', 'push'])
+            except:
+                print(bcolors.WARNING+'WARNING: It could not push the ID\' to git. This can happen if your branch is behind the remote branch. '
+                      'You need to run "git pull" and "git push" to save the ID\'s in the git repository.'+bcolors.ENDC)
 
 
 
