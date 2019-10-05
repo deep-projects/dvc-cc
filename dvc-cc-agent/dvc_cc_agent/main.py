@@ -177,7 +177,15 @@ def main():
     git_complete_path_to_repo = 'https://' + git_own_username+":"+git_own_password+"@"+git_path_to_working_repository + '/' + git_working_repository_owner + '/'+ git_working_repository_name
     command = 'git clone --recurse-submodules ' + git_complete_path_to_repo + ' repo'
     print('\t' + 'git clone --recurse-submodules ' + 'https://' + git_own_username+":"+"$$$$$$$$$$$$$"+"@"+git_path_to_working_repository + '/' + git_working_repository_owner + '/'+ git_working_repository_name)
-    print(subprocess.check_output(command, shell=True).decode())
+    error_message = None
+    try:
+        print(subprocess.check_output(command, shell=True).decode())
+    except Exception as e:
+        error_message = str(e)
+        error_message = error_message.replace(git_own_password, '$$$$$$$$$')
+        error_message  = error_message  + '\nMaybe you used a wrong username or password?'
+    if error_message is not None:
+        raise Exception(error_message)
 
     print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
     if args.dvc_remote_directory_sshfs is None:
