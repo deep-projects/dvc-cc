@@ -489,6 +489,7 @@ def main():
         list_of_hyperopt_files = [f for f in os.listdir(str(Path('dvc/.hyperopt'))) if f.endswith('.hyperopt')]
         for f in list_of_hyperopt_files:
             os.rename(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
+            print(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
     else:
         list_of_hyperopt_files = []
 
@@ -525,7 +526,6 @@ def main():
     ####################################
     if len(dvc_files) == 0:
         raise ValueError('There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
-
 
     ##########################
     # Get All Hyperparemters #

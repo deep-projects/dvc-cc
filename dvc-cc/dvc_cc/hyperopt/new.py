@@ -50,45 +50,28 @@ def main():
             sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_').replace('\\\\', '_')
             output_filename = sys.argv[i+1]
 
-
     if found_user_filename:
         subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])
     else:
         output_filename = str(Path('dvc/'+ str(uuid.uuid4())+'.dvc'))
         subprocess.call(['dvc', 'run', '--no-exec', '-f', output_filename] + sys.argv[1:])
 
-    new_hyperopt_filename = str(Path('dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt'))
-    os.rename(output_filename, new_hyperopt_filename)
 
-    try:
-        vc.register_dvccc_file(new_hyperopt_filename)
-    except KeyboardInterrupt as ki:
-        # Delete the file if the user want to cancel the job
-        os.remove(new_hyperopt_filename)
-        raise ki
-    vc.update_dvccc_files()
+    if ' '.join(sys.argv[1:]).find('{{') >= 0:
+        new_hyperopt_filename = str(Path('dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt'))
+        os.rename(output_filename, new_hyperopt_filename)
 
-    subprocess.call(['git', 'add', str(Path('dvc/.hyperopt/*'))])
+        try:
+            vc.register_dvccc_file(new_hyperopt_filename)
+        except KeyboardInterrupt as ki:
+            # Delete the file if the user want to cancel the job
+            os.remove(new_hyperopt_filename)
+            raise ki
+        vc.update_dvccc_files()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        subprocess.call(['git', 'add', str(Path('dvc/.hyperopt/*'))])
+    else:
+        subprocess.call(['git', 'add', str(Path(output_filename))])
 
 
 
