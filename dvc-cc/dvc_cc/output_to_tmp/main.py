@@ -63,7 +63,10 @@ def main():
         remote_settings['password'] = getpass.getpass('Password for ' + remote_settings['url'] + ': ')
         remote_settings['ask_password'] = False
 
-    outputdir = create_output_dir(repo.root_dir, args.path_to_output)
+    path_to_output_clean = args.path_to_output.replace('./', '_').replace('/', '_').replace(
+        '\\\\', '_')
+    outputdir = create_output_dir(repo.root_dir, path_to_output_clean)
+    print('##################',outputdir)
     if outputdir is None:
         exit(1)
 
@@ -96,11 +99,20 @@ def main():
     for b in all_branches:
         if list_of_allowed_dvccc_ids is None or int(b.split('_')[1]) in list_of_allowed_dvccc_ids:
             print('dvc get : ','.', args.path_to_output,str(Path(outputdir + '/' + b)), b)
-
-            if b.endswith('.dvc'):
-                repo.get('.', args.path_to_output,out=str(Path(outputdir + '/' + b[:-4])), rev=b)
-            else:
-                repo.get('.', args.path_to_output,out=str(Path(outputdir + '/' + b)), rev=b)
+            try:
+                if b.endswith('.dvc'):
+                    path_to_output = str(Path(outputdir + '/' + b[:-4]))
+                    print(path_to_output)
+                    os.mkdir(path_to_output)
+                    repo.get('.', args.path_to_output,out=str(Path(path_to_output + '/' + path_to_output_clean)), rev=b)
+                else:
+                    path_to_output = str(Path(outputdir + '/' + b))
+                    print(path_to_output)
+                    os.mkdir(path_to_output)
+                    repo.get('.', args.path_to_output,out=str(Path(path_to_output + '/' + path_to_output_clean)), rev=b)
+            except:
+                print('File was not found.')
+                os.rmdir(path_to_output)
     print()
     print('Found ' + str(len(os.listdir(str(Path(outputdir))))) + ' files or folders.')
     print('If files are missing, please use "dvc-cc git sync" to get new result branches and repeat this command.')
