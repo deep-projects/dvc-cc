@@ -57,7 +57,7 @@ def main():
         else:
             loop = False
 
-        _ = check_output(['git', 'stash'])
+        git_stash_output = check_output(['git', 'stash']).decode().startswith('No local changes to save')
 
         try:
             is_first_iteration = True
@@ -81,12 +81,12 @@ def main():
 
                         print('\t\ŧI CHECKOUT THE DATA')
 
-                        try:
-                            repo.checkout()
-                        except:
-                            print('Some files are missing.')
-
                         if len(argv) >= 2 and argv[1] == '-d':
+                            try:
+                                repo.checkout()
+                            except:
+                                print('Some files are missing.')
+
                             print('\t\ŧI PULL THE DATA')
                             try:
                                 repo.pull()
@@ -103,7 +103,8 @@ def main():
                 repo.pull()
             except:
                 print('Some files are missing.')
-            _ = check_output(['git', 'stash', 'apply'])
+            if git_stash_output == False:
+                _ = check_output(['git', 'stash', 'apply'])
     else:
         subprocess.call(['git'] + argv)
         try:
