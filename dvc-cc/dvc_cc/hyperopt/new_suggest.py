@@ -109,10 +109,10 @@ def main():
             path = dirpath+'/'+filename
             if filename.endswith('.py') and dirpath.find('.ipynb_checkpoints') == -1:
                 with open(str(Path(path))) as f:
-                    content = f.readlines()
+                    content = f.readlines().replace('"',"'")
             elif filename.endswith('.ipynb') and dirpath.find('.ipynb_checkpoints') == -1:
                 path = path[:-6] + '.py'
-                content = jupyter_notebook_to_source(dirpath,filename).split('\n')
+                content = jupyter_notebook_to_source(dirpath,filename).replace('"',"'").split('\n')
 
             # this variable is used to save lines, if a command goes over several lines.
             saved_lines = ''
