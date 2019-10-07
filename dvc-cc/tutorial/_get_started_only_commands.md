@@ -52,5 +52,5 @@ dvc-cc status
 
 ## 8) Get output files from the experiments
 ```
-dvc-cc output-to-tmp -f tensorboard -d -pos 1
+dvc-cc output-to-tmp tensorboard -p 1
 ```

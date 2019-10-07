@@ -224,10 +224,10 @@ experiment by an external
 persona on the readme.md of this branch.
 
 ## 8) Get output files from the experiments
-To get all output TensorBoard folders (`-f tensorboard`) that were created by the script from the
-first experiment (`-pos 1`) and download the stages (`-d`) you can use the following command:
+To get all output TensorBoard folders (`tensorboard`) that were created by the script from the
+first experiment (`-p 1`) you can use the following command:
 ```
-dvc-cc output-to-tmp -f tensorboard -d -pos 1
+dvc-cc output-to-tmp tensorboard -p 1
 ```
 
 ## 9) And more informations
