@@ -65,18 +65,18 @@ def search_for_argparse_parameter(command):
         params = command.split('.add_argument(')[1].split(',')
 
         if params[0].startswith('\'--'): # optional parameter but only with long name
-            shortname = params[0][3:-1]
-            longname = params[0][1:-1]
+            shortname = params[0].strip()[3:-1]
+            longname = params[0].strip()[1:-1]
         elif params[0].startswith('\'-'): # required parameter
-            shortname = params[0][2:-1]
-            longname = params[1][1:-1]
+            shortname = params[0].strip()[2:-1]
+            longname = params[1].strip()[1:-1]
         else:
-            shortname = params[0][1:-1]
+            shortname = params[0].strip()[1:-1]
             longname = ''
         dtype = ''
         for p in params[1:]:
             p = p.strip()
-            if p.startswith('type='):
+            if p.startswith('type=') or p.startswith('type ='):
                 if p[5:].startswith('int'):
                     dtype = 'int'
                 elif p[5:].startswith('float'):
@@ -109,10 +109,10 @@ def main():
             path = dirpath+'/'+filename
             if filename.endswith('.py') and dirpath.find('.ipynb_checkpoints') == -1:
                 with open(str(Path(path))) as f:
-                    content = [tmpf.replace('"',"'") for tmpf in f.readlines()]
+                    content = f.readlines()
             elif filename.endswith('.ipynb') and dirpath.find('.ipynb_checkpoints') == -1:
                 path = path[:-6] + '.py'
-                content = jupyter_notebook_to_source(dirpath,filename).replace('"',"'").split('\n')
+                content = jupyter_notebook_to_source(dirpath,filename).split('\n')
 
             # this variable is used to save lines, if a command goes over several lines.
             saved_lines = ''
@@ -123,7 +123,7 @@ def main():
 
             # for each line
             for i in range(len(content)):
-                line = content[i]
+                line = content[i].replace('"',"'")
                 splitted_line = line.split()
 
                 if len(splitted_line) >= 2 and splitted_line[1] == 'argparse':
@@ -131,9 +131,9 @@ def main():
 
                 line = line.strip().split('#')[0]
 
-                if len(saved_lines) > 0:
-                    saved_lines = saved_lines + line
-                    line = saved_lines
+                #f len(saved_lines) > 0:
+                saved_lines = saved_lines + line
+                line = saved_lines
 
                 if line.count('(') == line.count(')'):
                     saved_lines = ''
