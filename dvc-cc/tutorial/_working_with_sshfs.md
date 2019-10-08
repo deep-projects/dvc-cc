@@ -1,3 +1,4 @@
+
 # DVC-CC: Using of SSHFS
 
 This site is an extension of the [main tutorial](Get_Started.md). Make sure you read it before you read this site.
@@ -18,3 +19,5 @@ To unmount the data folder use the following command:
 ```
 fusermount -u data
 ```
+
+You need to add the "data" folder to your ".gitignore" to make sure that the files get not pushed to git.
