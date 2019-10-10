@@ -13,7 +13,7 @@ To assign the right hardware for your need in the cloud, we use
 [**C**urious **C**ontainers (CC)](https://www.curious-containers.cc/). This Software runs on our cloud and manages the
  cloud.
 
-![DVC-CC-Overview](https://github.com/deep-projects/dvc-cc/raw/master/dvc-cc/tutorial/DVC-CC-Overview.pdf)
+![DVC-CC-Overview](https://github.com/deep-projects/dvc-cc/raw/master/dvc-cc/tutorial/DVC-CC-Overview.png)
 
 ## Installation of DVC-CC
 
