@@ -20,9 +20,9 @@ To assign the right hardware for your need in the cloud, we use
 DVC-CC is written in python so you can easily install DVC-CC by using pip.
 We recommend that you install DVC-CC in a conda environment.
 You can use [anaconda](https://www.anaconda.com/distribution/) or miniconda.
-For windows user We recommend
+<del>For windows user We recommend
 [this website](https://www.earthdatascience.org/workshops/setup-earth-analytics-python/setup-git-bash-conda/)
-to install miniconda.
+to install miniconda.</del> Currently DVC-CC does not work under Windows!
 
 You can create, and activate an environment with the following lines:
 
