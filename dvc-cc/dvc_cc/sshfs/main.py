@@ -109,6 +109,8 @@ def main():
         unmount()
     elif len(argv) == 1:
         print('NEW SSHFS connection to data folder')
+        new_sshfs_connection(argv + ['data'])
     else:
         print('NEW SSHFS connection')
+        new_sshfs_connection(argv)
 
