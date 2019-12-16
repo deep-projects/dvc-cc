@@ -37,6 +37,9 @@ from dvc_cc.hyperopt.main import DESCRIPTION as HYPEROPT_DESCRIPTION
 from dvc_cc.live_output.main import main as live_output_main
 from dvc_cc.live_output.main import DESCRIPTION as LIVE_OUTPUT_DESCRIPTION
 
+from dvc_cc.sshfs.main import main as sshfs_main
+from dvc_cc.sshfs.main import DESCRIPTION as SSHFS_DESCRIPTION
+
 SCRIPT_NAME = 'dvc-cc'
 TITLE = 'tools'
 DESCRIPTION = 'This software is for Machine Learner and Deep Learner to make scalable and reproducable experiments. It combines ' \
@@ -53,7 +56,8 @@ MODES = OrderedDict([
     ('status', {'main': status_main, 'description': STATUS_DESCRIPTION}),
     ('cancel', {'main': cancel_main, 'description': CANCEL_DESCRIPTION}),
     ('live-output', {'main': live_output_main, 'description': LIVE_OUTPUT_DESCRIPTION}),
-    ('output-to-tmp', {'main': output_to_tmp_main, 'description': output_to_tmp_DESCRIPTION})
+    ('output-to-tmp', {'main': output_to_tmp_main, 'description': output_to_tmp_DESCRIPTION}),
+    ('sshfs', {'main': sshfs_main, 'description': SSHFS_DESCRIPTION})
 ])
 
 
