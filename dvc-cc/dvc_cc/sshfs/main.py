@@ -56,7 +56,7 @@ def new_sshfs_connection(sshfs_parameters):
     project_dir = get_main_git_directory_Path()
 
     dest = os.path.realpath(os.path.expanduser(sshfs_parameters[-1]))
-    dest_rel = dest[len(project_dir) + 1]
+    dest_rel = dest[len(project_dir) + 1:]
     # Prüfe ob Ordner existiert und lege ihn gegebenfalls neu an
     if not os.path.exists(dest):
         os.makedirs(dest)
@@ -73,6 +73,7 @@ def new_sshfs_connection(sshfs_parameters):
     f.close()
 
     # Führe den SSHFS-Kommando aus
+    #TODO: use password from keyring or ask for it!
     print(check_output(["sshfs"] + sshfs_parameters[:-1] + [dest]).decode("utf8"))
 
     # Finden der wichtigen Parameter
