@@ -216,7 +216,28 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     dvc_url, dvc_server, dvc_path = get_dvcurl()
 
     data_username, data_server, data_path = get_mount_values_for_a_direcotry(project_dir + '/data')
-    data_password = '{{' + str(data_server) + '_password}}'
+
+    # TODO: The following should be the only way to use SSHFS!
+    # TODO: It should also be possible to use other folders than the data folder
+    if data_server is None:
+        # Try to read the SSHFS-Connection via the .dvc_cc/sshfs.json file!
+
+        project_dir = get_main_git_directory_Path()
+        path_to_sshfs_json = str(Path(os.path.join(project_dir, '.dvc_cc/sshfs.json')))
+
+        if os.path.exists(path_to_sshfs_json):
+            with open(path_to_sshfs_json, "r") as jsonFile:
+                data = json.load(jsonFile)
+
+        if 'data' in data.keys():
+            print('Hint: The external server use SSHFS to the data folder. Currently you do not have a SSHFS connection'
+                  ' to this folder. If you wish to activate this SSHFS connection you can use: "dvc-cc sshfs r[econnect]"'
+                  )
+            data_username = data["data"]["username"]
+            data_server = data["data"]["server"]
+            data_path = data["data"]["remote_path"]
+
+    data_password = '{{' + str(data_server).replace('.', '_').replace('-', '_') + '_password}}'
     use_external_data_dir = data_server is not None
 
     os.mkdir('.dvc_cc/' + branch_name)
