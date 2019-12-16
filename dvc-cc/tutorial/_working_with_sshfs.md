@@ -1,4 +1,3 @@
-
 # DVC-CC: Using of SSHFS
 
 This site is an extension of the [main tutorial](Get_Started.md). Make sure you read it before you read this site.
