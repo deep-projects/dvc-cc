@@ -229,13 +229,13 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
             with open(path_to_sshfs_json, "r") as jsonFile:
                 data = json.load(jsonFile)
 
-        if 'data' in data.keys():
-            print('Hint: The external server use SSHFS to the data folder. Currently you do not have a SSHFS connection'
-                  ' to this folder. If you wish to activate this SSHFS connection you can use: "dvc-cc sshfs r[econnect]"'
-                  )
-            data_username = data["data"]["username"]
-            data_server = data["data"]["server"]
-            data_path = data["data"]["remote_path"]
+            if 'data' in data.keys():
+                print('Hint: The external server use SSHFS to the data folder. Currently you do not have a SSHFS connection'
+                      ' to this folder. If you wish to activate this SSHFS connection you can use: "dvc-cc sshfs r[econnect]"'
+                      )
+                data_username = data["data"]["username"]
+                data_server = data["data"]["server"]
+                data_path = data["data"]["remote_path"]
 
     data_password = '{{' + str(data_server).replace('.', '_').replace('-', '_') + '_password}}'
     use_external_data_dir = data_server is not None
