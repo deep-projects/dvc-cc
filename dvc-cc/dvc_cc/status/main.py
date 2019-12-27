@@ -289,12 +289,25 @@ def main():
                             print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(detail['history'][-1]['ccagent']['process']['returnCode']))
                             if args.summary is False:
                                 print()
-                                print(bcolors.OKGREEN + 'stdOut: ' + bcolors.ENDC)
-                                print('\n'.join(detail['history'][-1]['ccagent']['process']['stdOut']))
-                                print()
                                 print(bcolors.WARNING + 'stdErr: ' + bcolors.ENDC)
                                 print('\n'.join(detail['history'][-1]['ccagent']['process']['stdErr']))
                                 print()
+
+                                stdOut = '\n'.join(detail['history'][-1]['ccagent']['process']['stdOut'])
+                                stdOut = stdOut.split('\nSTART DVC REPRO')
+                                print(bcolors.OKGREEN + 'Before running the command: ' + bcolors.ENDC)
+                                print(stdOut[0])
+                                print()
+                                if len(stdOut) > 1:
+                                    stdOut = stdOut[1].split('\nWRITE RED-YML-File TO MAIN-Directory')
+                                    if len(stdOut) > 1:
+                                        print(bcolors.OKGREEN + 'After running the command: ' + bcolors.ENDC)
+                                        print(stdOut[1])
+                                        print()
+
+                                    print(bcolors.OKGREEN + 'stdOut: ' + bcolors.ENDC)
+                                    print(stdOut[0])
+                                    print()
                         else:
                             print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
                     else:
