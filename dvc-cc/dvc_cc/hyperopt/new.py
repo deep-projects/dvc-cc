@@ -42,24 +42,31 @@ def main():
         vc.register_dvccc_file(str(Path('dvc/.hyperopt/'+f)))
 
     # create the dvc file
-    found_user_filename = False
-    command_start_in = 0
+    dvc_filename = None
+    output_name = None
     for i in range(len(sys.argv)-1):
         if sys.argv[i] == '-f':
-            found_user_filename = True
-            sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_').replace('\\\\', '_')
-            output_filename = sys.argv[i+1]
+            sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_').replace('\\\\', '_').replace(' ', '_')
+            dvc_filename = sys.argv[i+1]
+            if not dvc_filename.endswith('.dvc'):
+                dvc_filename = dvc_filename + '.dvc'
+        elif sys.argv[i] == '-o' or sys.argv[i] == '-O' or sys.argv[i] == '-m' or sys.argv[i] == '-M':
+            output_name = sys.argv[i+1]
+            output_name = 'dvc/'+output_name.replace('/', '_').replace('\\\\', '_').replace('.', '_').replace(' ', '_')
 
-    if found_user_filename:
+    if dvc_filename is not None:
         subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])
+    elif output_name is not None:
+        dvc_filename = str(Path(output_name))
+        subprocess.call(['dvc', 'run', '--no-exec', '-f', dvc_filename] + sys.argv[1:])
     else:
-        output_filename = str(Path('dvc/'+ str(uuid.uuid4())+'.dvc'))
-        subprocess.call(['dvc', 'run', '--no-exec', '-f', output_filename] + sys.argv[1:])
+        dvc_filename = str(Path('dvc/'+ str(uuid.uuid4())+'.dvc'))
+        subprocess.call(['dvc', 'run', '--no-exec', '-f', dvc_filename] + sys.argv[1:])
 
 
     if ' '.join(sys.argv[1:]).find('{{') >= 0:
-        new_hyperopt_filename = str(Path('dvc/.hyperopt/'+output_filename[4:-4]+'.hyperopt'))
-        os.rename(output_filename, new_hyperopt_filename)
+        new_hyperopt_filename = str(Path('dvc/.hyperopt/'+dvc_filename[4:-4]+'.hyperopt'))
+        os.rename(dvc_filename, new_hyperopt_filename)
 
         try:
             vc.register_dvccc_file(new_hyperopt_filename)
@@ -71,7 +78,7 @@ def main():
 
         subprocess.call(['git', 'add', str(Path('dvc/.hyperopt/*'))])
     else:
-        subprocess.call(['git', 'add', str(Path(output_filename))])
+        subprocess.call(['git', 'add', str(Path(dvc_filename))])
 
 
 
