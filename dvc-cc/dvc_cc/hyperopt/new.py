@@ -46,13 +46,15 @@ def main():
     output_name = None
     for i in range(len(sys.argv)-1):
         if sys.argv[i] == '-f':
-            sys.argv[i + 1]='dvc/'+sys.argv[i + 1].replace('/', '_').replace('\\\\', '_').replace(' ', '_')
-            dvc_filename = sys.argv[i+1]
+            dvc_filename = 'dvc/'+sys.argv[i + 1].replace('/', '_').replace('\\\\', '_').replace(' ', '_')
             if not dvc_filename.endswith('.dvc'):
                 dvc_filename = dvc_filename + '.dvc'
+            sys.argv[i + 1] = dvc_filename
         elif sys.argv[i] == '-o' or sys.argv[i] == '-O' or sys.argv[i] == '-m' or sys.argv[i] == '-M':
             output_name = sys.argv[i+1]
             output_name = 'dvc/'+output_name.replace('/', '_').replace('\\\\', '_').replace('.', '_').replace(' ', '_')
+            if not output_name.endswith('.dvc'):
+                output_name = output_name + '.dvc'
 
     if dvc_filename is not None:
         subprocess.call(['dvc', 'run', '--no-exec'] + sys.argv[1:])
