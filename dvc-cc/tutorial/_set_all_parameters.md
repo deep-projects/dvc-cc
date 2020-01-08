@@ -23,7 +23,7 @@ In the main tutorial we used the following command:
 dvc-cc hyperopt new -d source/train.py \
                     -o tensorboard \
                     -o model.h5 \
-                    -m summary.yml \
+                    -M summary.yml \
                     -f train.dvc \
                     "python source/train.py --num_of_kernels {{nk}} --activation_function {{af}}"
 ```
@@ -36,7 +36,7 @@ short name:
 dvc-cc hyperopt new -d source/train.py \
                     -o tensorboard \
                     -o model.h5 \
-                    -m summary.yml \
+                    -M summary.yml \
                     -f train.dvc \
                     "python source/train.py --seed {{seed}} --num_of_hidden_layers {{nh}} --num_of_kernels {{nk}} --dropout_rate {{dr}} --learning_rate {{lr}} --activation_function {{af}} --batch_size {{bs}} --epochs {{e}} --dataset {{d}}"
 ```
@@ -50,7 +50,7 @@ update the above command, we get the following command:
 dvc-cc hyperopt new -d source/train.py \
                     -o tensorboard \
                     -o model.h5 \
-                    -m summary.yml \
+                    -M summary.yml \
                     -f train.dvc \
                     "python source/train.py --seed {{seed:int}} --num_of_hidden_layers {{nh:int}} --num_of_kernels {{nk:int}} --dropout_rate {{dr:float}} --learning_rate {{lr:float}} --activation_function {{af:[relu,tanh]}} --batch_size {{bs:int}} --epochs {{e:int}} --dataset {{d:[mnist,fashion_mnist,cifar10,cifar100]}}"
 ```
