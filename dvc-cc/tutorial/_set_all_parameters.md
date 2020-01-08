@@ -12,7 +12,7 @@ look to set all parameters. But first let's take a look at the script from the m
 - you can use the regular DVC syntax in the `dvc-cc hyperopt new ...` command.  
 - The `-d` flag is used to define a dependency of your script, i.e. the source code of the script.
 - The `-o` flag is used to define an output file or output folder of your script
-- The `-m` flag is used to define a metric file. This is a special case of an output file that summaries the result of
+- The `-M` flag is used to define a metric file. This is a special case of an output file that summaries the result of
 a script. For example, the best validation accuracy saved in a json-file.
 - The `-f` flag is used to define a filename for the DVC-file that gets created by this command.
 - The last line of the command is the pure command that we would also use at the command line.
