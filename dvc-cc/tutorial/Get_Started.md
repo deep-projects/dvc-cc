@@ -121,7 +121,7 @@ With the following command, we define one stage from the pipeline.
 dvc-cc hyperopt new -d source/train.py \
                     -o tensorboard \
                     -o model.h5 \
-                    -m summary.yml \
+                    -M summary.yml \
                     -f train.dvc \
                     "python source/train.py --num_of_kernels {{nk}} --activation_function {{af}}"
 ```
@@ -133,7 +133,7 @@ this parameter is and create a file in the folder ./dvc/.hyperopt that has all i
 
 The DVC-CC command runs in the background `dvc run --no-exec ...`. That means that all parameters
 are defined in the DVC documentation of [`dvc run`](https://dvc.org/doc/commands-reference/run).
-The parameters `-d` (dependency), `-o` (output) and `-m` (metric) describes the pipeline and if one of them is 
+The parameters `-d` (dependency), `-o` (output) and `-M` (metric) describes the pipeline and if one of them is 
 changed or missing DVC knows that
 this stage needs to reproduce. For an overview, take a look at the following table:
 
@@ -143,7 +143,7 @@ this stage needs to reproduce. For an overview, take a look at the following tab
 |  `-d`  |     <sup>False</sup>    |        <sup>False</sup>       |        <sup>True</sup>       | <sup>You use this to define dependencies (inputs) or everything from what this stage depends on.</sup>       |
 |  `-o`  |     <sup>False</sup>    |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Large output files or folders</sup>                                                                                |
 |  `-O`  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Small output files or folders </sup>                                                                               |
-|  `-m`  |     <sup>True</sup>     |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Metrics are output files but have a special feature that you can use with `dvc metrics show`</sup>  |
+|  `-m`  |     <sup>False</sup>     |        <sup>True</sup>        |        <sup>True</sup>       | <sup>Metrics are output files but have a special feature that you can use with `dvc metrics show`</sup>  |
 |  `-M`  |     <sup>True</sup>     |        <sup>False</sup>       |        <sup>True</sup>       | <sup>Metrics see above. Find more information about metrics [here](https://dvc.org/doc/commands-reference/metrics-show). </sup>  
 
 In the command above we also use `-f` to define the stage name. The stage file is in this location:
