@@ -323,7 +323,6 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
         print("      auth: {password: '{{agency_password}}', username: '{{agency_username}}'}", file=f)    
         print("      url: " + engine_url, file=f)
         print("    batchConcurrencyLimit: "+str(batch_concurrency_limit), file=f)
-        print("    retryIfFailed: false", file=f)
-        print("redVersion: '8'", file=f)
+        print("redVersion: '9'", file=f)
         
         

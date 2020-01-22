@@ -141,7 +141,7 @@ def get_leafs_that_need_to_reproduce():
     for G in Gs:
         leafs = leafs + [[x] for x in G.nodes() if G.in_degree(x) == 0]
 
-    status_of_leafs = [dvcrepo.status(targets=f, with_deps=True) for f in leafs]
+    status_of_leafs = [dvcrepo.status(targets=[s.path for s in l], with_deps=True) for l in leafs]
 
     # check if the leafs need to reproduce:
     leafs_to_reproduce = [len(status_of_leafs) > 0 for s in status_of_leafs]
