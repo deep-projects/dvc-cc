@@ -15,6 +15,7 @@ import time
 import numpy as np
 import getpass
 from pathlib import Path
+import json
 
 class bcolors:
     HEADER = '\033[95m'
@@ -262,6 +263,7 @@ def main():
             )
             detail = r.json()
 
+
             print(bcolors.OKGREEN+'#'*63+bcolors.ENDC)
             print(bcolors.OKGREEN+'# %50s (%6s) #' % (d['experiment_name'], d['experimentId']) +bcolors.ENDC)
             print(bcolors.OKGREEN+'# %59s #' % ('batch id: ' + d['_id']) +bcolors.ENDC)
@@ -269,53 +271,54 @@ def main():
         
             print(bcolors.OKGREEN+'State: '+bcolors.ENDC + d['state'])
 
-            try:
-                for h in detail['history']:
-                    print(bcolors.OKGREEN+'Time (' + h['state'] + '):  '+bcolors.ENDC + datetime.datetime.fromtimestamp(h['time']).strftime('%Y-%m-%d %H:%M:%S'))
-                if d['state'].find('failed') >= 0 or d['state'].find('succeeded') >= 0 or d['state'].find('canceled') >= 0:
-                    print(bcolors.OKGREEN+'Used server node: '+bcolors.ENDC + str(d['node']))
-                    if 'usedGPUs' in detail and detail['usedGPUs'] is not None:
-                        if len(detail['usedGPUs']) == 1:
-                            print(bcolors.OKGREEN+'Used GPUs: '+bcolors.ENDC + str(detail['usedGPUs'][0]))
-                        else:
-                            print(bcolors.OKGREEN+'Used GPUs: ' +bcolors.ENDC+ str(detail['usedGPUs']))
-                    if args.detail_unchanged == False:
-                        if detail['history'][-1]['ccagent'] is not None:
-                            c = detail['history'][-1]['ccagent']['command']
-                            if len(c) == 13:
-                                print(bcolors.OKGREEN +'Files: '+bcolors.ENDC + str(c[-1]))
-                            else:
-                                print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
-                            print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(detail['history'][-1]['ccagent']['process']['returnCode']))
-                            if args.summary is False:
-                                print()
-                                print(bcolors.WARNING + 'stdErr: ' + bcolors.ENDC)
-                                print('\n'.join(detail['history'][-1]['ccagent']['process']['stdErr']))
-                                print()
-
-                                stdOut = '\n'.join(detail['history'][-1]['ccagent']['process']['stdOut'])
-                                stdOut = stdOut.split('\nSTART DVC REPRO')
-                                print(bcolors.OKGREEN + 'stdOut of DVC-CC-Agent (BEFORE executing your code):' + bcolors.ENDC)
-                                print(stdOut[0])
-                                print()
-                                if len(stdOut) > 1:
-                                    stdOut = stdOut[1].split('\nWRITE RED-YML-File TO MAIN-Directory')
-                                    if len(stdOut) > 1:
-                                        print(bcolors.OKGREEN + 'stdOut of DVC-CC-Agent (AFTER executing your code):' + bcolors.ENDC)
-                                        print('WRITE RED-YML-File TO MAIN-Directory')
-                                        print(stdOut[1])
-                                        print()
-                                    print(bcolors.OKGREEN + 'stdOut:' + bcolors.ENDC)
-                                    print('START DVC REPRO')
-                                    print(stdOut[0])
-                                    print()
-                        else:
-                            print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
+            #try:
+            for h in detail['history']:
+                print(bcolors.OKGREEN+'Time (' + h['state'] + '):  '+bcolors.ENDC + datetime.datetime.fromtimestamp(h['time']).strftime('%Y-%m-%d %H:%M:%S'))
+            if d['state'].find('failed') >= 0 or d['state'].find('succeeded') >= 0 or d['state'].find('canceled') >= 0:
+                print(bcolors.OKGREEN+'Used server node: '+bcolors.ENDC + str(d['node']))
+                if 'usedGPUs' in detail and detail['usedGPUs'] is not None:
+                    if len(detail['usedGPUs']) == 1:
+                        print(bcolors.OKGREEN+'Used GPUs: '+bcolors.ENDC + str(detail['usedGPUs'][0]))
                     else:
-                        import json
-                        print(json.dumps(detail, sort_keys=True, indent=4))
-            except:
-                print(bcolors.FAIL+'Error: Some error happens. Maybe some problems with the CC settings? Use this command with "--detail-unchanged" to see the full output.'+bcolors.ENDC)
+                        print(bcolors.OKGREEN+'Used GPUs: ' +bcolors.ENDC+ str(detail['usedGPUs']))
+
+                if args.detail_unchanged == False:
+                    if detail['history'][-1]['ccagent'] is not None:
+                        c = detail['history'][-1]['ccagent']['command']
+                        if len(c) == 13:
+                            print(bcolors.OKGREEN +'Files: '+bcolors.ENDC + str(c[-1]))
+                        else:
+                            print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
+                        print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(detail['history'][-1]['ccagent']['process']['returnCode']))
+                        if args.summary is False:
+                            # print stdout and std err
+                            print(bcolors.OKGREEN + 'stdout: ' + bcolors.ENDC)
+                            print(execution_engine + '/batches/' + ids.iloc[i] + '/stdout')
+                            r = requests.get(
+                                execution_engine + '/batches/' + ids.iloc[i] + '/stdout',
+                                auth=auth
+                            )
+                            try:
+                                print(r)
+                                r.json()
+                                print(json.dumps(r.json(), sort_keys=True, indent=4))
+                                print(r.json())
+                            except:
+                                print('No stdout available.')
+                            print(bcolors.WARNING + 'stderr: ' + bcolors.ENDC)
+                            r = requests.get(
+                                execution_engine + '/batches/' + ids.iloc[i] + '/stderr',
+                                auth=auth
+                            )
+                            print(r.json())
+                    else:
+                        print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
+                else:
+                    print(json.dumps(detail, sort_keys=True, indent=4))
+
+
+            #except:
+            #    print(bcolors.FAIL+'Error: Some error happens. Maybe some problems with the CC settings? Use this command with "--detail-unchanged" to see the full output.'+bcolors.ENDC)
             print()
 
 
