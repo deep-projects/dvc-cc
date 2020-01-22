@@ -300,6 +300,8 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
         print("      type: int?", file=f)
 
         print("  outputs: {}", file=f)
+        print("  stdout: stdout.txt", file=f)
+        print("  stderr: stderr.txt", file=f)
         print("container:", file=f)
         print("  engine: docker", file=f)
         print("  settings:", file=f)
