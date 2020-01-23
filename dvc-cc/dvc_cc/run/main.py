@@ -139,9 +139,9 @@ def get_leafs_that_need_to_reproduce():
     # Get all leaf files.
     leafs = []
     for G in Gs:
-        leafs = leafs + [[x] for x in G.nodes() if G.in_degree(x) == 0]
+        leafs = leafs + [[x.path_in_repo] for x in G.nodes() if G.in_degree(x) == 0]
 
-    status_of_leafs = [dvcrepo.status(targets=[s.path for s in l], with_deps=True) for l in leafs]
+    status_of_leafs = [dvcrepo.status(targets=l, with_deps=True) for l in leafs]
 
     # check if the leafs need to reproduce:
     leafs_to_reproduce = [len(status_of_leafs) > 0 for s in status_of_leafs]

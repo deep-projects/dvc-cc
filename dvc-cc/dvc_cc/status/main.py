@@ -298,19 +298,14 @@ def main():
                                 execution_engine + '/batches/' + ids.iloc[i] + '/stdout',
                                 auth=auth
                             )
-                            try:
-                                print(r)
-                                r.json()
-                                print(json.dumps(r.json(), sort_keys=True, indent=4))
-                                print(r.json())
-                            except:
-                                print('No stdout available.')
+                            print(r.text)
+
                             print(bcolors.WARNING + 'stderr: ' + bcolors.ENDC)
                             r = requests.get(
                                 execution_engine + '/batches/' + ids.iloc[i] + '/stderr',
                                 auth=auth
                             )
-                            print(r.json())
+                            print(r.text)
                     else:
                         print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
                 else:
