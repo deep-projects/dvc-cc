@@ -24,7 +24,8 @@ def get_command_list_in_right_order():
 
     commandlist = ''
     for s in stages:
-        commandlist = commandlist + s.cmd + '\n'
+        if s.cmd is not None:
+            commandlist = commandlist + s.cmd + '\n'
     return commandlist
 
 def get_time():
