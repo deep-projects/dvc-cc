@@ -1,4 +1,4 @@
-FROM docker.io/deepprojects/dvc-cc_basic:10.0
+FROM docker.io/deepprojects/dvc-cc_basic:10.0a
 
 # Often used libraries
 RUN pip install --no-cache-dir --user \
