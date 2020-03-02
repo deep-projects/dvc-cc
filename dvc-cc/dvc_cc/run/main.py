@@ -72,19 +72,21 @@ def get_mount_values_for_a_direcotry(path):
 def get_dvcurl():
     dvc_url = []
     try:
-      with open(str(Path(".dvc/config")),"r") as fi:
+      with open(str(Path(".dvc/config.local")), "r") as fi:
         for ln in fi:
-            if ln.startswith("url = "):
+            ln = ln.replace(' ', '')
+            if ln.startswith("url="):
               dvc_url.append(ln)
     except:
-      print('No .dvc/config was found.')
-    try:
-      with open(str(Path(".dvc/config.local")),"r") as fi:
-        for ln in fi:
-            if ln.startswith("url = "):
-              dvc_url.append(ln)
-    except:
-      print('No .dvc/config.local was found.')
+        print('No .dvc/config.local was found.')
+        try:
+          with open(str(Path(".dvc/config")), "r") as fi:
+            for ln in fi:
+                ln = ln.replace(' ', '')
+                if ln.startswith("url="):
+                  dvc_url.append(ln)
+        except:
+          print('No .dvc/config was found.')
 
     if len(dvc_url) != 1:
       if len(dvc_url) == 0:

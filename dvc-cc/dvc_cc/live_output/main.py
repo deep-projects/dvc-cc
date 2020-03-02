@@ -28,14 +28,16 @@ def get_dvcurl():
     try:
       with open(str(Path(".dvc/config.local")), "r") as fi:
         for ln in fi:
-            if ln.startswith("url = ") or ln.startswith("url="):
+            ln = ln.replace(' ', '')
+            if ln.startswith("url="):
               dvc_url.append(ln)
     except:
         print('No .dvc/config.local was found.')
         try:
           with open(str(Path(".dvc/config")), "r") as fi:
             for ln in fi:
-                if ln.startswith("url =") or ln.startswith("url="):
+                ln = ln.replace(' ', '')
+                if ln.startswith("url="):
                   dvc_url.append(ln)
         except:
           print('No .dvc/config was found.')
