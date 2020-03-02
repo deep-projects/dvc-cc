@@ -45,7 +45,7 @@ def main():
 
         if (len(argv) > 2 and argv[1] == '-d') or (len(argv) == 3 and argv[2] == '-d'):
             remote_name = repo.config['core']['remote']
-            remote_settings = repo.config['remote "' + remote_name + '"']
+            remote_settings = repo.config['remote'][remote_name]
             if 'ask_password' in remote_settings and remote_settings['ask_password']:
                 remote_settings['password'] = getpass.getpass('Password for ' + remote_settings['url'] + ': ')
                 remote_settings['ask_password'] = False
