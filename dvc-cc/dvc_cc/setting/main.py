@@ -44,7 +44,6 @@ def show_all():
     print('%23s : %s GB' % ('ram' , str(int(settings['container']['settings']['ram']/1000))))
     print('%23s : %s' % ('docker-image' , str(settings['container']['settings']['image']['url'])))
     print('%23s : %s' % ('batch-concurrency-limit' , str(settings['execution']['settings']['batchConcurrencyLimit'])))
-    print('%23s : %s' % ('retry-if-failed' , str(settings['execution']['settings']['retryIfFailed'])))
     print('%23s : %s' % ('engine' , str(settings['execution']['engine'])))
     print('%23s : %s' % ('engine-url' , str(settings['execution']['settings']['access']['url'])))
     print()
@@ -125,22 +124,6 @@ def setting_engine_url():
         with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
-
-def setting_retry_if_failed():
-    parser = ArgumentParser(description='Show or set the setting: Retry if failed.')
-    parser.add_argument('--set',help='Set the setting: Retry if failed.', type=bool, default=None)
-    args = parser.parse_args()
-
-    with open(str(Path(".dvc_cc/cc_config.yml")), 'r') as stream:
-        settings = yaml.safe_load(stream)
-
-    if args.set is None:
-        print('%23s : %s' % ('retry-if-failed' , str(settings['execution']['settings']['retryIfFailed'])))
-    else:
-        settings['execution']['settings']['retryIfFailed'] = args.set
-        with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
-            yaml.dump(settings, outfile)
-
 def setting_num_of_gpus():
     parser = ArgumentParser(description='Show or set the number of GPUs.')
     parser.add_argument('--set',help='Set the number of GPUs.', type=int, default=None)
@@ -186,7 +169,6 @@ MODES = OrderedDict([
     ('batch-concurrency-limit', {'main': setting_batch_concurrency_limit, 'description': 'Show or set the batch concurrency limit.'}),
     ('engine', {'main': setting_engine, 'description': 'Show or set the engine.'}),
     ('engine-url', {'main': setting_engine_url, 'description': 'Show or set the engine URL.'}),
-    ('retry-if-failed', {'main': setting_retry_if_failed, 'description': 'Show or set the setting: Retry if failed.'}),
     ('num-of-gpus', {'main': setting_num_of_gpus, 'description': 'Show or set the number of GPUs.'}),
 ])
 
