@@ -19,10 +19,14 @@ def main():
     parser.add_argument('--all', help='If this parameter is set, all running or registered jobs get canceled.', default=False, action='store_true')
     parser.add_argument('--last', help='If this parameter is true, than the last started job get canceled.', default=False, action='store_true')
     parser.add_argument('--last_n', help='If you set this parameter it will cancel the last n jobs, that was started.', default=None, type=int)
+    parser.add_argument('--keyring-service', type=str,
+                        help='The default name of the keyring service that is used. For more information visit: '
+                             'https://www.curious-containers.cc/docs/red-format-protecting-credentials',
+                        default='red')
     args = parser.parse_args()
 
-    pw = keyring.get_password('red', 'agency_password')
-    uname = keyring.get_password('red', 'agency_username')
+    pw = keyring.get_password(args.keyring_service, 'agency_password')
+    uname = keyring.get_password(args.keyring_service, 'agency_username')
     auth = (uname, pw)
 
     execution_engine = read_execution_engine()

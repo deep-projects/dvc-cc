@@ -196,9 +196,11 @@ def run_command(command):
             break
         yield line
 
-def get_last_cc_experimentid():
-    pw = keyring.get_password('red', 'agency_password')
-    uname = keyring.get_password('red', 'agency_username')
+def get_last_cc_experimentid(keyring_service):
+    if keyring_service is None:
+        keyring_service = 'red'
+    pw = keyring.get_password(keyring_service, 'agency_password')
+    uname = keyring.get_password(keyring_service, 'agency_username')
     if uname is None:
         uname = input('agency_username: ')
         pw = input('agency_password: ')
@@ -215,7 +217,8 @@ def get_last_cc_experimentid():
 
 
 
-def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, live_output_files, live_output_update_frequence):
+def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, live_output_files,
+                live_output_update_frequence, keyring_service):
     git_path, git_owner, git_name = get_gitinformation()
 
     dvc_url, dvc_server, dvc_path = get_dvcurl()
@@ -334,10 +337,13 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                 print(r.read(), file=f)
 
         # EXECUTE THE RED-YML
-        p = 'faice exec .dvc_cc/tmp.red.yml'
+        if keyring_service is None:
+            p = 'faice exec .dvc_cc/tmp.red.yml'
+        else:
+            p = 'faice exec --keyring-service ' + keyring_service + ' .dvc_cc/tmp.red.yml'
         # TODO: IS A LIST NEEDED?
         subprocess.call(p.split(' '))
-        cc_id = get_last_cc_experimentid()
+        cc_id = get_last_cc_experimentid(keyring_service)
         print('The experiment ID is: ' + str(cc_id))
         os.remove('.dvc_cc/tmp.red.yml')
         return cc_id
@@ -459,6 +465,10 @@ def main():
     parser.add_argument('-lf','--live_output_update_frequence', type=int,
                         help='The update frequence of the live output in seconds.',
                         default=60)
+    parser.add_argument('--keyring-service', type=str,
+                        help='The default name of the keyring service that is used. For more information visit: '
+                             'https://www.curious-containers.cc/docs/red-format-protecting-credentials',
+                        default= None)
 
     args = parser.parse_args()
     
@@ -636,7 +646,8 @@ def main():
             else:
                 branch_name = exp_name
 
-            cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats, args.live_output_files, args.live_output_update_frequence)
+            cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats,
+                                args.live_output_files, args.live_output_update_frequence, args.keyring_service)
 
             if len(draw) > 0:  # one or more hyperparameters was set!
                 subprocess.call(['git', 'checkout', '-q', exp_name])

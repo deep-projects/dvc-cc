@@ -109,20 +109,24 @@ def main():
     parser.add_argument('-ne','--only-not-executed', help='Show only not executed experiments.', default=False, action='store_true')
     parser.add_argument('--node', help='Show all nodes in the cluster. If you run this command, it will ignore all other paramters!', default=False, action='store_true')
     parser.add_argument('--detail-unchanged', help='Print the orignal CC output', default=False, action='store_true')
+    parser.add_argument('--keyring-service', type=str,
+                        help='The default name of the keyring service that is used. For more information visit: '
+                             'https://www.curious-containers.cc/docs/red-format-protecting-credentials',
+                        default='red')
     args = parser.parse_args()
     
     # Change the directory to the main git directory.
     #os.chdir(str(Path(get_main_git_directory_Path())))
 
-    uname = keyring.get_password('red', 'agency_username')
-    pw = keyring.get_password('red', 'agency_password')
+    uname = keyring.get_password(args.keyring_service, 'agency_username')
+    pw = keyring.get_password(args.keyring_service, 'agency_password')
     if uname == None:
         uname = input('Please specifiy the agency_username: ')
         pw = getpass.getpass()
         save = input('Do you want to save it? [y/n]')
         if save.lower().startswith('y'):
-            keyring.set_password('red', 'agency_username', uname)
-            keyring.set_password('red', 'agency_password', pw)
+            keyring.set_password(args.keyring_service, 'agency_username', uname)
+            keyring.set_password(args.keyring_service, 'agency_password', pw)
     auth = (uname, pw)
         
 
