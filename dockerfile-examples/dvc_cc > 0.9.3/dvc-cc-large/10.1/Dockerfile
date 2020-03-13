@@ -35,4 +35,6 @@ RUN pip install --user --no-cache-dir dvc==0.88.0
 RUN pip install --user --no-cache-dir dvc-cc-agent==0.9.1
 RUN pip install --user --no-cache-dir dvc-cc-connector==0.8.1
 
+ENV PYTHONUNBUFFERED="1"
+
 WORKDIR home/cc/

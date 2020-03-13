@@ -21,7 +21,7 @@ def get_command_list_in_right_order():
         for node in next:
             G.remove_node(node)
 
-    stages = sorted(dvcrepo.stages, key=lambda s: all_nodes.index(s))
+    stages = sorted(dvcrepo.stages, key=lambda s: all_nodes.index(s) + s**2) # TODO JUST A RUNTIME ERROR !!!
 
     commandlist = ''
     for s in stages:

@@ -32,11 +32,18 @@ def get_gitinformation():
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('--not-interactive', help='If this parameter is set, it will not ask the user to set the values. All values will set by default values.',default=False, action='store_true')
+    parser.add_argument('--htw-student', help='If this parameter is set, it will not ask the user to set the values. '
+                                             'All values will set by default values.',default=False, action='store_true')
+
+    parser.add_argument('--stderr-in-sep-file',
+                        help='If you want a own file for stdout and stderr you need to set this flag. If this flag is not set, it will use the same file for both pipes.',
+                        default=False, action='store_true')
+
     args = parser.parse_args()
+
     gitrepo,gitowner,gitname = get_gitinformation()
 
-    if not args.not_interactive:
+    if not args.htw_student:
         print('These settings refer to the required hardware resources in the cluster.')
         print('If you do not set an argument it will take the default values.')
 
@@ -174,7 +181,7 @@ def main():
         print()
     else:
         # set default values
-        num_of_gpus = 0 ##
+        num_of_gpus = 1 ##
         ram = 131072
         docker_image = 'docker.io/deepprojects/dvc-cc_large:dev'
         docker_image_needs_credentials = False
@@ -183,7 +190,14 @@ def main():
         engine_url = 'https://agency.f4.htw-berlin.de/dt'
         dvc_remote_server = 'dt1.f4.htw-berlin.de'
         dvc_remote_path = '~/' + gitrepo + '/' + gitowner + '/' + gitname
-        dvc_remote_user = ''
+
+        valid_matriculation_number = False
+        while valid_matriculation_number == False:
+            dvc_remote_user = input('\tPlease fill in your matriculation number (i.e. s0XXXXXX): ').strip()
+            if dvc_remote_user.startswith('s0') and dvc_remote_user[2:].isdigit():
+                valid_matriculation_number = True
+            else:
+                print('This is not a valid matriculation number.')
 
     # Change the directory to the main git directory.
     #os.chdir(str(Path(get_main_git_directory_str(Path()))
@@ -232,12 +246,14 @@ def main():
     if os.path.exists(str(Path('.dvc_cc/cc_config.yml'))):
         os.remove('.dvc_cc/cc_config.yml')
 
-    create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url)
+    create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit,
+                          engine, engine_url, args.stderr_in_sep_file)
     subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
     #TODO: CREATE THE SAMPLE PROJECTS !!!
 
 
-def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit, engine, engine_url):
+def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit,
+                          engine, engine_url, stderr_in_sep_file):
     with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as f:
         print("cli:", file=f)
         print("  baseCommand: [dvc-cc-agent]", file=f)
@@ -301,7 +317,10 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
 
         print("  outputs: {}", file=f)
         print("  stdout: stdout.txt", file=f)
-        print("  stderr: stderr.txt", file=f)
+        if stderr_in_sep_file:
+            print("  stderr: stderr.txt", file=f)
+        else:
+            print("  stderr: stdout.txt", file=f)
         print("container:", file=f)
         print("  engine: docker", file=f)
         print("  settings:", file=f)
