@@ -248,17 +248,9 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     data_password = '{{' + str(data_server).replace('.', '_').replace('-', '_') + '_password}}'
     use_external_data_dir = data_server is not None
 
-    os.mkdir('.dvc_cc/' + branch_name)
-
-    paths = []
-
-    for i in range(len(dvc_files)):
-        dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
-        path = '.dvc_cc/' + branch_name + '/' + dvcfiles_to_execute.replace(",", "_").replace('/', '___').replace('\\\\', '___') + '.yml'
-        paths.append(path)
-
-        print(path)
-        with open(str(Path(path)), "w") as f:
+    with open('cc_execution_file.red.yml',"w") as f:
+        print("batches:", file=f)
+        for i in range(len(dvc_files)):
             # print("batches:", file=f)
             print("  - inputs:", file=f)
             print("      git_authentication_json:", file=f)
@@ -308,47 +300,37 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
             print("              port: 22", file=f)
             print("              auth:", file=f)
             print("                username: '" + "{{" + dvc_server.replace('.', '_').replace('-',
-                                                                                        '_') + "_username}}'", file=f)
+                                                                                              '_') + "_username}}'",
+                  file=f)
             print("                password: '" + "{{" + dvc_server.replace(
-                                        '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
+                '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
             print("              writable: True", file=f)
             print("              dirPath: '" + dvc_path + "'", file=f)
 
-            print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\','/') + "'", file=f)
+            print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\', '/') + "'", file=f)
             if live_output_files is not None:
                 print("      live_output_files: '" + live_output_files + "'", file=f)
                 print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
             print("    outputs: {}", file=f)
-        subprocess.call(['git', 'add', path])
+        with open('.dvc_cc/cc_config.yml',"r") as r:
+            print(r.read(), file=f)
+
+    subprocess.call(['git', 'add', 'cc_execution_file.red.yml'])
     subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
     # subprocess.call(['git', 'add', '.dvc_cc/cc_agency_experiments.yml'])
-    subprocess.call(['git', 'commit', '-m', '\'Build new Pipeline: ' + path + '\''])
+    subprocess.call(['git', 'commit', '-m', '\'Create red.yml file.\''])
     subprocess.call(['git', 'push'])
 
-    # CREATE THE COMPLETE RED-YML
-    if no_exec == False:
-        with open(str(Path('.dvc_cc/tmp.red.yml')), "w") as f:
-            print("batches:", file=f)
-            for i in range(num_of_repeats):
-                for path in paths:
-                    with open(str(Path(path)), "r") as r:
-                        print(r.read(), file=f)
-            with open(str(Path('.dvc_cc/cc_config.yml')), "r") as r:
-                print(r.read(), file=f)
-
-        # EXECUTE THE RED-YML
-        if keyring_service is None:
-            p = 'faice exec .dvc_cc/tmp.red.yml'
-        else:
-            p = 'faice exec --keyring-service ' + keyring_service + ' .dvc_cc/tmp.red.yml'
-        # TODO: IS A LIST NEEDED?
-        subprocess.call(p.split(' '))
-        cc_id = get_last_cc_experimentid(keyring_service)
-        print('The experiment ID is: ' + str(cc_id))
-        os.remove('.dvc_cc/tmp.red.yml')
-        return cc_id
+    # EXECUTE THE RED-YML
+    if keyring_service is None:
+        p = 'faice exec cc_execution_file.red.yml'
     else:
-        return None
+        p = 'faice exec --keyring-service ' + keyring_service + ' cc_execution_file.red.yml'
+    # TODO: IS A LIST NEEDED?
+    subprocess.call(p.split(' '))
+    cc_id = get_last_cc_experimentid(keyring_service)
+    print('The experiment ID is: ' + str(cc_id))
+    return cc_id
 
 def intarray_to_shortstr(input_array):
     input_array = np.array(input_array, dtype=int)
