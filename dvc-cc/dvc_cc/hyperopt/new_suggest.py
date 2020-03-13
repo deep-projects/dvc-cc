@@ -65,7 +65,7 @@ def search_for_argparse_parameter(command):
         params = command.split('.add_argument(')[1].split(',')
 
         if params[0].startswith('\'--'): # optional parameter but only with long name
-            shortname = params[0].strip()[3:-1]
+            shortname = params[0].strip()[3:-1].replace('-','').replace('_','')
             longname = params[0].strip()[1:-1]
         elif params[0].startswith('\'-'): # required parameter
             shortname = params[0].strip()[2:-1]

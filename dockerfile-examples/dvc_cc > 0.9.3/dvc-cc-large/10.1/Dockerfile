@@ -14,7 +14,7 @@ ENV PATH="${PATH}:/home/cc/.local/bin"
 # Some common environmenta variables that Python uses
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-RUN pip install --user --no-cache-dir install \
+RUN pip install --user --no-cache-dir \
     Pillow \
     h5py \
     keras_preprocessing \
@@ -27,6 +27,8 @@ RUN pip install --user --no-cache-dir install \
     seaborn \
     torch \
     torchvision
+
+RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector!'
 
 RUN pip install --user --no-cache-dir red-connector-ssh==1.2
 RUN pip install --user --no-cache-dir dvc==0.88.0

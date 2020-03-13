@@ -6,6 +6,7 @@ import datetime
 import time
 import shutil
 import dvc_cc_agent.copy_output_files
+import dvc_cc_agent.bcolors as bcolors
 
 def get_command_list_in_right_order():
     from dvc.repo import Repo as DVCRepo
@@ -19,8 +20,8 @@ def get_command_list_in_right_order():
         all_nodes.extend(next)
         for node in next:
             G.remove_node(node)
-    all_nodes
-    stages = sorted(dvcrepo.stages, key=lambda s: all_nodes.index(s.relpath))
+
+    stages = sorted(dvcrepo.stages, key=lambda s: all_nodes.index(s))
 
     commandlist = ''
     for s in stages:
@@ -162,17 +163,17 @@ def main():
         dvc_files_to_execute = args.dvc_file_to_execute.replace('\'', '').replace('\"', '').replace('[', '').replace(
             ']', '')
         dvc_files_to_execute = dvc_files_to_execute.split(',')
-    
-    print('SET GIT GLOBAL CONFIGURATIONS   ' + get_time())
+
+    print(bcolors.OKBLUE+'SET GIT GLOBAL CONFIGURATIONS   ' + get_time()+bcolors.ENDC)
     command = 'git config --global user.email ' + git_own_email
     print('\t'+str(command))
     subprocess.check_output(command, shell=True)
     command = 'git config --global user.name ' + git_own_username
     print('\t'+str(command))
     subprocess.check_output(command, shell=True)
-    
-    
-    print('CLONE GIT REPOSITORY   ' + get_time())
+
+
+    print(bcolors.OKBLUE+'CLONE GIT REPOSITORY   ' + get_time()+bcolors.ENDC)
     # clone repository
     #git clone https://$2:$3@$1/$4/$5/
     git_complete_path_to_repo = 'https://' + git_own_username+":"+git_own_password+"@"+git_path_to_working_repository + '/' + git_working_repository_owner + '/'+ git_working_repository_name
@@ -188,7 +189,7 @@ def main():
     if error_message is not None:
         raise Exception(error_message)
 
-    print('SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time())
+    print(bcolors.OKBLUE+'SSHFS TO THE REMOTE-DVC-Directory to save the output file' + get_time()+bcolors.ENDC)
     if args.dvc_remote_directory_sshfs is None:
         print('DO NOT USE SSHFS FOR OUTPUT!')
         sshfs_dvc_remote_directory = os.path.expanduser('~/dvc_remote_directory')
@@ -202,15 +203,14 @@ def main():
         os.makedirs(path_to_save_output)
     except:
         print('Warning: The folder already exists: ' + path_to_save_output)
-    print('EXISTS OUTPUT-PATH: ' + str(os.path.exists(path_to_save_output)),':',path_to_save_output)
-    print('EXISTS PATH TO SCRIPT?: ', str(os.path.exists('/home/cc/.pyenv/versions/3.7.2/lib/python3.7/site-packages/dvc_cc_agent/start_dvc_repro.sh')))
 
-    print('CD TO PATH   ' + get_time())
+
+    print(bcolors.OKBLUE+'CD TO PATH   ' + get_time()+bcolors.ENDC)
     print('\t chdir: repo')
     print(os.chdir('repo'))
     os.makedirs('stdout_stderr')
     
-    print('WRITE TO config.local FILE   ' + get_time())
+    print(bcolors.OKBLUE+'WRITE TO config.local FILE   ' + get_time()+bcolors.ENDC)
     print("\n\t['remote \\\"nas\\\"']\n\turl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\n\tpassword = '"+"$$$$$$$$$$$$$"+"'\n\n\t[core]\n\tremote = nas")
     could_not_create_dvcconfigfile = False
     try:
@@ -224,13 +224,13 @@ def main():
         raise ValueError('It could create the dvc config file! Maybe it is not a DVC-Repository? Or the cd command did not worked correctly.\n Here is the ls output:\n' + ls_output)
 
 
-    print('PULL FROM GIT   ' + get_time())
+    print(bcolors.OKBLUE+'PULL FROM GIT   ' + get_time()+bcolors.ENDC)
     command = 'git pull'
     print(subprocess.check_output(command, shell=True).decode())
 
 
 
-    print('SWITCH GIT BRANCH   ' + get_time())
+    print(bcolors.OKBLUE+'SWITCH GIT BRANCH   ' + get_time()+bcolors.ENDC)
     is_tag = git_name_of_branch.startswith('tag/')
     if is_tag:
         git_name_of_branch = git_name_of_branch[4:]
@@ -251,7 +251,7 @@ def main():
 
     for filename in os.listdir():
         if filename.lower() == 'requirements' or  filename.lower() == 'requirements.txt':
-            print('INSTALL '+filename+' with pip.')
+            print(bcolors.OKBLUE+'INSTALL '+filename+' with pip.'+bcolors.ENDC)
             command = "pip install --user -r " + filename
             print(subprocess.check_output(command, shell=True).decode())
 
@@ -263,16 +263,10 @@ def main():
         print('Some files was not created. You should not be worried about this.')
     
     if data_dir is not None and len(data_dir) > 0 and data_dir[0] == '/':
-        print('SET A LINK TO THE DATAFOLDER   ' + get_time())
+        print(bcolors.OKBLUE+'SET A LINK TO THE DATAFOLDER   ' + get_time()+bcolors.ENDC)
         command = 'ln -s ' + data_dir + ' data'
         print('\t'+command)
         print(subprocess.check_output(command, shell=True).decode())
-        command = 'ls data'
-        print('\tls data:'+subprocess.check_output(command, shell=True).decode())
-        command = 'ls -i data'
-        print('\tls -i data:'+subprocess.check_output(command, shell=True).decode())
-        command = 'ls -il data'
-        print('\tls -il data:'+subprocess.check_output(command, shell=True).decode())
 
     # check dvc status
     command = 'dvc status -c'
@@ -281,14 +275,14 @@ def main():
     # start copier:
     if args.live_output_files is not None:
         #['something', 'file']
-        print('Start thread to live push output:', args.live_output_files.split(','))
+        print(bcolors.OKBLUE+'Start thread to live push output:', args.live_output_files.split(',') + bcolors.ENDC)
         dvc_cc_agent.copy_output_files.Thread(args.live_output_files.split(','),path_to_save_output, args.live_output_update_frequence)
 
     # start dvc repro
     if dvc_files_to_execute is not None:
         for f in dvc_files_to_execute:
             if f.endswith('.dvc'):
-                print('START DVC REPRO ' + f + '   ' + get_time())
+                print(bcolors.OKBLUE+'START DVC REPRO ' + f + '   ' + get_time()+bcolors.ENDC)
                 command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh ' + f + ' ' + f.replace('/','_') + ' ' + path_to_save_output
                 #command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh'
                 print(command)
@@ -298,11 +292,11 @@ def main():
         subprocess.call(['git','add','stdout_stderr/*'])
     else:
         # TODO USE HERE ALSO THE SCRIPT !!! Currently this will not work!
-        print('START DVC REPRO -P   ' + get_time())
+        print(bcolors.OKBLUE+'START DVC REPRO -P   ' + get_time()+bcolors.ENDC)
         command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_output + '/' + str(time.time()) + ' stdout_stderr'
         print(subprocess.check_output(command, shell=True).decode())
 
-    print('WRITE RED-YML-File TO MAIN-Directory   ' + get_time())
+    print(bcolors.OKBLUE+'WRITE RED-YML-File TO MAIN-Directory   ' + get_time()+bcolors.ENDC)
     #TODO HANDLE IF dvc_files_to_execute is NONE !!!
     path = '.dvc_cc/'+git_name_of_branch+'/'+args.dvc_file_to_execute.replace('/','___').replace(',','_') + '.yml'
     with open('cc_execution_file.red.yml',"w") as f:
@@ -313,38 +307,38 @@ def main():
             print(r.read(), file=f)
     
     if dvc_files_to_execute is not None:
-        print('REMOVE ALL DVC FILES THAT ARE NOT NEEDED   ' + get_time())
+        print(bcolors.OKBLUE+'REMOVE ALL DVC FILES THAT ARE NOT NEEDED   ' + get_time()+bcolors.ENDC)
         files = get_all_dvc_files_that_are_not_needed(dvc_files_to_execute)
         for f in files:
             print('   - delete File: ' + f)
             os.remove(f)
 
-    print('Remove ".dvc_cc"-direcotry   ' + get_time())
+    print(bcolors.OKBLUE+'Remove ".dvc_cc"-direcotry   ' + get_time()+bcolors.ENDC)
     shutil.rmtree('.dvc_cc')
 
-    print('Remove "dvc/.hyperopt"-direcotry   ' + get_time())
+    print(bcolors.OKBLUE+'Remove "dvc/.hyperopt"-direcotry   ' + get_time()+bcolors.ENDC)
     if os.path.exists('dvc/.hyperopt'):
         shutil.rmtree('dvc/.hyperopt')
     
-    print('WRITE README.md')
+    print(bcolors.OKBLUE+'WRITE README.md'+bcolors.ENDC)
     write_readme(dvc_status, data_dir is not None and len(data_dir) > 0 and data_dir[0] == '/')
     
-    print('GIT-ADD ' + get_time())
+    print(bcolors.OKBLUE+'GIT-ADD ' + get_time()+bcolors.ENDC)
     command = "git add -A"
     print(subprocess.check_output(command, shell=True).decode())
     
-    print('COMMIT AT GIT   ' + get_time())
+    print(bcolors.OKBLUE+'COMMIT AT GIT   ' + get_time()+bcolors.ENDC)
     if dvc_files_to_execute is not None:
         command = "git commit -m 'run "+str(dvc_files_to_execute)+" in the experiment setup: " + git_name_of_branch + "'"
     else:
         command = "git commit -m 'run all dvc-files in the experiment setup: " + git_name_of_branch + "'"
     print(subprocess.check_output(command, shell=True).decode())
     
-    print('COMMIT AT DVC   ' + get_time())
+    print(bcolors.OKBLUE+'COMMIT AT DVC   ' + get_time()+bcolors.ENDC)
     command = "dvc commit --force"
     print(subprocess.check_output(command, shell=True).decode())
 
-    print('PUSH TO DVC   ' + get_time())
+    print(bcolors.OKBLUE+'PUSH TO DVC   ' + get_time()+bcolors.ENDC)
     pushed_successfull = False
     num_of_tries = 0
     while pushed_successfull == False:
@@ -360,7 +354,7 @@ def main():
             else:
                 raise ValueError('It was tried 5 times to push to the remote dvc. This was not possible.')
 
-    print('PUSH TO GIT   ' + get_time())
+    print(bcolors.OKBLUE+'PUSH TO GIT   ' + get_time()+bcolors.ENDC)
     pushed_successfull = False
     pushed_failed = False
     num_of_tries = 0
