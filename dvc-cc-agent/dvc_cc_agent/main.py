@@ -118,7 +118,7 @@ def get_all_dvc_files_that_are_not_needed(dvc_filenames):
     return [s for s in all_stages if s not in descendants_stages]
 
 def main():
-    print('Start executer-python [version 0.1]')
+    print('Start executer-python [version 9.1]')
     
     parser = ArgumentParser()
     
@@ -197,10 +197,6 @@ def main():
         print('USE SSHFS FOR OUTPUT!')
         sshfs_dvc_remote_directory = args.dvc_remote_directory_sshfs
 
-    # TODO: JUST A TEST
-    command = 'ls -il ' + sshfs_dvc_remote_directory
-    print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
-
     path_to_save_output = sshfs_dvc_remote_directory + '/' + git_working_repository_owner + '/' + git_working_repository_name + '/' + '_'.join(git_name_of_branch.split('_')[:3]) + '/' + '_'.join(git_name_of_branch.split('_')[3:]) + '/'
     try:
         os.makedirs(path_to_save_output)
@@ -208,10 +204,6 @@ def main():
         print('Warning: The folder already exists: ' + path_to_save_output)
     print('EXISTS OUTPUT-PATH: ' + str(os.path.exists(path_to_save_output)),':',path_to_save_output)
     print('EXISTS PATH TO SCRIPT?: ', str(os.path.exists('/home/cc/.pyenv/versions/3.7.2/lib/python3.7/site-packages/dvc_cc_agent/start_dvc_repro.sh')))
-
-    #TODO: JUST A TEST
-    #command = 'ls -il ' + sshfs_dvc_remote_directory
-    #print('\tls -il sshfs_dvc_remote_directory:' + subprocess.check_output(command, shell=True).decode())
 
     print('CD TO PATH   ' + get_time())
     print('\t chdir: repo')
@@ -370,21 +362,31 @@ def main():
 
     print('PUSH TO GIT   ' + get_time())
     pushed_successfull = False
-    num_of_tries = 1
-    while pushed_successfull == False:
+    pushed_failed = False
+    num_of_tries = 0
+    while pushed_successfull == False and pushed_failed == False:
         try:
             command = 'git push --repo='+git_complete_path_to_repo+' -u origin ' + name_of_result_branch + ':' + name_of_result_branch
-            if num_of_tries >= 2:
-                command = command + '_' + str(num_of_tries)
+
+            if num_of_tries < 4:
+                existing_branches = subprocess.check_output('git branch -a', shell=True).decode()
+                num_of_already_existing_branches = len([b for b in existing_branches.split('\n') if b.find(
+                    name_of_result_branch) >= 0])
+                if num_of_already_existing_branches > 0:
+                    command = command + '_' + str(num_of_already_existing_branches+1)
+            else:
+                command = command + '_' + str(time.time()).replace('.','')
 
             print(subprocess.check_output(command, shell=True).decode())
             pushed_successfull = True
         except:
-            if num_of_tries < 1000:
-                # TODO: Smarter way would be to ask already used indexing.
+            if num_of_tries < 5:
                 num_of_tries += 1
             else:
-                raise ValueError('It was tried 1000 times to push to the remote. This was not possible.')
+                pushed_failed = True
+
+    if pushed_failed:
+        raise ValueError('It was tried 5 times to push to the remote. This was not possible.')
 
 
 

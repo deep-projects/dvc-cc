@@ -295,21 +295,29 @@ def main():
                             print(bcolors.OKGREEN +'Files:'+bcolors.ENDC+' ALL')
                         print(bcolors.OKGREEN + 'Return Code: ' + bcolors.ENDC + str(detail['history'][-1]['ccagent']['process']['returnCode']))
                         if args.summary is False:
-                            # print stdout and std err
-                            print(bcolors.OKGREEN + 'stdout: ' + bcolors.ENDC)
-                            print(execution_engine + '/batches/' + ids.iloc[i] + '/stdout')
+                            #get stdout
                             r = requests.get(
                                 execution_engine + '/batches/' + ids.iloc[i] + '/stdout',
                                 auth=auth
                             )
-                            print(r.text)
+                            stdout = r.text
 
-                            print(bcolors.WARNING + 'stderr: ' + bcolors.ENDC)
+                            #get stderr
                             r = requests.get(
                                 execution_engine + '/batches/' + ids.iloc[i] + '/stderr',
                                 auth=auth
                             )
-                            print(r.text)
+                            stderr = r.text
+
+                            if stdout != stderr: # if two files exsist seperated for stdout and stderr
+                                print(bcolors.OKGREEN + 'stdout: ' + bcolors.ENDC)
+                                print(stdout)
+                                print()
+                                print(bcolors.WARNING + 'stderr: ' + bcolors.ENDC)
+                                print(stderr)
+                            else: # stdout and stderr share the same file!
+                                print(bcolors.OKGREEN + 'stdout & stderr: ' + bcolors.ENDC)
+                                print(stdout)
                     else:
                         print(bcolors.FAIL+'ERROR: The ccagend is None.' + bcolors.ENDC)
                 else:

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -eu
+
+IMAGE=docker.io/deepprojects/dvc-cc-large:10.1
+
+docker build --pull -t ${IMAGE} .
+docker push ${IMAGE}
