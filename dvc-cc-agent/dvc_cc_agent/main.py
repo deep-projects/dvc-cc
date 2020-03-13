@@ -6,7 +6,7 @@ import datetime
 import time
 import shutil
 import dvc_cc_agent.copy_output_files
-import dvc_cc_agent.bcolors as bcolors
+from dvc_cc_agent.bcolors import bcolors
 
 def get_command_list_in_right_order():
     from dvc.repo import Repo as DVCRepo
