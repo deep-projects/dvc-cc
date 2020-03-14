@@ -78,7 +78,6 @@ def get_dvcurl():
             if ln.startswith("url="):
               dvc_url.append(ln)
     except:
-        print('No .dvc/config.local was found.')
         try:
           with open(str(Path(".dvc/config")), "r") as fi:
             for ln in fi:
@@ -86,7 +85,7 @@ def get_dvcurl():
                 if ln.startswith("url="):
                   dvc_url.append(ln)
         except:
-          print('No .dvc/config was found.')
+          print('No .dvc/config or .dvc/config.local was found.')
 
     if len(dvc_url) != 1:
       if len(dvc_url) == 0:
@@ -617,7 +616,10 @@ def main():
             draw = hyperopt_draws[i]
             if len(draw) > 0: # one or more hyperparameters was set!
                 branch_name = branch_names[i]
-                subprocess.call(['git', 'checkout', '-q', '-b', branch_name])
+                if len(branch_names) == 1: # use only one input branch, if only one experiment exists
+                    subprocess.call(['git', 'checkout', '-q', branch_name])
+                else: # create new input branches for each experiment
+                    subprocess.call(['git', 'checkout', '-q', '-b', branch_name])
                 print(bcolors.BOLD + 'Create an hyperopt-input git-branch: ' + branch_name + bcolors.ENDC)
 
                 # TODO: HYPEROPT-FILES TO DVC WITH SETTED PARAMETERS #
