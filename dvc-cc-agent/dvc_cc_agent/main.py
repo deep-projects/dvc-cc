@@ -295,16 +295,6 @@ def main():
         print(bcolors.OKBLUE+'START DVC REPRO -P   ' + get_time()+bcolors.ENDC)
         command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_output + '/' + str(time.time()) + ' stdout_stderr'
         print(subprocess.check_output(command, shell=True).decode())
-
-    print(bcolors.OKBLUE+'WRITE RED-YML-File TO MAIN-Directory   ' + get_time()+bcolors.ENDC)
-    #TODO HANDLE IF dvc_files_to_execute is NONE !!!
-    path = '.dvc_cc/'+git_name_of_branch+'/'+args.dvc_file_to_execute.replace('/','___').replace(',','_') + '.yml'
-    with open('cc_execution_file.red.yml',"w") as f:
-        print("batches:", file=f)
-        with open(path,"r") as r:
-            print(r.read(), file=f)
-        with open('.dvc_cc/cc_config.yml',"r") as r:
-            print(r.read(), file=f)
     
     if dvc_files_to_execute is not None:
         print(bcolors.OKBLUE+'REMOVE ALL DVC FILES THAT ARE NOT NEEDED   ' + get_time()+bcolors.ENDC)
