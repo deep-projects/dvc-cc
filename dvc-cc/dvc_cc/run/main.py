@@ -251,6 +251,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     with open('cc_execution_file.red.yml',"w") as f:
         print("batches:", file=f)
         for i in range(len(dvc_files)):
+            dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
             # print("batches:", file=f)
             print("  - inputs:", file=f)
             print("      git_authentication_json:", file=f)
