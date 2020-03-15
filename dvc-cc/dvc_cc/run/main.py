@@ -444,6 +444,9 @@ def main():
                              'https://www.curious-containers.cc/docs/red-format-protecting-credentials',
                         default= None)
 
+    parser.add_argument('-p','--papermill',help='Use papermill to run the jupyter notebook on the server and save the results in the jupyter notebook.',
+                        default=False, action='store_true')
+
     args = parser.parse_args()
     
     project_dir = get_main_git_directory_Path()
@@ -542,8 +545,47 @@ def main():
     ####################################
     # Error if no DVC-file was defined #
     ####################################
-    if len(dvc_files) == 0:
+    if len(dvc_files) == 0 and not args.papermill:
         raise ValueError('There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
+
+    ######################################
+    # Use papermill to create a dvc file #
+    ######################################
+    if args.papermill:
+        ipynb_files_in_main_dir = [f for f in os.listdir() if f.endswith('.ipynb')][0] # Todo: Allow different location of the ipynb file
+        with open(ipynb_files_in_main_dir) as f:
+            notebook = json.load(f)
+        cells = notebook["cells"]
+        for i in range(len(cells)):
+            c = cells[i]
+            use_this_cell = True
+            if 'tags' in c['metadata'] and 'parameters' in c['metadata']['tags']:
+                for line in c['source']:
+                    if line.find('=') > 0:
+                        line_sep = line.split('=')
+                        varname = line_sep[0].strip()
+                        default_value = line_sep[1].strip()
+                        if default_value.find("'"):
+                            type = 'str'
+                        elif default_value.isdigit():
+                            type = 'int'
+                        elif default_value.startswith('-') and default_value.isdigit():
+                            type = 'int'
+                        elif default_value.find('.'):
+                            type = 'float'
+                        else:
+                            type = 'str'
+
+        #TODO
+        #TODO
+        #TODO
+        #TODO
+        #TODO
+        #TODO
+        #TODO
+        #TODO
+
+
 
     ##########################
     # Get All Hyperparemters #
