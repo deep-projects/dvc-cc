@@ -263,7 +263,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
             if sshfs_data is not None:
                 print("      sshfs_input_server_settings:", file=f)
                 print("        [", file=f)
-                for i in range(len(sshfs_data.keys)):
+                for i in range(len(sshfs_data.keys())):
                     sshfs_dest_rel = sshfs_data[i]
                     sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
                     sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
@@ -280,7 +280,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                     print("                auth:", file=f)
                     print("                  username: '" + sshfs_username + "'", file=f)
                     print("                  password: '" + sshfs_password + "'", file=f)
-                    if i+1 < len(sshfs_data.keys):
+                    if i+1 < len(sshfs_data.keys()):
                         print("                dirPath: '" + sshfs_path + "',", file=f)
                     else:
                         print("                dirPath: '" + sshfs_path + "'", file=f)
@@ -288,9 +288,9 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
 
                 print("      sshfs_input_dest_rel_paths:", file=f)
                 print("        [", file=f)
-                for i in range(len(sshfs_data.keys)):
+                for i in range(len(sshfs_data.keys())):
                     sshfs_dest_rel = sshfs_data[i]
-                    if i+1 < len(sshfs_data.keys):
+                    if i+1 < len(sshfs_data.keys()):
                         print("        '"+sshfs_dest_rel+"',", file=f)
                     else:
                         print("        '"+sshfs_dest_rel+"'", file=f)
@@ -666,8 +666,12 @@ def main():
         ##########################
         # Return to START-Branch #
         ##########################
-        #TODO: THIS SHOULD BE IN THE FINALLY BLOCK! !!
         subprocess.call(['git', 'checkout', startbranch])
+        try:
+            subprocess.call(['rm', '-R', '.dvc/lock'])
+            print('Information: delete ".dvc/lock" manually.')
+        except:
+            print('Information: ".dvc/lock" does not exist.')
 
         if loaded_yml is not None:
             if os.path.exists(str(Path('.dvc_cc/cc_all_ids.yml'))):
