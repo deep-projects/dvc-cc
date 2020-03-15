@@ -26,7 +26,8 @@ RUN pip install --user --no-cache-dir \
     tensorflow-probability \
     seaborn \
     torch \
-    torchvision
+    torchvision \
+    papermill
 
 RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector!'
 
