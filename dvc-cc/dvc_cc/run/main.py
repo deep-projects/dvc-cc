@@ -129,14 +129,7 @@ def check_git_repo(args):
     """
     return
 
-def get_leafs_that_need_to_reproduce():
-    from dvc.repo import Repo as DVCRepo
-    dvcrepo = DVCRepo('.')
-    try:
-        Gs = dvcrepo.pipelines
-    except:
-        # OLDER DVC-VERSION !
-        Gs = dvcrepo.pipelines()
+def get_leafs_that_need_to_reproduce(dvcrepo, Gs):
     # Get all leaf files.
     leafs = []
     for G in Gs:
@@ -170,17 +163,8 @@ def get_leafs_that_need_to_reproduce():
             leafs_need_to_reproduce.append(leafs[i])
     return leafs_need_to_reproduce
 
-def all_jupyter_notebook_to_py_files(project_dir):
+def all_jupyter_notebook_to_py_files(Gs):
     created_files = []
-
-    from dvc.repo import Repo as DVCRepo
-    dvcrepo = DVCRepo('.')
-    try:
-        Gs = dvcrepo.pipelines
-    except:
-        # OLDER DVC-VERSION !
-        Gs = dvcrepo.pipelines()
-
     for G in Gs:
         for s in G.nodes():
             cmd = s.cmd.split()
@@ -188,7 +172,8 @@ def all_jupyter_notebook_to_py_files(project_dir):
                 for c in cmd:
                     if c.endswith('.py'):
                         if not os.path.exists(c) and os.path.exists(c[:-3]+'.ipynb'):
-                            created_files.append(jupyter_notebook_to_py_file(c))
+                            created_files.append(jupyter_notebook_to_py_file(c[:-3]+'.ipynb'))
+                            print(bcolors.BOLD+'    Convert ' + c[:-3]+'.ipynb' +  ' to ' + c + ' file.' + bcolors.ENDC)
     return created_files
 
 def jupyter_notebook_to_py_file(path_to_ipynb):
@@ -524,7 +509,15 @@ def main():
     try:
         if args.dvc_files is None:
             #dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
-            dvc_files = get_leafs_that_need_to_reproduce()
+            from dvc.repo import Repo as DVCRepo
+            dvcrepo = DVCRepo('.')
+            try:
+                Gs = dvcrepo.pipelines
+            except:
+                # OLDER DVC-VERSION !
+                Gs = dvcrepo.pipelines()
+
+            dvc_files = get_leafs_that_need_to_reproduce(dvcrepo, Gs)
         else:
             dvc_files = []
             dvc_files_tmp = args.dvc_files.replace(' ', '').split(',')
@@ -592,7 +585,7 @@ def main():
         # CONVERT Jupyter Notebooks #
         #############################
         if not args.not_ipynb_to_py:
-            created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(project_dir)
+            created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(Gs)
         else:
             created_pyfiles_from_jupyter = []
         for f in created_pyfiles_from_jupyter:
