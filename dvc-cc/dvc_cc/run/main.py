@@ -183,7 +183,7 @@ def all_jupyter_notebook_to_py_files(project_dir):
 
     for G in Gs:
         for s in G.nodes():
-            cmd = s.cmd().split()
+            cmd = s.cmd.split()
             if cmd[0] == 'python':
                 for c in cmd:
                     if c.endswith('.py'):
