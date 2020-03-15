@@ -262,7 +262,6 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
 
             if sshfs_data is not None:
                 print("      sshfs_input_server_settings:", file=f)
-                print("        [", file=f)
                 for i in range(len(sshfs_data.keys())):
                     sshfs_dest_rel = list(sshfs_data.keys())[i]
                     sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
@@ -270,7 +269,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                     sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
                     sshfs_password = '{{' + str(sshfs_server).replace('.', '_').replace('-', '_') + '_password}}'
 
-                    print("          class: Directory", file=f)
+                    print("        - class: Directory", file=f)
                     print("          connector:", file=f)
                     print("              command: \"red-connector-ssh\"", file=f)
                     print("              mount: true", file=f)
@@ -280,21 +279,12 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                     print("                auth:", file=f)
                     print("                  username: '" + sshfs_username + "'", file=f)
                     print("                  password: '" + sshfs_password + "'", file=f)
-                    if i+1 < len(sshfs_data.keys()):
-                        print("                dirPath: '" + sshfs_path + "',", file=f)
-                    else:
-                        print("                dirPath: '" + sshfs_path + "'", file=f)
-                print("        ]", file=f)
+                    print("                dirPath: '" + sshfs_path + "'", file=f)
 
                 print("      sshfs_input_dest_rel_paths:", file=f)
-                print("        [", file=f)
                 for i in range(len(sshfs_data.keys())):
                     sshfs_dest_rel = list(sshfs_data.keys())[i]
-                    if i+1 < len(sshfs_data.keys()):
-                        print("        '"+sshfs_dest_rel+"',", file=f)
-                    else:
-                        print("        '"+sshfs_dest_rel+"'", file=f)
-                print("        ]", file=f)
+                    print("      - '"+sshfs_dest_rel+"'", file=f)
 
             print("      dvc_remote_directory_sshfs:", file=f)
             print("        class: Directory", file=f)
