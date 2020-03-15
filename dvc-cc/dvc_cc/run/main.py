@@ -284,7 +284,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                 print("      sshfs_input_dest_rel_paths:", file=f)
                 for i in range(len(sshfs_data.keys())):
                     sshfs_dest_rel = list(sshfs_data.keys())[i]
-                    print("      - '"+sshfs_dest_rel+"'", file=f)
+                    print("        - '"+sshfs_dest_rel+"'", file=f)
 
             print("      dvc_remote_directory_sshfs:", file=f)
             print("        class: Directory", file=f)
