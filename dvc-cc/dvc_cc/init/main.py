@@ -35,8 +35,8 @@ def main():
     parser.add_argument('--htw-student', help='If this parameter is set, it will not ask the user to set the values. '
                                              'All values will set by default values.',default=False, action='store_true')
 
-    parser.add_argument('--stderr-in-sep-file',
-                        help='If you want a own file for stdout and stderr you need to set this flag. If this flag is not set, it will use the same file for both pipes.',
+    parser.add_argument('--stderr-in-same-file',
+                        help='If you do not want a own file for stdout and stderr you need to set this flag. If this flag is set, it will use the same file for both stdout and stderr.',
                         default=False, action='store_true')
 
     args = parser.parse_args()
@@ -77,28 +77,12 @@ def main():
         print()
         print('Please enter the Docker Image in which your script gets executed at the cluster.')
         print('   You can choose from the following:')
-        print('     - "tf2", if you want to work with TensorFlow 2.0.')
-        print('     - "tf1", if you want to work with TensorFlow 1.5.')
-        print('     - "torch", if you want to work with PyTorch 1.2.')
-        print('     - "large", if you want to work with PyTorch 1.2 or/and TensorFlow 2.0.')
-        print('     - "basic", if you want install it by yourself via the Requirements.txt.')
+        print('     - "large", if you want to work with PyTorch 1.2 or/and TensorFlow 2.')
         print('   You can also enter a URL to your own Docker Image.')
         print('   If you need more informations take a look at the following site: https://bit.ly/2mgbiVK')
         docker_image = input(bcolors.OKBLUE+'\tDocker Image'+bcolors.ENDC+' (default: "large"): ')
         if docker_image == '' or docker_image.lower() == 'large':
-            docker_image = 'docker.io/deepprojects/dvc-cc_large:dev'
-            docker_image_needs_credentials = False
-        elif docker_image.lower() == 'tf2':
-            docker_image = 'docker.io/deepprojects/dvc-cc_tensorflow:2.0'
-            docker_image_needs_credentials = False
-        elif docker_image.lower() == 'tf1':
-            docker_image = 'docker.io/deepprojects/dvc-cc_tensorflow:1.15'
-            docker_image_needs_credentials = False
-        elif docker_image.lower() == 'torch':
-            docker_image = 'docker.io/deepprojects/dvc-cc_pytorch:1.2'
-            docker_image_needs_credentials = False
-        elif docker_image.lower() == 'basic':
-            docker_image = 'docker.io/deepprojects/dvc-cc_basic:10.0'
+            docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
             docker_image_needs_credentials = False
         else:
             docker_image_needs_credentials = None
@@ -183,7 +167,7 @@ def main():
         # set default values
         num_of_gpus = 1 ##
         ram = 131072
-        docker_image = 'docker.io/deepprojects/dvc-cc_large:dev'
+        docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
         docker_image_needs_credentials = False
         batch_concurrency_limit = 12
         engine = 'ccagency'
@@ -192,6 +176,12 @@ def main():
         dvc_remote_path = '~/' + gitrepo + '/' + gitowner + '/' + gitname
 
         valid_matriculation_number = False
+
+        print(bcolors.OKBLUE+'Information: The matriculation number is used to access the dt1-storage server and the curious containers '
+              'agency. If you get asked for dt1_f4_htw_berlin_de_username or agency_username, please use your matriculation number. '
+              'The password for agency_password and dt1_f4_htw_berlin_de_password is the password you received to access '
+              'the curious containers agency.'+bcolors.ENDC)
+
         while valid_matriculation_number == False:
             dvc_remote_user = input('\tPlease fill in your matriculation number (i.e. s0XXXXXX): ').strip()
             if dvc_remote_user.startswith('s0') and dvc_remote_user[2:].isdigit():
@@ -247,13 +237,13 @@ def main():
         os.remove('.dvc_cc/cc_config.yml')
 
     create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit,
-                          engine, engine_url, args.stderr_in_sep_file)
+                          engine, engine_url, args.stderr_in_same_file)
     subprocess.call(['git', 'add', '.dvc_cc/cc_config.yml'])
     #TODO: CREATE THE SAMPLE PROJECTS !!!
 
 
 def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_credentials, batch_concurrency_limit,
-                          engine, engine_url, stderr_in_sep_file):
+                          engine, engine_url, stderr_in_same_file):
     with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as f:
         print("cli:", file=f)
         print("  baseCommand: [dvc-cc-agent]", file=f)
@@ -317,7 +307,7 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
 
         print("  outputs: {}", file=f)
         print("  stdout: stdout.txt", file=f)
-        if stderr_in_sep_file:
+        if stderr_in_same_file == False:
             print("  stderr: stderr.txt", file=f)
         else:
             print("  stderr: stdout.txt", file=f)
