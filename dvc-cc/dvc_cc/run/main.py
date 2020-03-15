@@ -264,7 +264,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                 print("      sshfs_input_server_settings:", file=f)
                 print("        [", file=f)
                 for i in range(len(sshfs_data.keys())):
-                    sshfs_dest_rel = sshfs_data[i]
+                    sshfs_dest_rel = sshfs_data.keys()[i]
                     sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
                     sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
                     sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
@@ -289,7 +289,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                 print("      sshfs_input_dest_rel_paths:", file=f)
                 print("        [", file=f)
                 for i in range(len(sshfs_data.keys())):
-                    sshfs_dest_rel = sshfs_data[i]
+                    sshfs_dest_rel = sshfs_data.keys()[i]
                     if i+1 < len(sshfs_data.keys()):
                         print("        '"+sshfs_dest_rel+"',", file=f)
                     else:
