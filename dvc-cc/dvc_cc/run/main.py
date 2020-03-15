@@ -172,19 +172,30 @@ def get_leafs_that_need_to_reproduce():
 
 def all_jupyter_notebook_to_py_files(project_dir):
     created_files = []
-    for root, dirs, files in os.walk(project_dir, topdown=True):
-        for f in files:
-            if f.endswith('ipynb'):
-                created_files.append(jupyter_notebook_to_py_file(root, f))
+
+    from dvc.repo import Repo as DVCRepo
+    dvcrepo = DVCRepo('.')
+    try:
+        Gs = dvcrepo.pipelines
+    except:
+        # OLDER DVC-VERSION !
+        Gs = dvcrepo.pipelines()
+
+    for G in Gs:
+        for s in G.nodes():
+            cmd = s.cmd().split()
+            if cmd[0] == 'python':
+                for c in cmd:
+                    if c.endswith('.py'):
+                        if not os.path.exists(c) and os.path.exists(c[:-3]+'.ipynb'):
+                            created_files.append(jupyter_notebook_to_py_file(c))
     return created_files
 
-def jupyter_notebook_to_py_file(root, file_name):
-    source = jupyter_notebook_to_source(root, file_name)
-
-    output_name = root+'/'+file_name[:-6]+'.py'
+def jupyter_notebook_to_py_file(path_to_ipynb):
+    source = jupyter_notebook_to_source(path_to_ipynb)
+    output_name = path_to_ipynb[:-6]+'.py'
     with open(str(Path(output_name)), 'w') as fh:
         print(source, file=fh)
-
     return output_name
 
 def run_command(command):
@@ -580,10 +591,6 @@ def main():
         #############################
         # CONVERT Jupyter Notebooks #
         #############################
-        # convert jupyter notebooks to py-files.
-
-
-
         if not args.not_ipynb_to_py:
             created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(project_dir)
         else:

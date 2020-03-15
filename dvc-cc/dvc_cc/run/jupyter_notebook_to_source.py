@@ -21,8 +21,8 @@ from dvc_cc.hyperopt.hyperoptimizer import *
 import uuid
 from pathlib import Path
 
-def jupyter_notebook_to_source(root, file_name):
-    with open(str(Path(root+'/'+file_name))) as f:
+def jupyter_notebook_to_source(path_to_ipnb):
+    with open(str(Path(path_to_ipnb))) as f:
         notebook = json.load(f)
 
     cells = notebook["cells"]
