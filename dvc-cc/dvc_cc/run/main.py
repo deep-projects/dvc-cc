@@ -264,7 +264,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                 print("      sshfs_input_server_settings:", file=f)
                 print("        [", file=f)
                 for i in range(len(sshfs_data.keys())):
-                    sshfs_dest_rel = sshfs_data.keys()[i]
+                    sshfs_dest_rel = list(sshfs_data.keys())[i]
                     sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
                     sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
                     sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
@@ -289,7 +289,7 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
                 print("      sshfs_input_dest_rel_paths:", file=f)
                 print("        [", file=f)
                 for i in range(len(sshfs_data.keys())):
-                    sshfs_dest_rel = sshfs_data.keys()[i]
+                    sshfs_dest_rel = list(sshfs_data.keys())[i]
                     if i+1 < len(sshfs_data.keys()):
                         print("        '"+sshfs_dest_rel+"',", file=f)
                     else:
@@ -672,6 +672,13 @@ def main():
             print('Information: delete ".dvc/lock" manually.')
         except:
             print('Information: ".dvc/lock" does not exist.')
+
+        try:
+            subprocess.call(['rm', 'cc_execution_file.red.yml'])
+            print('Information: delete "cc_execution_file.red.yml')
+        except:
+            print('Information: "cc_execution_file.red.yml" does not exist.')
+
 
         if loaded_yml is not None:
             if os.path.exists(str(Path('.dvc_cc/cc_all_ids.yml'))):
