@@ -132,10 +132,13 @@ def main():
     parser.add_argument('dvc_servername', help='The servername of the dvc directory.')
     parser.add_argument('dvc_path_to_working_repository', help='The directory that is used for the dvc script.')
     parser.add_argument('--dvc_remote_directory_sshfs', default=None, help='A SSHFS connection to stream the output of DVC REPRO -P.')
-    parser.add_argument('--data_dir_sshfs', default=None, help='This is optional parameter. Here you can specify a sshfs folder for the \"data\" folder.')
     parser.add_argument('--dvc_file_to_execute', default=None, help='This is optional parameter. If this parameter is given it will run \"dvc repro DVC_FILE_TO_EXECUTE\". Is this parameter is not set it will run \"dvc repro -P\"')
     parser.add_argument('--live_output_files', default=None, help='Comma separated string list of files that should be included to the live output for example: "tensorboard,output.json" This could track a tensorboard folder and a output.json file.')
     parser.add_argument('--live_output_update_frequence', default=60, help='The update frequence of the live output in seconds.')
+    parser.add_argument('--sshfs_input_dest_rel_paths', nargs='+', default=None,
+                        help='This is optional parameter. Here you define all relative paths to the folder that has a SSHFS connection at your project. sshfs_input_dest_rel_paths and sshfs_input_server_settings must be have the same number of elements.')
+    parser.add_argument('--sshfs_input_server_settings', nargs='+', default=None,
+                        help='This is optional parameter. Here you define all sshfs connections to the folder that has a SSHFS connection at your project. sshfs_input_dest_rel_paths and sshfs_input_server_settings must be have the same number of elements.')
     args = parser.parse_args()
     
     with open(args.git_authentication_json) as f:
@@ -155,8 +158,7 @@ def main():
     dvc_path_to_working_repository = args.dvc_path_to_working_repository
     dvc_own_username = dvc_authentication_json['username']
     dvc_own_password = dvc_authentication_json['password']
-    
-    data_dir = args.data_dir_sshfs
+
     if args.dvc_file_to_execute is None:
         dvc_files_to_execute = None
     else:
@@ -262,11 +264,14 @@ def main():
     except:
         print('Some files was not created. You should not be worried about this.')
     
-    if data_dir is not None and len(data_dir) > 0 and data_dir[0] == '/':
-        print(bcolors.OKBLUE+'SET A LINK TO THE DATAFOLDER   ' + get_time()+bcolors.ENDC)
-        command = 'ln -s ' + data_dir + ' data'
-        print('\t'+command)
-        print(subprocess.check_output(command, shell=True).decode())
+    if args.sshfs_input_dest_rel_paths is not None and len(args.sshfs_input_dest_rel_paths) > 0:
+        print(bcolors.OKBLUE+'SET LINKS FOR THE SSHFS FOLDERS   ' + get_time()+bcolors.ENDC)
+        for i in range(len(args.sshfs_input_dest_rel_paths)):
+            dest_rel = args.sshfs_input_dest_rel_paths[i]
+            source_path = args.sshfs_input_server_settings[i]
+            command = 'ln -s ' + source_path + ' ' + dest_rel
+            print(bcolors.OKBLUE + '   add SSHFS connection for the folder: '+ dest_rel + bcolors.ENDC)
+            print(subprocess.check_output(command, shell=True).decode())
 
     # check dvc status
     command = 'dvc status -c'
@@ -311,7 +316,7 @@ def main():
         shutil.rmtree('dvc/.hyperopt')
     
     print(bcolors.OKBLUE+'WRITE README.md'+bcolors.ENDC)
-    write_readme(dvc_status, data_dir is not None and len(data_dir) > 0 and data_dir[0] == '/')
+    write_readme(dvc_status, args.sshfs_input_dest_rel_paths is not None and len(args.sshfs_input_dest_rel_paths) > 0)
     
     print(bcolors.OKBLUE+'GIT-ADD ' + get_time()+bcolors.ENDC)
     command = "git add -A"
