@@ -294,11 +294,11 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
 
         print("    sshfs_input_dest_rel_paths:", file=f)
         print("      doc: 'This is optional parameter. Here you define all relative paths to the folder that has a SSHFS connection at your project. sshfs_input_dest_rel_paths and sshfs_input_server_settings must be have the same number of elements.'", file=f)
-        print("      inputBinding: {prefix: --data_dir}", file=f)
+        print("      inputBinding: {prefix: --sshfs_input_dest_rel_paths}", file=f)
         print("      type: string[]?", file=f)
         print("    sshfs_input_server_settings:", file=f)
         print("      doc: 'This is optional parameter. Here you define all sshfs connections to the folder that has a SSHFS connection at your project. sshfs_input_dest_rel_paths and sshfs_input_server_settings must be have the same number of elements.'", file=f)
-        print("      inputBinding: {prefix: --data_dir}", file=f)
+        print("      inputBinding: {prefix: --sshfs_input_server_settings}", file=f)
         print("      type: Directory[]?", file=f)
 
         print("    live_output_files:", file=f)
