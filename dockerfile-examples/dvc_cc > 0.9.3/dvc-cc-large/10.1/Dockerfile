@@ -27,7 +27,9 @@ RUN pip install --user --no-cache-dir \
     seaborn \
     torch \
     torchvision \
-    papermill
+    papermill \
+    jupyter \
+    black
 
 RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector!'
 

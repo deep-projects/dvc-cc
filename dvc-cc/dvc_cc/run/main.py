@@ -421,6 +421,56 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
 
     return batch_names
 
+def find_all_dvc_leafs(args_dvc_files):
+
+    #####################################
+    # Rename the hyperopt-files to .dvc #
+    #####################################
+    if os.path.exists('dvc') and os.path.exists(str(Path('dvc/.hyperopt'))):
+        list_of_hyperopt_files = [f for f in os.listdir(str(Path('dvc/.hyperopt'))) if f.endswith('.hyperopt')]
+        for f in list_of_hyperopt_files:
+            os.rename(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
+            print(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
+    else:
+        list_of_hyperopt_files = []
+
+    #############################
+    # Find all leafs to execute #
+    #############################
+    try:
+        dvcrepo = DVCRepo('.')
+        try:
+            Gs = dvcrepo.pipelines
+        except:
+            # OLDER DVC-VERSION !
+            Gs = dvcrepo.pipelines()
+
+
+        if args_dvc_files is None:
+            #dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
+            dvc_files = get_leafs_that_need_to_reproduce(dvcrepo, Gs)
+        else:
+            dvc_files = []
+            dvc_files_tmp = args_dvc_files.dvc_files.replace(' ', '').split(',')
+            for dvc_files_branch in dvc_files_tmp:
+                dvc_files.append([])
+                dvc_files_file = dvc_files_branch.split('|')
+                for i in range(len(dvc_files_file)):
+                    dvc_files[-1].append(dvc_files_file[i])
+                    if not dvc_files_file[i].endswith('.dvc'):
+                        raise ValueError('Error: You define with -f which dvc files you want to exec. One or more files does not ends with .dvc. Please use only DVC files.')
+    # make sure that the hyperopt files get always renamed!
+    finally:
+        #############################
+        # Rename the hyperopt-files #
+        #############################
+        for f in list_of_hyperopt_files:
+            if os.path.exists(str(Path('dvc/'+f[:-9]+'.dvc'))):
+                os.rename(str(Path('dvc/'+f[:-9]+'.dvc')), str(Path('dvc/.hyperopt/' + f)))
+            else:
+                print(bcolors.WARNING+'Warning: File ' + str(Path('dvc/'+f[:-9]+'.dvc')) + ' not found.'+bcolors.ENDC)
+    return dvc_files, list_of_hyperopt_files, Gs
+
 def main():
 
     parser = ArgumentParser(description=DESCRIPTION)
@@ -495,52 +545,15 @@ def main():
     except:
         print('Some files are missing.')
 
-    #####################################
-    # Rename the hyperopt-files to .dvc #
-    #####################################
-    if os.path.exists('dvc') and os.path.exists(str(Path('dvc/.hyperopt'))):
-        list_of_hyperopt_files = [f for f in os.listdir(str(Path('dvc/.hyperopt'))) if f.endswith('.hyperopt')]
-        for f in list_of_hyperopt_files:
-            os.rename(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
-            print(str(Path('dvc/.hyperopt/' + f)), str(Path('dvc/'+f[:-9]+'.dvc')))
-    else:
-        list_of_hyperopt_files = []
+    ############################################
+    # CREATE DVCREPO AND get the dvc-pipelines #
+    ############################################
 
-    #############################
-    # Find all leafs to execute #
-    #############################
-    try:
-        if args.dvc_files is None:
-            #dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
-            from dvc.repo import Repo as DVCRepo
-            dvcrepo = DVCRepo('.')
-            try:
-                Gs = dvcrepo.pipelines
-            except:
-                # OLDER DVC-VERSION !
-                Gs = dvcrepo.pipelines()
 
-            dvc_files = get_leafs_that_need_to_reproduce(dvcrepo, Gs)
-        else:
-            dvc_files = []
-            dvc_files_tmp = args.dvc_files.replace(' ', '').split(',')
-            for dvc_files_branch in dvc_files_tmp:
-                dvc_files.append([])
-                dvc_files_file = dvc_files_branch.split('|')
-                for i in range(len(dvc_files_file)):
-                    dvc_files[-1].append(dvc_files_file[i])
-                    if not dvc_files_file[i].endswith('.dvc'):
-                        raise ValueError('Error: You define with -f which dvc files you want to exec. One or more files does not ends with .dvc. Please use only DVC files.')
-    # make sure that the hyperopt files get always renamed!
-    finally:
-        #############################
-        # Rename the hyperopt-files #
-        #############################
-        for f in list_of_hyperopt_files:
-            if os.path.exists(str(Path('dvc/'+f[:-9]+'.dvc'))):
-                os.rename(str(Path('dvc/'+f[:-9]+'.dvc')), str(Path('dvc/.hyperopt/' + f)))
-            else:
-                print(bcolors.WARNING+'Warning: File ' + str(Path('dvc/'+f[:-9]+'.dvc')) + ' not found.'+bcolors.ENDC)
+    #############################################################
+    # Find all hyperopt files and leafs to execute the pipeline #
+    #############################################################
+    dvc_files, list_of_hyperopt_files, Gs = find_all_dvc_leafs(args.dvc_files)
 
     ####################################
     # Error if no DVC-file was defined #
@@ -548,70 +561,8 @@ def main():
     if len(dvc_files) == 0 and not args.papermill:
         raise ValueError('There exist no job to execute! Create DVC-Files with "dvc run --no-exec ..." to define the jobs. Or check the .dvc_cc/dvc_cc_ignore file. All DVC-Files that are defined there are ignored from this script.')
 
-    ######################################
-    # Use papermill to create a dvc file #
-    ######################################
-    if args.papermill:
-        ipynb_files_in_main_dir = [f for f in os.listdir() if f.endswith('.ipynb')][0] # Todo: Allow different location of the ipynb file
-        with open(ipynb_files_in_main_dir) as f:
-            notebook = json.load(f)
-        cells = notebook["cells"]
-        for i in range(len(cells)):
-            c = cells[i]
-            use_this_cell = True
-            if 'tags' in c['metadata'] and 'parameters' in c['metadata']['tags']:
-                for line in c['source']:
-                    if line.find('=') > 0:
-                        line_sep = line.split('=')
-                        varname = line_sep[0].strip()
-                        default_value = line_sep[1].strip()
-                        if default_value.find("'"):
-                            type = 'str'
-                        elif default_value.isdigit():
-                            type = 'int'
-                        elif default_value.startswith('-') and default_value.isdigit():
-                            type = 'int'
-                        elif default_value.find('.'):
-                            type = 'float'
-                        else:
-                            type = 'str'
-
-        #TODO
-        #TODO
-        #TODO
-        #TODO
-        #TODO
-        #TODO
-        #TODO
-        #TODO
-
-
-
-    ##########################
-    # Get All Hyperparemters #
-    ##########################
-    vc = VariableCache()
-
-    for f in list_of_hyperopt_files:
-        f = str(Path('dvc/.hyperopt/' + f))
-        vc.register_dvccc_file(f)
-
-    ###################################
-    # DEFINE ALL Hyperopt-Experiments #
-    ###################################
-    if len(vc.list_of_all_variables) > 0:
-        hyperopt_draws = create_hyperopt_variables(vc)
-        user_input = input('You defined ' + str(len(hyperopt_draws)) + ' * ' + str(args.num_of_repeats) + ' = ' + str(
-            len(
-                hyperopt_draws) * args.num_of_repeats) + ' hyperoptimization pairs. Do you want to continue and start the job? [y,n]: ')
-        if not user_input.lower().startswith('y'):
-            print('The job was canceled')
-            exit(0)
-    else:
-        hyperopt_draws = [[]]
-
     loaded_yml = None
-    cc_ids = []
+
     try:
         ###########################
         # Create an input branch! #
@@ -636,6 +587,59 @@ def main():
         if not args.not_ipynb_to_py:
             subprocess.call(['git', 'commit','-q','-m', 'Convert Jupyter Notebooks to Py-File.'])
             subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
+
+        ######################################
+        # Use papermill to create a dvc file #
+        ######################################
+        if args.papermill:
+            ipynb_files_in_main_dir = [f for f in os.listdir() if f.endswith('.ipynb')]  # Todo: Allow different location of the ipynb file
+            if len(ipynb_files_in_main_dir) == 0:
+                raise ValueError('To use papermill you need a jupyter notebook to run on the server in the main git '
+                                 'directory.')
+            else:
+                ipynb_files_in_main_dir = ipynb_files_in_main_dir[0]
+            print(bcolors.BOLD + 'Create a DVC file for executing ' + ipynb_files_in_main_dir + ' with papermill.' +
+                  bcolors.ENDC)
+            from dvc_cc.run import papermill_helper
+            parameters = papermill_helper.read_params_from_parametercell(ipynb_files_in_main_dir)
+
+            cmd = 'papermill ' + ipynb_files_in_main_dir + ' ' + ipynb_files_in_main_dir[:-6] + '_output.ipynb'
+            for p in parameters:
+                cmd = cmd +' -k python -p ' + p[0] + ' {{' + p[0] + ':' + p[1] + ':None}}'
+
+            subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', ipynb_files_in_main_dir, '-o',
+                             ipynb_files_in_main_dir[:-6] + '_output.ipynb', '-f','papermill.dvc',cmd])
+            subprocess.call(['git', 'add', 'dvc/.hyperopt/papermill.hyperopt'])  # TODO: build quite mode!
+            subprocess.call(['git', 'commit','-q','-m', 'Create a dvc file for papermill.'])
+            subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
+            dvc_files, list_of_hyperopt_files, Gs = find_all_dvc_leafs(args.dvc_files)
+
+        ##########################
+        # Get All Hyperparemters #
+        ##########################
+        vc = VariableCache()
+
+        for f in list_of_hyperopt_files:
+            f = str(Path('dvc/.hyperopt/' + f))
+            vc.register_dvccc_file(f)
+
+        ###################################
+        # DEFINE ALL Hyperopt-Experiments #
+        ###################################
+        if len(vc.list_of_all_variables) > 0:
+            hyperopt_draws = create_hyperopt_variables(vc)
+            user_input = input(
+                'You defined ' + str(len(hyperopt_draws)) + ' * ' + str(args.num_of_repeats) + ' = ' + str(
+                    len(
+                        hyperopt_draws) * args.num_of_repeats) + ' hyperoptimization pairs. Do you want to continue and start the job? [y,n]: ')
+            if not user_input.lower().startswith('y'):
+                print('The job was canceled')
+                exit(0)
+        else:
+            hyperopt_draws = [[]]
+
+        loaded_yml = None
+
 
         #####################################################
         # TODO: SAVE the Hyperopt-Values and the VC!        #
