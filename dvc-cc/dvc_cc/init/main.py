@@ -166,7 +166,7 @@ def main():
     else:
         # set default values
         num_of_gpus = 1 ##
-        ram = 131072
+        ram = 60000
         docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
         docker_image_needs_credentials = False
         batch_concurrency_limit = 12
