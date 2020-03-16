@@ -298,7 +298,7 @@ def main():
     else:
         # TODO USE HERE ALSO THE SCRIPT !!! Currently this will not work!
         print(bcolors.OKBLUE+'START DVC REPRO -P   ' + get_time()+bcolors.ENDC)
-        command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_output + '/' + str(time.time()) + ' stdout_stderr'
+        command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_outputdvc-c + '/' + str(time.time()) + ' stdout_stderr'
         print(subprocess.check_output(command, shell=True).decode())
     
     if dvc_files_to_execute is not None:
