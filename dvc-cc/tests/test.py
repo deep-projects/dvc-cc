@@ -58,6 +58,10 @@ parser.add_argument('--num_of_repeats_of_each_run',
                     help='...',#TODO
                     default=5)
 
+parser.add_argument('--name_of_repo',type=str,
+                    help='If this parameter is not set it will create a new repository!',#TODO
+                    default=None)
+
 
 args = parser.parse_args()
 
@@ -75,8 +79,6 @@ def print_head(text):
     print('#############################################')
     print()
     head_index += 1
-
-
 
 
 
