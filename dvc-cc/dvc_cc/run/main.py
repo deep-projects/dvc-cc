@@ -439,26 +439,24 @@ def find_all_dvc_leafs(args_dvc_files):
     #############################
     try:
         dvcrepo = DVCRepo('.')
-        try:
-            Gs = dvcrepo.pipelines
-        except:
-            # OLDER DVC-VERSION !
-            Gs = dvcrepo.pipelines()
+        Gs = dvcrepo.pipelines
 
-
-        if args_dvc_files is None:
-            #dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
-            dvc_files = get_leafs_that_need_to_reproduce(dvcrepo, Gs)
+        if len(Gs) > 0:
+            if args_dvc_files is None:
+                #dvc_files = [[f[2:]] for f in helper.getListOfFiles(add_only_files_that_ends_with='.dvc')]
+                dvc_files = get_leafs_that_need_to_reproduce(dvcrepo, Gs)
+            else:
+                dvc_files = []
+                dvc_files_tmp = args_dvc_files.dvc_files.replace(' ', '').split(',')
+                for dvc_files_branch in dvc_files_tmp:
+                    dvc_files.append([])
+                    dvc_files_file = dvc_files_branch.split('|')
+                    for i in range(len(dvc_files_file)):
+                        dvc_files[-1].append(dvc_files_file[i])
+                        if not dvc_files_file[i].endswith('.dvc'):
+                            raise ValueError('Error: You define with -f which dvc files you want to exec. One or more files does not ends with .dvc. Please use only DVC files.')
         else:
             dvc_files = []
-            dvc_files_tmp = args_dvc_files.dvc_files.replace(' ', '').split(',')
-            for dvc_files_branch in dvc_files_tmp:
-                dvc_files.append([])
-                dvc_files_file = dvc_files_branch.split('|')
-                for i in range(len(dvc_files_file)):
-                    dvc_files[-1].append(dvc_files_file[i])
-                    if not dvc_files_file[i].endswith('.dvc'):
-                        raise ValueError('Error: You define with -f which dvc files you want to exec. One or more files does not ends with .dvc. Please use only DVC files.')
     # make sure that the hyperopt files get always renamed!
     finally:
         #############################
@@ -494,7 +492,7 @@ def main():
                              'https://www.curious-containers.cc/docs/red-format-protecting-credentials',
                         default= None)
 
-    parser.add_argument('-p','--papermill',help='Use papermill to run the jupyter notebook on the server and save the results in the jupyter notebook.',
+    parser.add_argument('-p','--papermill',help='Use papermill to run the jupyter notebook on the server and save the results in the jupyter notebook. If this parameter is set, no jupyter notebook will be converted to py files.',
                         default=False, action='store_true')
 
     args = parser.parse_args()
@@ -545,11 +543,6 @@ def main():
     except:
         print('Some files are missing.')
 
-    ############################################
-    # CREATE DVCREPO AND get the dvc-pipelines #
-    ############################################
-
-
     #############################################################
     # Find all hyperopt files and leafs to execute the pipeline #
     #############################################################
@@ -577,7 +570,7 @@ def main():
         #############################
         # CONVERT Jupyter Notebooks #
         #############################
-        if not args.not_ipynb_to_py:
+        if not args.not_ipynb_to_py and len(Gs) > 0:
             created_pyfiles_from_jupyter = all_jupyter_notebook_to_py_files(Gs)
         else:
             created_pyfiles_from_jupyter = []
