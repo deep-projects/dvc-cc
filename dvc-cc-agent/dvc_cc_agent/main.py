@@ -223,7 +223,9 @@ def main():
         could_not_create_dvcconfigfile = True
     if could_not_create_dvcconfigfile:
         ls_output = subprocess.check_output('ls', shell=True).decode()
-        raise ValueError('It could create the dvc config file! Maybe it is not a DVC-Repository? Or the cd command did not worked correctly.\n Here is the ls output:\n' + ls_output)
+        raise ValueError('It could create the dvc config file! Maybe it is not a DVC-Repository? Or the cd command '
+                         'did not worked correctly.\n Or the DVC username or password are wrong! \n Here is the ls '
+                         'output:\n' + ls_output)
 
 
     print(bcolors.OKBLUE+'PULL FROM GIT   ' + get_time()+bcolors.ENDC)

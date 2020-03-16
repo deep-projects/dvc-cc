@@ -263,7 +263,7 @@ def create_hyperopt_variables(vc): # vc == VariableCache
             selected_hyper = None
             while selected_hyper is None:
                 print('Specifie the variable ' + v.varname)
-                print('\tSet one or multiple comma sebarated values directly.')
+                print('\tSet one or multiple COMMA exitsebarated values directly.')
                 if len(hyper) > 0:
                     print('\tOr do hyperoptimization with one of the following options:')
                     for h in hyper:
