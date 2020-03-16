@@ -290,7 +290,6 @@ def main():
                 print(bcolors.OKBLUE+'START DVC REPRO ' + f + '   ' + get_time()+bcolors.ENDC)
                 command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh ' + f + ' ' + f.replace('/','_') + ' ' + path_to_save_output
                 #command = 'sh '+os.path.realpath(__file__)[:-7]+'start_dvc_repro.sh'
-                print(command)
                 print(subprocess.check_output(command.split(' ')).decode())
             else:
                 print('WARNING: A file that should be execute ('+f+') does not ends with .dvc. The job is skipped!')
