@@ -206,26 +206,10 @@ def main():
     except:
         print('Warning: The folder already exists: ' + path_to_save_output)
 
-
     print(bcolors.OKBLUE+'CD TO PATH   ' + get_time()+bcolors.ENDC)
     print('\t chdir: repo')
     print(os.chdir('repo'))
     os.makedirs('stdout_stderr')
-    
-    print(bcolors.OKBLUE+'WRITE TO config.local FILE   ' + get_time()+bcolors.ENDC)
-    print("\n\t['remote \\\"nas\\\"']\n\turl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\n\tpassword = '"+"$$$$$$$$$$$$$"+"'\n\n\t[core]\n\tremote = nas")
-    could_not_create_dvcconfigfile = False
-    try:
-        filecontent = "\n['remote \\\"nas\\\"']\nurl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\npassword = '"+dvc_own_password+"'\n\n[core]\nremote = nas"
-        command = "echo \"" + filecontent + "\" > .dvc/config.local"
-        subprocess.check_output(command, shell=True).decode()
-    except:
-        could_not_create_dvcconfigfile = True
-    if could_not_create_dvcconfigfile:
-        ls_output = subprocess.check_output('ls', shell=True).decode()
-        raise ValueError('It could create the dvc config file! Maybe it is not a DVC-Repository? Or the cd command '
-                         'did not worked correctly.\n Or the DVC username or password are wrong! \n Here is the ls '
-                         'output:\n' + ls_output)
 
 
     print(bcolors.OKBLUE+'PULL FROM GIT   ' + get_time()+bcolors.ENDC)
@@ -258,6 +242,21 @@ def main():
             print(bcolors.OKBLUE+'INSTALL '+filename+' with pip.'+bcolors.ENDC)
             command = "pip install --user -r " + filename
             print(subprocess.check_output(command, shell=True).decode())
+
+    print(bcolors.OKBLUE+'WRITE TO config.local FILE   ' + get_time()+bcolors.ENDC)
+    print("\n\t['remote \\\"nas\\\"']\n\turl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\n\tpassword = '"+"$$$$$$$$$$$$$"+"'\n\n\t[core]\n\tremote = nas")
+    could_not_create_dvcconfigfile = False
+    try:
+        filecontent = "\n['remote \\\"nas\\\"']\nurl = ssh://"+dvc_own_username+"@"+dvc_servername+':'+dvc_path_to_working_repository+"\npassword = '"+dvc_own_password+"'\n\n[core]\nremote = nas"
+        command = "echo \"" + filecontent + "\" > .dvc/config.local"
+        subprocess.check_output(command, shell=True).decode()
+    except:
+        could_not_create_dvcconfigfile = True
+    if could_not_create_dvcconfigfile:
+        ls_output = subprocess.check_output('ls -a', shell=True).decode()
+        raise ValueError('It could not create the dvc config file! Maybe it is not a DVC-Repository? Or the cd command '
+                         'did not worked correctly.\n Or the DVC username or password are wrong! \n Here is the ls '
+                         'output:\n' + ls_output)
 
     print('PULL FROM DVC   ' + get_time())
     command = 'dvc pull'

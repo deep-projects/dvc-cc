@@ -35,7 +35,7 @@ RUN echo 'INSTALL dvc-cc-agent and the dvc-cc-connector!'
 
 RUN pip install --user --no-cache-dir red-connector-ssh==1.2
 RUN pip install --user --no-cache-dir dvc==0.88.0
-RUN pip install --user --no-cache-dir dvc-cc-agent==0.9.12
+RUN pip install --user --no-cache-dir dvc-cc-agent==0.9.14
 RUN pip install --user --no-cache-dir dvc-cc-connector==0.8.1
 
 WORKDIR home/cc/
