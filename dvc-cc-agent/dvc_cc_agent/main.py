@@ -300,9 +300,11 @@ def main():
                     print()
                     print('#####+++++#####+++++#####+++++#####+++++#####+++++#####+++++#####+++++#####')
                     print()
-                    raise RuntimeError(bcolors.FAIL+message[
-                                                    message.find('Traceback (most recent call last):'):]
-                                       +bcolors.ENDC)
+
+                    err = bcolors.FAIL+'\n#####+++++#####+++++#####+++++#####+++++#####+++++#####+++++#####+++++#####\n\n'
+                    err = err + message[message.find('Traceback (most recent call last):'):]+bcolors.ENDC
+
+                    raise RuntimeError(err)
                 else:
                     print()
                     print('#####+++++#####+++++#####+++++#####+++++#####+++++#####+++++#####+++++#####')
