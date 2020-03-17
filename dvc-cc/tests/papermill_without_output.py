@@ -1,4 +1,5 @@
 # This test use the Script: tests/Helper_Scripts/papermill.ipynb
+# This tests works, if the keyring data are already set!
 
 import keyring
 import subprocess
@@ -67,6 +68,8 @@ args.dvcpassword = getpass.getpass('DVC-Storage-Password: ')
 if args.gitprojectname == None:
     args.gitprojectname = 'TEST_' + uuid.uuid4().hex
 
+os.chdir(os.path.expanduser('~'))
+
 head_index = 1
 def PRINT_HEAD(text):
     global head_index
@@ -119,7 +122,7 @@ except:
 
 
 PRINT_HEAD('switch to new branch')
-branch_name = str(int(time.time())) + '_Test_SimpleTensorflow'
+branch_name = str(int(time.time())) + '_Test_PapermillWithoutOutput'
 p = subprocess.call(['git','checkout','-B', branch_name])
 time.sleep(1)
 PRINT_HEAD('TEST END')
@@ -177,7 +180,7 @@ time.sleep(1)
 PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
 subprocess.call(['wget', '-O','source/train.py',
-                 'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/train.py'])
+                 'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/papermill.ipynb'])
 subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'source/train.py', '-o', 'tensorboard', '-o', 'model.h5', '-m',
                  'summary.yml', '-f', 'train.dvc', 'python source/train.py --num_of_kernels {{nk:int}} --activation_function {{af:[relu,tanh,sigmoid]}}'])
 subprocess.call(['git', 'add','-A'])
@@ -197,10 +200,11 @@ subprocess.call(['git', 'push', '--set-upstream',
 
 PRINT_HEAD('call "dvc-cc run"')
 if args.num_of_repeats_of_each_run > 1:
-    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), 'RunTheTest'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), '-p','RunTheTest'],
+                         stdin = subprocess.PIPE,
                      bufsize = 1)
 else:
-    p = subprocess.Popen(['dvc-cc', 'run', 'RunTheTest'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', '-p', 'RunTheTest'], stdin = subprocess.PIPE,
                      bufsize = 1)
 
 # The Kernelsize of the script
