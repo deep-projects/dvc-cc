@@ -95,6 +95,7 @@ try:
     os.chdir(args.gitprojectname)
     subprocess.call(['git', 'config', '--global', 'credential.helper', 'store'])
     subprocess.call(['git', 'config', 'credential.helper', 'cache', '1800'])
+    subprocess.call(['git', 'checkout', 'master'])
     print('The repo was cloned!')
 except:
     subprocess.call(['mkdir', args.gitprojectname])
@@ -199,10 +200,10 @@ subprocess.call(['git', 'push', '--set-upstream',
 
 PRINT_HEAD('call "dvc-cc run"')
 if args.num_of_repeats_of_each_run > 1:
-    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), 'RunTheTest'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), 'simple tensorflow'], stdin = subprocess.PIPE,
                      bufsize = 1)
 else:
-    p = subprocess.Popen(['dvc-cc', 'run', 'RunTheTest'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', 'simple tensorflow'], stdin = subprocess.PIPE,
                      bufsize = 1)
 
 # The Kernelsize of the script

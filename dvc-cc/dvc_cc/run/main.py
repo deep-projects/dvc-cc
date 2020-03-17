@@ -137,6 +137,9 @@ def get_leafs_that_need_to_reproduce(dvcrepo, Gs):
 
     status_of_leafs = [dvcrepo.status(targets=l, with_deps=True) for l in leafs]
 
+    print(leafs)
+    print(status_of_leafs)
+
     # check if the leafs need to reproduce:
     leafs_to_reproduce = [len(status_of_leafs) > 0 for s in status_of_leafs]
     leafs = [leafs[i] for i in range(len(leafs)) if leafs_to_reproduce[i]]

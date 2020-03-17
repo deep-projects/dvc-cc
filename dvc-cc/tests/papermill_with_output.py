@@ -1,4 +1,4 @@
-# This test use the Script: tests/Helper_Scripts/papermill.ipynb
+# This test use the Script: tests/Helper_Scripts/papermill_with_output.ipynb
 # This tests works, if the keyring data are already set!
 
 import keyring
@@ -181,7 +181,10 @@ time.sleep(1)
 PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
 subprocess.call(['wget', '-O','example.ipynb',
-                 'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/papermill.ipynb'])
+                 'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/papermill_with_output.ipynb'])
+subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'example.ipynb', '-o', 'plot_to_save.jpg', '-o',
+                 'example_output.ipynb', '-f', 'papermill.dvc',
+                 'papermill example.ipynb example_output.ipynb -p a {{a}} -p b {{b}}'])
 subprocess.call(['git', 'add','-A'])
 subprocess.call(['git', 'commit', '-m', '"build the pipeline for the first test run with DVC-CC"'])
 #subprocess.call(['git', 'push'])
