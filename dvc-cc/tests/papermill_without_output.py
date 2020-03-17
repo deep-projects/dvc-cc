@@ -1,3 +1,5 @@
+# This test use the Script: tests/Helper_Scripts/papermill.ipynb
+
 import keyring
 import subprocess
 from argparse import ArgumentParser
@@ -117,7 +119,7 @@ except:
 
 
 PRINT_HEAD('switch to new branch')
-branch_name = 'TEST_'+str(int(time.time()))
+branch_name = str(int(time.time())) + '_Test_SimpleTensorflow'
 p = subprocess.call(['git','checkout','-B', branch_name])
 time.sleep(1)
 PRINT_HEAD('TEST END')
@@ -174,7 +176,8 @@ time.sleep(1)
 
 PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
-subprocess.call(['wget', '-O','source/train.py','https://bit.ly/2krHi8E'])
+subprocess.call(['wget', '-O','source/train.py',
+                 'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/train.py'])
 subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'source/train.py', '-o', 'tensorboard', '-o', 'model.h5', '-m',
                  'summary.yml', '-f', 'train.dvc', 'python source/train.py --num_of_kernels {{nk:int}} --activation_function {{af:[relu,tanh,sigmoid]}}'])
 subprocess.call(['git', 'add','-A'])

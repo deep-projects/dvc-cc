@@ -38,7 +38,6 @@ parser.add_argument('--batch-concurrency-limit',
                     help='...',
                     default=12)
 
-
 parser.add_argument('--engine',
                     help='i.e. dt, cc, cctest',
                     default="dt")
@@ -67,7 +66,7 @@ if args.gitprojectname == None:
     args.gitprojectname = 'TEST_' + uuid.uuid4().hex
 
 head_index = 1
-def print_head(text):
+def PRINT_HEAD(text):
     global head_index
     print()
     print()
@@ -76,117 +75,114 @@ def print_head(text):
     print()
     head_index += 1
 
+PRINT_HEAD('remove local repository folder, if exists.')
+if os.path.exists(args.gitprojectname):
+    subprocess.call(['rm','-Rf',args.gitprojectname])
+    print('Folder '+args.gitprojectname+' was removed.')
+else:
+    print('Nothing to do.')
 
-
-
-
-
-
-
-
-print_head('create a new git repository')
-subprocess.call(['mkdir', args.gitprojectname])
-os.chdir(args.gitprojectname)
-subprocess.call(['touch', 'README.md'])
-subprocess.call(['git','init'])
-subprocess.call(['git','add',  'README.md'])
-subprocess.call(['git','commit',  '-m', '"Initial new TEST-Project"'])
-
+PRINT_HEAD('clone existing repo or create a new one.')
 project_path_full = args.gitpath + '/' + args.gitusername + '/' + args.gitprojectname + '.git'
-subprocess.call(['git','remote',  'add', 'origin', project_path_full])
 
-p = subprocess.Popen(['git','push','--set-upstream',
-                 project_path_full,
-                 'master'],
-                     stdin = subprocess.PIPE, bufsize = 1)
-time.sleep(0.5)
-#p.stdin.write((args.gitusername+'\n').encode())
-#p.stdin.flush()
-#time.sleep(0.5)
-#p.stdin.write((args.gitpassword+'\n').encode())
-#
-#p.communicate()
+try:
+    subprocess.call(['git', 'clone', project_path_full])
+    os.chdir(args.gitprojectname)
+    subprocess.call(['git', 'config', '--global', 'credential.helper', 'store'])
+    subprocess.call(['git', 'config', 'credential.helper', 'cache', '1800'])
+    print('The repo was cloned!')
+except:
+    subprocess.call(['mkdir', args.gitprojectname])
+    os.chdir(args.gitprojectname)
+    subprocess.call(['touch', 'README.md'])
+    subprocess.call(['git','init'])
+    subprocess.call(['git', 'config', '--global', 'credential.helper', 'store'])
+    subprocess.call(['git', 'config', 'credential.helper', 'cache', '1800'])
+    subprocess.call(['git','add',  'README.md'])
+    subprocess.call(['git','commit',  '-m', '"Initial new TEST-Project"'])
 
-p = subprocess.Popen(['git','checkout','-B','TEST_'+str(int(time.time()))],
-                     stdin = subprocess.PIPE, bufsize = 1)
+    subprocess.call(['git','remote',  'add', 'origin', project_path_full])
 
+    p = subprocess.Popen(['git','push','--set-upstream',
+                     project_path_full,
+                     'master'],
+                         stdin = subprocess.PIPE, bufsize = 1)
+    time.sleep(0.5)
+    p.stdin.write((args.gitusername+'\n').encode())
+    p.stdin.flush()
+    time.sleep(0.5)
+    p.stdin.write((args.gitpassword+'\n').encode())
+    p.communicate()
+    print('The repo was new created!')
+
+
+PRINT_HEAD('switch to new branch')
+branch_name = str(int(time.time())) + '_Test_SimpleTensorflow'
+p = subprocess.call(['git','checkout','-B', branch_name])
 time.sleep(1)
-
+PRINT_HEAD('TEST END')
 
 
 import pexpect
 
 child = pexpect.spawn('dvc-cc init')
-child.expect([pexpect.TIMEOUT, ".*Number of GPUs (default 0).*"])
+child.expect([pexpect.TIMEOUT, ".*Number of GPUs.*"])
 child.sendline(str(args.number_of_gpus))
+print('SET num of GPUs')
 
 child.expect([pexpect.TIMEOUT, ".*RAM in GB.*"])
 child.sendline(str(args.ram))
+print('SET ram')
 
 child.expect([pexpect.TIMEOUT, ".*Docker Image.*"])
 child.sendline(args.docker_image)
+print('SET docker_image')
 
 child.expect([pexpect.TIMEOUT, ".*Batch concurrency limit.*"])
 child.sendline(str(args.batch_concurrency_limit))
+print('SET batch_concurrency_limit')
 
 child.expect([pexpect.TIMEOUT, ".*engine.*"])
 child.sendline(args.engine)
+print('SET engine')
 
 child.expect([pexpect.TIMEOUT, ".*DVC server.*"])
 child.sendline(args.dvc_server)
+print('SET dvc_server')
 
 child.expect([pexpect.TIMEOUT, ".*DVC folder.*"])
 if args.dvc_folder is not None:
     child.sendline(args.dvc_folder)
 else:
     child.sendline('')
+print('SET dvc_folder')
 
 child.expect([pexpect.TIMEOUT, ".*username.*"])
 child.sendline(args.dvcusername)
-
-child.expect([pexpect.TIMEOUT, ".*private key passphrase or a password for host.*"])
-child.sendline(args.dvcpassword)
+print('SET dvcusername')
 
 child.expect([pexpect.TIMEOUT, ".*s password:*"])
 child.sendline(args.dvcpassword)
+print('SET dvcpassword')
 
 print(child.read())
 
 
 
 
+time.sleep(1)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-time.sleep(5)
-
-print_head('create some sorce code and build a pipeline')
+PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
 subprocess.call(['wget', '-O','source/train.py','https://bit.ly/2krHi8E'])
 subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'source/train.py', '-o', 'tensorboard', '-o', 'model.h5', '-m',
                  'summary.yml', '-f', 'train.dvc', 'python source/train.py --num_of_kernels {{nk:int}} --activation_function {{af:[relu,tanh,sigmoid]}}'])
 subprocess.call(['git', 'add','-A'])
 subprocess.call(['git', 'commit', '-m', '"build the pipeline for the first test run with DVC-CC"'])
-subprocess.call(['git', 'push'])
+#subprocess.call(['git', 'push'])
+subprocess.call(['git', 'push', '--set-upstream',
+                      project_path_full,
+                      branch_name])
 
 
 
@@ -196,9 +192,7 @@ subprocess.call(['git', 'push'])
 
 
 
-
-
-print_head('call "dvc-cc run"')
+PRINT_HEAD('call "dvc-cc run"')
 if args.num_of_repeats_of_each_run > 1:
     p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), 'RunTheTest'], stdin = subprocess.PIPE,
                      bufsize = 1)
