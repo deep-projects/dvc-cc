@@ -123,7 +123,7 @@ except:
 
 
 PRINT_HEAD('switch to new branch')
-branch_name = str(int(time.time())) + '_Test_PapermillWithoutOutput'
+branch_name = str(int(time.time())) + '_Test_PapermillWithOutput'
 p = subprocess.call(['git','checkout','-B', branch_name])
 time.sleep(1)
 PRINT_HEAD('TEST END')
@@ -184,7 +184,7 @@ subprocess.call(['wget', '-O','example.ipynb',
                  'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/papermill_with_output.ipynb'])
 subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'example.ipynb', '-o', 'plot_to_save.jpg', '-o',
                  'example_output.ipynb', '-f', 'papermill.dvc',
-                 'papermill example.ipynb example_output.ipynb -p a {{a}} -p b {{b}}'])
+                 'papermill example.ipynb example_output.ipynb -p a {{a:int:None}} -p b {{b:float:None}}'])
 subprocess.call(['git', 'add','-A'])
 subprocess.call(['git', 'commit', '-m', '"build the pipeline for the first test run with DVC-CC"'])
 #subprocess.call(['git', 'push'])
@@ -202,11 +202,11 @@ subprocess.call(['git', 'push', '--set-upstream',
 
 PRINT_HEAD('call "dvc-cc run"')
 if args.num_of_repeats_of_each_run > 1:
-    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), '-p','papermill without out'],
+    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), '-p','papermill with out'],
                          stdin = subprocess.PIPE,
                      bufsize = 1)
 else:
-    p = subprocess.Popen(['dvc-cc', 'run', '-p', 'papermill without out'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', '-p', 'papermill with out'], stdin = subprocess.PIPE,
                      bufsize = 1)
 
 # The Kernelsize of the script
