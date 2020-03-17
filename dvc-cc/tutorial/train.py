@@ -83,7 +83,7 @@ callbacks = [
 ################
 ### TRAIN MODEL
 ################
-model.fit(x_train, y_train, epochs=args.epochs, batch_size=args.batch_size, validation_split=0.1,
+history = model.fit(x_train, y_train, epochs=args.epochs, batch_size=args.batch_size, validation_split=0.1,
           callbacks=callbacks, verbose=2)
 ################
 ### TEST MODEL
@@ -93,10 +93,10 @@ model.evaluate(x_test, y_test, verbose=2)
 ################
 ### SAVE SUMMARY
 ################
-summary = {'loss': float(np.min(model.history.history['loss'])),
-            'val_loss': float(np.min(model.history.history['val_loss'])),
-            'acc': float(np.max(model.history.history['acc'])),
-            'val_acc': float(np.max(model.history.history['val_acc']))
+summary = {'loss': float(np.min(history.history['loss'])),
+            'val_loss': float(np.min(history.history['val_loss'])),
+            'acc': float(np.max(history.history['acc'])),
+            'val_acc': float(np.max(history.history['val_acc']))
           }
 with open('summary.yml', 'w') as f:
     yaml.dump(summary, f)

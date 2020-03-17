@@ -219,8 +219,6 @@ def main():
         subprocess.call(['dvc', 'remote', 'add', '--force', '-d', 'dvc_connection',
                          'ssh://' + dvc_remote_user + '@' + dvc_remote_server + ':' + dvc_remote_path])
         subprocess.call(['dvc', 'remote', 'modify', 'dvc_connection', 'ask_password', 'true'])
-    # test remote connection
-    subprocess.call(['dvc','push'])
 
     try:
         subprocess.call(['ssh', dvc_remote_user + '@' + dvc_remote_server, "mkdir -p "+dvc_remote_path+" ; chmod 774 "+dvc_remote_path+" ; setfacl -d -m u::rwX,g::rwX,o::- "+dvc_remote_path])

@@ -313,14 +313,19 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     subprocess.call(['git', 'commit', '-m', '\'Create red.yml file.\''])
     subprocess.call(['git', 'push'])
 
+    # Get last experiment ID
+    last_cc_id = get_last_cc_experimentid(keyring_service)
+
     # EXECUTE THE RED-YML
     if keyring_service is None:
         p = 'faice exec cc_execution_file.red.yml'
     else:
         p = 'faice exec --keyring-service ' + keyring_service + ' cc_execution_file.red.yml'
-    # TODO: IS A LIST NEEDED?
-    subprocess.call(p.split(' '))
+    message = subprocess.call(p.split(' '))
     cc_id = get_last_cc_experimentid(keyring_service)
+    if last_cc_id == cc_id:
+        raise RuntimeError(bcolors.FAIL+'The job could not be started. Maybe there is some error in the '
+                                        'RED-YML file.\n\nMessage of "faice exec":\n' + message + bcolors.ENDC)
     print('The experiment ID is: ' + str(cc_id))
     return cc_id
 
