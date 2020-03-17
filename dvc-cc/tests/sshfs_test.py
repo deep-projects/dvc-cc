@@ -1,4 +1,4 @@
-# This test use the Script: tests/Helper_Scripts/train.py
+# This test use the Script: tests/Helper_Scripts/papermill_with_output.ipynb
 # This tests works, if the keyring data are already set!
 
 import keyring
@@ -27,7 +27,7 @@ parser.add_argument('--keyring-service', type=str,
 
 parser.add_argument('--number-of-gpus', type=int,
                     help='The number of gpus.',
-                    default=1)
+                    default=0)
 
 parser.add_argument('--ram', type=int,
                     help='The ram that should be used here!',
@@ -59,6 +59,11 @@ parser.add_argument('--dvc-folder',
 parser.add_argument('--num_of_repeats_of_each_run',
                     help='...',#TODO
                     default=5)
+
+
+parser.add_argument('sshfs_address1')
+parser.add_argument('sshfs_address2')
+parser.add_argument('sshfs_address3')
 
 
 args = parser.parse_args()
@@ -123,7 +128,7 @@ except:
 
 
 PRINT_HEAD('switch to new branch')
-branch_name = str(int(time.time())) + '_Test_SimpleTensorflow'
+branch_name = str(int(time.time())) + '_Test_PapermillWithOutput'
 p = subprocess.call(['git','checkout','-B', branch_name])
 time.sleep(1)
 PRINT_HEAD('TEST END')
@@ -180,9 +185,13 @@ time.sleep(1)
 
 PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
-subprocess.call(['wget', '-O','source/train.py','https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/train.py'])
-subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'source/train.py', '-o', 'tensorboard', '-o', 'model.h5', '-m',
-                 'summary.yml', '-f', 'train.dvc', 'python source/train.py --num_of_kernels {{nk:int}} --activation_function {{af:[relu,tanh,sigmoid]}}'])
+subprocess.call(['wget', '-O','sshfs_sum.py',
+                 'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/sshfs_sum.py'])
+subprocess.call(['dvc-cc','sshfs',args.sshfs_address1,'sshfs_connection1'])
+subprocess.call(['dvc-cc','sshfs',args.sshfs_address2,'sshfs_connection2'])
+subprocess.call(['dvc-cc','sshfs',args.sshfs_address3,'sshfs_connection3'])
+subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'sshfs_sum.py','-f', 'sshfs_sum.dvc',
+                 'python sshfs_sum.py sshfs_connection1 sshfs_connection2 sshfs_connection3'])
 subprocess.call(['git', 'add','-A'])
 subprocess.call(['git', 'commit', '-m', '"build the pipeline for the first test run with DVC-CC"'])
 #subprocess.call(['git', 'push'])
@@ -200,10 +209,11 @@ subprocess.call(['git', 'push', '--set-upstream',
 
 PRINT_HEAD('call "dvc-cc run"')
 if args.num_of_repeats_of_each_run > 1:
-    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), 'simple tensorflow'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), '-p','papermill with out'],
+                         stdin = subprocess.PIPE,
                      bufsize = 1)
 else:
-    p = subprocess.Popen(['dvc-cc', 'run', 'simple tensorflow'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', '-p', 'papermill with out'], stdin = subprocess.PIPE,
                      bufsize = 1)
 
 # The Kernelsize of the script
