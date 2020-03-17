@@ -2,6 +2,7 @@
 import sys
 import os
 from subprocess import check_output
+import subprocess
 from argparse import ArgumentParser
 import keyring
 import requests
@@ -10,8 +11,11 @@ from dvc_cc.bcolors import *
 from pathlib import Path
 from git import Repo as GITRepo
 import json
+import time
+import pexpect
 
-DESCRIPTION = 'This script saves the SSHFS connection that was created with this script and can reconnect to this source.'
+DESCRIPTION = 'This script saves the SSHFS connection that was created with this script and can reconnect to this ' \
+              'source. You can also use the "--keyring-service str_name" parameter.'
 
 
 def get_main_git_directory_Path():
@@ -22,14 +26,14 @@ def get_main_git_directory_Path():
 def get_mount_values_for_a_direcotry(path):
     mount = [m.split(' ') for m in check_output(["mount"]).decode("utf8").split('\n')]
     for m in mount:
-        if len(m) == 6 and m[2] == path:
+        if len(m) == 6 and (m[2] == path or m[2] == os.getcwd() + '/' + path):
             username = m[0].split('@')[0]
             servername = m[0].split('@')[1].split(':')[0]
             path = m[0].split('@')[1].split(':')[1]
             return username, servername, path
     return None, None, None
 
-def reconnect():
+def reconnect(keyring_service='red'):
     project_dir = get_main_git_directory_Path()
     path_to_sshfs_json = str(Path(os.path.join(project_dir, '.dvc_cc/sshfs.json')))
 
@@ -49,14 +53,22 @@ def unmount():
             data = json.load(jsonFile)
 
         for key in data.keys():
+            print()
+            print()
+            print(check_output(['mount']).decode("utf8"))
+            print()
+            print()
+            print()
             print('unmount ' + str(key))
             print(check_output(['fusermount', '-u', key]).decode("utf8"))
+            time.sleep(1)
 
-def new_sshfs_connection(sshfs_parameters):
+def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
     project_dir = get_main_git_directory_Path()
 
     dest = os.path.realpath(os.path.expanduser(sshfs_parameters[-1]))
     dest_rel = dest[len(project_dir) + 1:]
+
     # Prüfe ob Ordner existiert und lege ihn gegebenfalls neu an
     if not os.path.exists(dest):
         os.makedirs(dest)
@@ -72,9 +84,38 @@ def new_sshfs_connection(sshfs_parameters):
     f.write('\n'+dest_rel)
     f.close()
 
-    # Führe den SSHFS-Kommando aus
-    #TODO: use password from keyring or ask for it!
-    print(check_output(["sshfs"] + sshfs_parameters[:-1] + [dest]).decode("utf8"))
+    # call the sshfs command with the password from keyring if possible.
+    pw = None
+    username = None
+    if sshfs_parameters[-2].find('@') > 0:
+        username, server = sshfs_parameters[-2].split('@')
+        server = server.split(':')[0]
+        server = server.replace('.','_').replace('-','_')
+
+
+        pw_keyring = server + '_password'
+        username_keyring = server + '_username'
+
+        pw_keyring = keyring.get_password(keyring_service, pw_keyring)
+        username_keyring = keyring.get_password(keyring_service, username_keyring)
+
+    if pw_keyring is not None and username_keyring is not None and username == username_keyring:
+        # see here https://stackoverflow.com/questions/28823639/how-to-automatically-input-ssh-private-key-passphrase-with-pexpect
+
+        bash = pexpect.spawn('bash', echo=False)
+        bash.sendline('echo READY')
+        bash.expect_exact('READY')
+        bash.sendline('sshfs ' + ' '.join(sshfs_parameters[:-1]) + ' ' + dest)
+        bash.expect('password')
+        bash.sendline(pw_keyring)
+        bash.sendline('echo COMPLETE')
+        bash.expect_exact('COMPLETE')
+        bash.sendline('exit')
+        bash.expect_exact(pexpect.EOF)
+
+    else:
+        print('NOW I ANM HERE !!!')
+        print(subprocess.call(['sshfs'] + sshfs_parameters[:-1] + [dest]))
 
     # Finden der wichtigen Parameter
     data_username, data_server, data_path = get_mount_values_for_a_direcotry(dest)
@@ -95,26 +136,40 @@ def new_sshfs_connection(sshfs_parameters):
 
     data.update(new_sshfs_connection)
 
+
+
     with open(path_to_sshfs_json, "w") as jsonFile:
         json.dump(data, jsonFile, indent=2, sort_keys=True)
 
 
-
 def main():
-    argv = sys.argv[1:]
+
+    argv_tmp = sys.argv[1:]
+    argv = []
+    found_keyring_service = False
+    keyring_service = 'red'
+    for i in argv_tmp:
+        if i == '--keyring-service':
+            found_keyring_service = True
+        elif found_keyring_service:
+            keyring_service = i
+            found_keyring_service = False
+        else:
+            argv.append(i)
+
     if '-h' in argv or '--help' in argv or len(argv) == 0:
         print(DESCRIPTION)
         print()
     elif len(argv) == 1 and 'reconnect'[:len(argv[0])] == argv[0]:
         print('Reconnect ALL SSHFS connections')
-        reconnect()
+        reconnect(keyring_service)
     elif len(argv) == 1 and 'unmount'[:len(argv[0])] == argv[0]:
         print('UNMOUNT ALL SSHFS connections')
         unmount()
     elif len(argv) == 1:
         print('NEW SSHFS connection to data folder')
-        new_sshfs_connection(argv + ['data'])
+        new_sshfs_connection(argv + ['data'], keyring_service)
     else:
         print('NEW SSHFS connection')
-        new_sshfs_connection(argv)
+        new_sshfs_connection(argv, keyring_service)
 

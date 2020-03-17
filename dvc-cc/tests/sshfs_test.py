@@ -177,9 +177,7 @@ child.sendline(args.dvcpassword)
 print('SET dvcpassword')
 
 print(child.read())
-
-
-
+pexpect.spawn.close(child)
 
 time.sleep(1)
 
@@ -187,20 +185,20 @@ PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
 subprocess.call(['wget', '-O','sshfs_sum.py',
                  'https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/sshfs_sum.py'])
-subprocess.call(['dvc-cc','sshfs',args.sshfs_address1,'sshfs_connection1'])
-subprocess.call(['dvc-cc','sshfs',args.sshfs_address2,'sshfs_connection2'])
-subprocess.call(['dvc-cc','sshfs',args.sshfs_address3,'sshfs_connection3'])
-subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'sshfs_sum.py','-f', 'sshfs_sum.dvc',
-                 'python sshfs_sum.py sshfs_connection1 sshfs_connection2 sshfs_connection3'])
-subprocess.call(['git', 'add','-A'])
-subprocess.call(['git', 'commit', '-m', '"build the pipeline for the first test run with DVC-CC"'])
-#subprocess.call(['git', 'push'])
-subprocess.call(['git', 'push', '--set-upstream',
-                      project_path_full,
-                      branch_name])
+time.sleep(1)
+#child = pexpect.spawn('dvc-cc sshfs '+args.dvcusername+'@'+args.sshfs_address1+ ' sshfs_connection1')
+#child.expect([pexpect.TIMEOUT, ".*s password:*"])
+#child.sendline(args.dvcpassword)
 
-
-
+subprocess.call(['dvc-cc','sshfs', args.dvcusername+'@'+args.sshfs_address1,'sshfs_connection1', '--keyring-service',
+                 args.keyring_service])
+time.sleep(1)
+subprocess.call(['dvc-cc','sshfs', args.dvcusername+'@'+args.sshfs_address2,'sshfs_connection2', '--keyring-service',
+                 args.keyring_service])
+time.sleep(1)
+subprocess.call(['dvc-cc','sshfs', args.dvcusername+'@'+args.sshfs_address3,'sshfs_connection3', '--keyring-service',
+                 args.keyring_service])
+time.sleep(1)
 
 
 
@@ -209,11 +207,11 @@ subprocess.call(['git', 'push', '--set-upstream',
 
 PRINT_HEAD('call "dvc-cc run"')
 if args.num_of_repeats_of_each_run > 1:
-    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), '-p','papermill with out'],
+    p = subprocess.Popen(['dvc-cc', 'run', '-r', str(args.num_of_repeats_of_each_run), 'papermill with out'],
                          stdin = subprocess.PIPE,
                      bufsize = 1)
 else:
-    p = subprocess.Popen(['dvc-cc', 'run', '-p', 'papermill with out'], stdin = subprocess.PIPE,
+    p = subprocess.Popen(['dvc-cc', 'run', 'papermill with out'], stdin = subprocess.PIPE,
                      bufsize = 1)
 
 # The Kernelsize of the script
@@ -236,3 +234,5 @@ print('# INPUT 13: y')
 p.stdin.flush()
 
 p.communicate()
+
+subprocess.call(['dvc-cc', 'sshfs', 'u'])
