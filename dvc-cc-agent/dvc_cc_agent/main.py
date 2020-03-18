@@ -212,9 +212,9 @@ def main():
     os.makedirs('stdout_stderr')
 
 
-    print(bcolors.OKBLUE+'PULL FROM GIT   ' + get_time()+bcolors.ENDC)
-    command = 'git pull'
-    print(subprocess.check_output(command, shell=True).decode())
+    #print(bcolors.OKBLUE+'PULL FROM GIT   ' + get_time()+bcolors.ENDC)
+    #command = 'git pull origin ' +
+    #print(subprocess.check_output(command, shell=True).decode())
 
 
 

@@ -59,6 +59,8 @@ def main():
 
         git_stash_output = check_output(['git', 'stash']).decode().startswith('No local changes to save')
 
+        subprocess.call(['git','fetch','--all'])
+
         try:
             is_first_iteration = True
             while loop or is_first_iteration:

@@ -11,6 +11,7 @@ from git import Repo as GITRepo
 from argparse import ArgumentParser
 import datetime
 from pathlib import Path
+import subprocess
 
 class bcolors:
     HEADER = '\033[95m'
@@ -46,6 +47,8 @@ def show_all():
     print('%23s : %s' % ('batch-concurrency-limit' , str(settings['execution']['settings']['batchConcurrencyLimit'])))
     print('%23s : %s' % ('engine' , str(settings['execution']['engine'])))
     print('%23s : %s' % ('engine-url' , str(settings['execution']['settings']['access']['url'])))
+    output = subprocess.check_output(['dvc', 'remote', 'list']).decode()
+    print('%23s : %s' % ('dvc-url', output.split()[1]))
     print()
     print('If you want help by reconfiguration the settings, please call "dvc-cc init".')
 
@@ -156,6 +159,22 @@ def setting_num_of_gpus():
         with open(str(Path('.dvc_cc/cc_config.yml')), 'w') as outfile:
             yaml.dump(settings, outfile)
 
+def setting_dvc_url():
+    parser = ArgumentParser(description='Show or set the url for the dvc storage.')
+    parser.add_argument('--set',help='Set the URL for the dvc storage.', type=str, default=None)
+    args = parser.parse_args()
+
+    if args.set is not None:
+        #print(subprocess.check_output('dvc remote remove dvc_connection'.split()).decode())
+        if os.path.exists(str(Path('.dvc/config'))):
+            os.remove('.dvc/config')
+        if os.path.exists(str(Path('.dvc/config.local'))):
+            os.remove('.dvc/config.local')
+        print(subprocess.check_output(('dvc remote add --force -d dvc_connection ' + args.set).split()).decode())
+        subprocess.call(['dvc', 'remote', 'modify', 'dvc_connection', 'ask_password', 'true'])
+
+    output = subprocess.check_output(['dvc','remote','list']).decode()
+    print('%23s : %s' % ('dvc-url', output.split()[1]))
 
 
 SCRIPT_NAME = 'dvc-cc setting'
@@ -170,6 +189,7 @@ MODES = OrderedDict([
     ('engine', {'main': setting_engine, 'description': 'Show or set the engine.'}),
     ('engine-url', {'main': setting_engine_url, 'description': 'Show or set the engine URL.'}),
     ('num-of-gpus', {'main': setting_num_of_gpus, 'description': 'Show or set the number of GPUs.'}),
+    ('dvc-url', {'main': setting_dvc_url, 'description': 'Show or set the url for the dvc storage.'}),
 ])
 
 

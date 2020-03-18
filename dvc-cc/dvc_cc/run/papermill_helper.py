@@ -35,8 +35,8 @@ def read_params_from_parametercell(path_to_ipynb):
         c = cells[i]
         if 'tags' in c['metadata'] and 'parameters' in c['metadata']['tags']:
             commentar = ''
-            for line in c['source']:
-                line = line.strip()
+            for line_original in c['source']:
+                line = line_original.strip()
                 if line.find('#') >= 0:
                     commentar = commentar + line[line.find('#')+1:].strip()
                     line = line[:line.find('#')].strip()
@@ -46,8 +46,13 @@ def read_params_from_parametercell(path_to_ipynb):
                     varname = line_sep[0].strip()
                     default_value = line_sep[1].strip()
 
-                    if line.find('one_of:') > 0:
-                        one_of_values = line.split('one_of:')[1].replace('"',"'")
+                    print('TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST-START')
+                    print(line_original)
+                    print('line.find(\'one_of:\') > 0', line_original.find('one_of:') > 0)
+                    print('line.find(\'one_of:\')', line_original.find('one_of:'))
+                    print('TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST-END')
+                    if line_original.find('one_of:') > 0:
+                        one_of_values = line_original.split('one_of:')[1].replace('"',"'")
 
                         if one_of_values.find("'") >= 0:
                             # first case, it was used ' at the beginning and ending of each possible value

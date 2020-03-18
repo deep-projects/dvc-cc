@@ -233,80 +233,81 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     with open('cc_execution_file.red.yml',"w") as f:
         print("batches:", file=f)
         for i in range(len(dvc_files)):
-            dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
-            # print("batches:", file=f)
-            print("  - inputs:", file=f)
-            print("      git_authentication_json:", file=f)
-            print("        class: File", file=f)
-            print("        connector:", file=f)
-            print("          access: {username: '{{" + git_path.replace('.', '_').replace('-',
-                                                                                          '_') + "_username}}', password: '{{" + git_path.replace(
-                '.', '_').replace('-', '_') + "_password}}', email: '{{" + git_path.replace('.', '_').replace('-',
-                                                                                                              '_') + "_email}}'}",
-                  file=f)
-            print("          command: dvc-cc-connector", file=f)
-            print("      git_path_to_working_repository: \"" + git_path + "\"", file=f)
-            print("      git_working_repository_owner: \"" + git_owner + "\"", file=f)
-            print("      git_working_repository_name: \"" + git_name + "\"", file=f)
-            print("      git_name_of_branch: \"" + branch_name + "\"", file=f)
-            print("      dvc_authentication_json:", file=f)
-            print("        class: File", file=f)
-            print("        connector:", file=f)
-            print("          access: {username: '{{" + dvc_server.replace('.', '_').replace('-',
-                                                                                            '_') + "_username}}', password: '{{" + dvc_server.replace(
-                '.', '_').replace('-', '_') + "_password}}'}", file=f)
-            print("          command: dvc-cc-connector", file=f)
-            print("      dvc_servername: \"" + dvc_server + "\"", file=f)
-            print("      dvc_path_to_working_repository: \"" + dvc_path + "\"", file=f)
+            for j in range(num_of_repeats):
+                dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
+                # print("batches:", file=f)
+                print("  - inputs:", file=f)
+                print("      git_authentication_json:", file=f)
+                print("        class: File", file=f)
+                print("        connector:", file=f)
+                print("          access: {username: '{{" + git_path.replace('.', '_').replace('-',
+                                                                                              '_') + "_username}}', password: '{{" + git_path.replace(
+                    '.', '_').replace('-', '_') + "_password}}', email: '{{" + git_path.replace('.', '_').replace('-',
+                                                                                                                  '_') + "_email}}'}",
+                      file=f)
+                print("          command: dvc-cc-connector", file=f)
+                print("      git_path_to_working_repository: \"" + git_path + "\"", file=f)
+                print("      git_working_repository_owner: \"" + git_owner + "\"", file=f)
+                print("      git_working_repository_name: \"" + git_name + "\"", file=f)
+                print("      git_name_of_branch: \"" + branch_name + "\"", file=f)
+                print("      dvc_authentication_json:", file=f)
+                print("        class: File", file=f)
+                print("        connector:", file=f)
+                print("          access: {username: '{{" + dvc_server.replace('.', '_').replace('-',
+                                                                                                '_') + "_username}}', password: '{{" + dvc_server.replace(
+                    '.', '_').replace('-', '_') + "_password}}'}", file=f)
+                print("          command: dvc-cc-connector", file=f)
+                print("      dvc_servername: \"" + dvc_server + "\"", file=f)
+                print("      dvc_path_to_working_repository: \"" + dvc_path + "\"", file=f)
 
-            if sshfs_data is not None:
-                print("      sshfs_input_server_settings:", file=f)
-                for i in range(len(sshfs_data.keys())):
-                    sshfs_dest_rel = list(sshfs_data.keys())[i]
-                    sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
-                    sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
-                    sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
-                    sshfs_password = '{{' + str(sshfs_server).replace('.', '_').replace('-', '_') + '_password}}'
+                if sshfs_data is not None:
+                    print("      sshfs_input_server_settings:", file=f)
+                    for i in range(len(sshfs_data.keys())):
+                        sshfs_dest_rel = list(sshfs_data.keys())[i]
+                        sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
+                        sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
+                        sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
+                        sshfs_password = '{{' + str(sshfs_server).replace('.', '_').replace('-', '_') + '_password}}'
 
-                    print("        - class: Directory", file=f)
-                    print("          connector:", file=f)
-                    print("              command: \"red-connector-ssh\"", file=f)
-                    print("              mount: true", file=f)
-                    print("              access:", file=f)
-                    print("                host: '" + sshfs_server + "'", file=f)
-                    print("                port: 22", file=f)
-                    print("                auth:", file=f)
-                    print("                  username: '" + sshfs_username + "'", file=f)
-                    print("                  password: '" + sshfs_password + "'", file=f)
-                    print("                dirPath: '" + sshfs_path + "'", file=f)
+                        print("        - class: Directory", file=f)
+                        print("          connector:", file=f)
+                        print("              command: \"red-connector-ssh\"", file=f)
+                        print("              mount: true", file=f)
+                        print("              access:", file=f)
+                        print("                host: '" + sshfs_server + "'", file=f)
+                        print("                port: 22", file=f)
+                        print("                auth:", file=f)
+                        print("                  username: '" + sshfs_username + "'", file=f)
+                        print("                  password: '" + sshfs_password + "'", file=f)
+                        print("                dirPath: '" + sshfs_path + "'", file=f)
 
-                print("      sshfs_input_dest_rel_paths:", file=f)
-                for i in range(len(sshfs_data.keys())):
-                    sshfs_dest_rel = list(sshfs_data.keys())[i]
-                    print("        - '"+sshfs_dest_rel+"'", file=f)
+                    print("      sshfs_input_dest_rel_paths:", file=f)
+                    for i in range(len(sshfs_data.keys())):
+                        sshfs_dest_rel = list(sshfs_data.keys())[i]
+                        print("        - '"+sshfs_dest_rel+"'", file=f)
 
-            print("      dvc_remote_directory_sshfs:", file=f)
-            print("        class: Directory", file=f)
-            print("        connector:", file=f)
-            print("            command: \"red-connector-ssh\"", file=f)
-            print("            mount: true", file=f)
-            print("            access:", file=f)
-            print("              host: '" + dvc_server + "'", file=f)
-            print("              port: 22", file=f)
-            print("              auth:", file=f)
-            print("                username: '" + "{{" + dvc_server.replace('.', '_').replace('-',
-                                                                                              '_') + "_username}}'",
-                  file=f)
-            print("                password: '" + "{{" + dvc_server.replace(
-                '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
-            print("              writable: True", file=f)
-            print("              dirPath: '" + dvc_path + "'", file=f)
+                print("      dvc_remote_directory_sshfs:", file=f)
+                print("        class: Directory", file=f)
+                print("        connector:", file=f)
+                print("            command: \"red-connector-ssh\"", file=f)
+                print("            mount: true", file=f)
+                print("            access:", file=f)
+                print("              host: '" + dvc_server + "'", file=f)
+                print("              port: 22", file=f)
+                print("              auth:", file=f)
+                print("                username: '" + "{{" + dvc_server.replace('.', '_').replace('-',
+                                                                                                  '_') + "_username}}'",
+                      file=f)
+                print("                password: '" + "{{" + dvc_server.replace(
+                    '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
+                print("              writable: True", file=f)
+                print("              dirPath: '" + dvc_path + "'", file=f)
 
-            print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\', '/') + "'", file=f)
-            if live_output_files is not None:
-                print("      live_output_files: '" + live_output_files + "'", file=f)
-                print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
-            print("    outputs: {}", file=f)
+                print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\', '/') + "'", file=f)
+                if live_output_files is not None:
+                    print("      live_output_files: '" + live_output_files + "'", file=f)
+                    print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
+                print("    outputs: {}", file=f)
         with open('.dvc_cc/cc_config.yml',"r") as r:
             print(r.read(), file=f)
 
@@ -319,11 +320,12 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     # Get last experiment ID
     last_cc_id = get_last_cc_experimentid(keyring_service)
 
+
     # EXECUTE THE RED-YML
     if keyring_service is None:
-        p = 'faice exec cc_execution_file.red.yml'
+        p = 'faice exec cc_execution_file.red.yml --disable-retry'
     else:
-        p = 'faice exec --keyring-service ' + keyring_service + ' cc_execution_file.red.yml'
+        p = 'faice exec --keyring-service ' + keyring_service + ' cc_execution_file.red.yml --disable-retry'
     message = subprocess.call(p.split(' '))
     cc_id = get_last_cc_experimentid(keyring_service)
     if last_cc_id == cc_id:

@@ -101,4 +101,7 @@ summary = {'loss': float(np.min(history.history['loss'])),
             'val_acc': float(np.max(history.history['val_acc']))
           }
 with open('summary.yml', 'w') as f:
-    yaml.dump(summary, f)
+    print('Name,Value,Timestamp,Step',file=f)
+    for i in range(len(history.history['loss'])):
+        loss = history.history['loss'][i]
+        print('"loss",'+str()+','+int(time.time())+','+str(i), file=f)

@@ -34,6 +34,8 @@ def main():
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('--htw-student', help='If this parameter is set, it will not ask the user to set the values. '
                                              'All values will set by default values.',default=False, action='store_true')
+    parser.add_argument('--htw-staff', help='If this parameter is set, it will not ask the user to set the values. '
+                                             'All values will set by default values.',default=False, action='store_true')
 
     parser.add_argument('--stderr-in-same-file',
                         help='If you do not want a own file for stdout and stderr you need to set this flag. If this flag is set, it will use the same file for both stdout and stderr.',
@@ -43,7 +45,7 @@ def main():
 
     gitrepo,gitowner,gitname = get_gitinformation()
 
-    if not args.htw_student:
+    if not args.htw_student and not args.htw_staff:
         print('These settings refer to the required hardware resources in the cluster.')
         print('If you do not set an argument it will take the default values.')
 
@@ -163,7 +165,7 @@ def main():
             if not dvc_remote_user.lower().startswith('y'):
                 dvc_remote_user = input('The username for the remote DVC folder: ')
         print()
-    else:
+    elif args.htw_student:
         # set default values
         num_of_gpus = 1 ##
         ram = 60000
@@ -188,12 +190,32 @@ def main():
                 valid_matriculation_number = True
             else:
                 print('This is not a valid matriculation number.')
+    else:
+        # set default values
+        num_of_gpus = 1 ##
+        ram = 180000
+        docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
+        docker_image_needs_credentials = False
+        batch_concurrency_limit = 12
+        engine = 'ccagency'
+        engine_url = 'https://agency.f4.htw-berlin.de/cc'
+        dvc_remote_server = 'avocado01.f4.htw-berlin.de'
+        dvc_remote_path = '/data/ldap/Data-Version-Control-Cache/' + gitrepo + '/' + gitowner + '/' + gitname
+
+        valid_matriculation_number = False
+
+        dvc_remote_user = input('\tPlease fill in your ldap username: ').strip()
 
     # Change the directory to the main git directory.
     #os.chdir(str(Path(get_main_git_directory_str(Path()))
     
     gitrepo = GITRepo('.')
     try:
+        if os.path.exists(str(Path('.dvc/config'))):
+            os.remove('.dvc/config')
+        if os.path.exists(str(Path('.dvc/config.local'))):
+            os.remove('.dvc/config.local')
+
         dvcrepo = DVCRepo('.')
 
         #TODO: this can be removed!?

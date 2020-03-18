@@ -31,6 +31,9 @@ from dvc_cc.cancel.main import DESCRIPTION as CANCEL_DESCRIPTION
 from dvc_cc.setting.main import main as setting_main
 from dvc_cc.setting.main import DESCRIPTION as SETTING_DESCRIPTION
 
+from dvc_cc.keyring.main import main as keyring_main
+from dvc_cc.keyring.main import DESCRIPTION as KEYRING_DESCRIPTION
+
 from dvc_cc.hyperopt.main import main as hyperopt_main
 from dvc_cc.hyperopt.main import DESCRIPTION as HYPEROPT_DESCRIPTION
 
@@ -47,6 +50,7 @@ DESCRIPTION = 'This software is for Machine Learner and Deep Learner to make sca
 MODES = OrderedDict([
     ('init', {'main': init_main, 'description': INIT_DESCRIPTION}),
     ('setting', {'main': setting_main, 'description': SETTING_DESCRIPTION}),
+    ('keyring', {'main': keyring_main, 'description': KEYRING_DESCRIPTION}),
     ('hyperopt', {'main': hyperopt_main, 'description': HYPEROPT_DESCRIPTION}),
     ('run', {'main': run_main, 'description': run_DESCRIPTION}),
     # TODO: This should be the rerun-part!
