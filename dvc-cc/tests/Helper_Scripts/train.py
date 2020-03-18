@@ -101,13 +101,20 @@ summary = {'loss': float(np.min(history.history['loss'])),
             'val_acc': float(np.max(history.history['val_acc']))
           }
 
+print('I AM HERE 1+2')
+
 with open('summary.csv', 'w') as f:
     print('Name,Value,Timestamp,Step',file=f)
     for i in range(len(history.history['loss'])):
         loss = history.history['loss'][i]
         print('"loss",'+str(loss)+','+str(int(time.time()))+','+str(i), file=f)
 
+print('I AM HERE 3')
+
 with open('params.yml', 'w') as f:
     print('a: 1',file=f)
     print('a: 2',file=f)
     print('a: 3',file=f)
+
+
+print('I AM HERE 4')
