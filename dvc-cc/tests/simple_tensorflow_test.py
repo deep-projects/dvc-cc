@@ -182,7 +182,8 @@ PRINT_HEAD('create some sorce code and build a pipeline')
 subprocess.call(['mkdir', 'source'])
 subprocess.call(['wget', '-O','source/train.py','https://raw.githubusercontent.com/deep-projects/dvc-cc/master/dvc-cc/tests/Helper_Scripts/train.py'])
 subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', 'source/train.py', '-o', 'tensorboard', '-o', 'model.h5', '-M',
-                 'summary.yml', '-f', 'train.dvc', 'python source/train.py --num_of_kernels {{nk:int}} --activation_function {{af:[relu,tanh,sigmoid]}}'])
+                 'summary.csv', '-f', 'train.dvc', 'python source/train.py --num_of_kernels {{nk:int}} '
+                                                 '--activation_function {{af:[relu,tanh,sigmoid]}}'])
 subprocess.call(['git', 'add','-A'])
 subprocess.call(['git', 'commit', '-m', '"build the pipeline for the first test run with DVC-CC"'])
 #subprocess.call(['git', 'push'])
