@@ -8,6 +8,8 @@ import time
 import getpass
 import os
 import uuid
+import numpy as np
+
 parser = ArgumentParser()
 parser.add_argument('--gitpath', type=str,
                     help='The path to the git repository',
@@ -217,6 +219,14 @@ time.sleep(0.1)
 p.stdin.write((str(0)+'\n').encode())
 print('# INPUT 12: 0')
 p.stdin.flush()
+
+
+# the one_of parameters
+for i in range(9):
+    time.sleep(0.1)
+    p.stdin.write((str(np.random.randint(0,3))+'\n').encode())
+    print('# INPUT of one_of parameter.')
+    p.stdin.flush()
 
 
 # do you really want to start the jobs? YEES

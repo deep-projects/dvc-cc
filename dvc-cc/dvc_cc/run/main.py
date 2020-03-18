@@ -604,7 +604,7 @@ def main():
             from dvc_cc.run import papermill_helper
             parameters = papermill_helper.read_params_from_parametercell(ipynb_files_in_main_dir)
 
-            cmd = 'papermill ' + ipynb_files_in_main_dir + ' ' + ipynb_files_in_main_dir[:-6] + '_output.ipynb'
+            cmd = 'papermill ' + ipynb_files_in_main_dir + ' ' + ipynb_files_in_main_dir[:-6] + '_output.ipynb --log-output'
             for p in parameters:
                 cmd = cmd +' -k python -p ' + p[0] + ' {{' + p[0] + ':' + p[1] + ':None}}'
 

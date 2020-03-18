@@ -8,6 +8,7 @@ import time
 import getpass
 import os
 import uuid
+
 parser = ArgumentParser()
 parser.add_argument('--gitpath', type=str,
                     help='The path to the git repository',
@@ -220,7 +221,6 @@ time.sleep(0.1)
 p.stdin.write((str(0)+'\n').encode())
 print('# INPUT 12: 0')
 p.stdin.flush()
-
 
 # do you really want to start the jobs? YEES
 time.sleep(0.1)
