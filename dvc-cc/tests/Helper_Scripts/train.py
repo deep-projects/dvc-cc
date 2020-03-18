@@ -104,4 +104,4 @@ with open('summary.yml', 'w') as f:
     print('Name,Value,Timestamp,Step',file=f)
     for i in range(len(history.history['loss'])):
         loss = history.history['loss'][i]
-        print('"loss",'+str()+','+int(time.time())+','+str(i), file=f)
+        print('"loss",'+str(loss)+','+str(int(time.time()))+','+str(i), file=f)
