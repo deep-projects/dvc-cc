@@ -91,7 +91,6 @@ def cmd_paraneter_to_dagshub_paramfile(file=None):
                             else:
                                 parameters[name_of_pyfile + '_' + not_saved_parametername] = node[i]
                                 not_saved_parametername = None
-                        print(node[i])
 
                     if node[i].endswith('.py'):
                         name_of_pyfile = node[i][:-3].split('/')[-1].replace('-', '').replace('-', '')
@@ -440,7 +439,7 @@ def main():
         print(bcolors.OKBLUE + 'For DAGsHub.com: CREATING DAGsHub params.yml.' + get_time() + bcolors.ENDC)
         try:
             os.mkdir('.dagshub')
-            print('\ŧcreate the .dagshub-Folder for dagshub params and dagshub metric files.')
+            print('\tcreate the .dagshub-Folder for dagshub params and dagshub metric files.')
         except:
             print('\t.dagshub-Folder already exist.')
         with open('.dagshub/params.yml', 'w') as f:
@@ -457,6 +456,9 @@ def main():
             print('\tFor DAGsHub.com: All tensorboard files are converted to dagshub files.')
         except:
             print('\tFor DAGsHub.com: Tensorboard files could not be converted to dagshub files.')
+
+        subprocess.call(['git','add','.dagshub'])
+
 
 
 
