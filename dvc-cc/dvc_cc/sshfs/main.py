@@ -53,15 +53,9 @@ def unmount():
             data = json.load(jsonFile)
 
         for key in data.keys():
-            print()
-            print()
-            print(check_output(['mount']).decode("utf8"))
-            print()
-            print()
-            print()
-            print('unmount ' + str(key))
-            print(check_output(['fusermount', '-u', key]).decode("utf8"))
-            time.sleep(1)
+            if get_mount_values_for_a_direcotry(key)[0] is not None:
+                print(check_output(['fusermount', '-u', key]).decode("utf8"))
+                time.sleep(1)
 
 def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
     project_dir = get_main_git_directory_Path()
@@ -71,6 +65,7 @@ def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
 
     # Prüfe ob Ordner existiert und lege ihn gegebenfalls neu an
     if not os.path.exists(dest):
+        print(dest, os.path.exists(dest))
         os.makedirs(dest)
     # Prüfen ob eine SSHFS-Verbindung für das Ziel bereits vorliegt
     elif get_mount_values_for_a_direcotry(dest)[0] is not None:
@@ -101,8 +96,7 @@ def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
 
     if pw_keyring is not None and username_keyring is not None and username == username_keyring:
         # see here https://stackoverflow.com/questions/28823639/how-to-automatically-input-ssh-private-key-passphrase-with-pexpect
-
-        bash = pexpect.spawn('bash', echo=False)
+        bash = pexpect.spawn('bash', echo=True)
         bash.sendline('echo READY')
         bash.expect_exact('READY')
         bash.sendline('sshfs ' + ' '.join(sshfs_parameters[:-1]) + ' ' + dest)
@@ -114,11 +108,11 @@ def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
         bash.expect_exact(pexpect.EOF)
 
     else:
-        print('NOW I ANM HERE !!!')
         print(subprocess.call(['sshfs'] + sshfs_parameters[:-1] + [dest]))
-
     # Finden der wichtigen Parameter
     data_username, data_server, data_path = get_mount_values_for_a_direcotry(dest)
+    if data_server is None or data_server == 'null':
+        raise ValueError('The connection is lost. Maybe you do not have the rights?')
 
     # Bei gelingen: Erstelle einen neuen Eintrag oder aktualliesiere den alten Eintrag
     path_to_sshfs_json = str(Path(os.path.join(project_dir, '.dvc_cc/sshfs.json')))

@@ -68,6 +68,13 @@ def read_execution_engine():
         y = yaml.safe_load(f.read())
     return y['execution']['settings']['access']['url']
 
+def remove_keyring_pair(keyring_service, key_dvc_pw):
+    try:
+        keyring.delete_password(keyring_service, key_dvc_pw)
+        print('Delete the keyring parameter: ', keyring_service, key_dvc_pw)
+    except:
+        print('The following combination of keyring service and name does not exists: ', keyring_service, key_dvc_pw)
+
 def main():
     parser = ArgumentParser(description=DESCRIPTION)
     parser.add_argument('--htw-student', help='If this parameter is set, it will not ask the user to set the values. '
@@ -91,6 +98,9 @@ def main():
     parser.add_argument('--check-unsave', help='This is the same as --check, only that it shows the original error '
                                                'message of git push and sshfs connections. Warning: It can happen '
                                                'that the message shows your password.',
+                        default=False,
+                        action='store_true')
+    parser.add_argument('--delete', help='Delete all keyring informations.',
                         default=False,
                         action='store_true')
     args = parser.parse_args()
@@ -124,7 +134,8 @@ def main():
             keyring.set_password(keyring_service, key_agency_username, agency_user)
 
         if args.htw_student:
-            pw = getpass.getpass('\tPlease insert your '+bcolors.OKBLUE+'password for the DT-Cluster'+bcolors.ENDC+': ')
+            pw = getpass.getpass('\tPlease insert your '+bcolors.OKBLUE+'password for the '
+                                                                        'DT-Cluster / CC agency'+bcolors.ENDC+': ')
             keyring.set_password(keyring_service, key_agency_pw, pw)
             keyring.set_password(keyring_service, key_dvc_pw, pw)
         else:
@@ -253,22 +264,40 @@ def main():
 
 
 
+    if args.delete:
+        print()
+        print('# All keyring parameters are deleted.')
 
+        remove_keyring_pair(keyring_service, key_git_username)
+        remove_keyring_pair(keyring_service, key_git_email)
+        remove_keyring_pair(keyring_service, key_git_pw)
 
+        remove_keyring_pair(keyring_service, key_dvc_username)
+        remove_keyring_pair(keyring_service, key_dvc_pw)
 
-
+        remove_keyring_pair(keyring_service, key_agency_username)
+        remove_keyring_pair(keyring_service, key_agency_pw)
 
     print()
     print('# Print the keyring parameters')
     print('%23s : %s' % ('key_git_username', keyring.get_password(keyring_service, key_git_username)))
     print('%23s : %s' % ('key_git_email', keyring.get_password(keyring_service, key_git_email)))
-    print('%23s : %s' % ('key_git_pw', '*'*len(keyring.get_password(keyring_service, key_git_pw))))
+    if keyring.get_password(keyring_service, key_git_pw) is not None:
+        print('%23s : %s' % ('key_git_pw', '*'*len(keyring.get_password(keyring_service, key_git_pw))))
+    else:
+        print('%23s : %s' % ('key_git_pw', 'None'))
     print()
     print('%23s : %s' % ('key_dvc_username', keyring.get_password(keyring_service, key_dvc_username)))
-    print('%23s : %s' % ('key_dvc_pw', '*'*len(keyring.get_password(keyring_service, key_dvc_pw))))
+    if keyring.get_password(keyring_service, key_dvc_pw) is not None:
+        print('%23s : %s' % ('key_dvc_pw', '*'*len(keyring.get_password(keyring_service, key_dvc_pw))))
+    else:
+        print('%23s : %s' % ('key_dvc_pw', 'None'))
     print()
     print('%23s : %s' % ('key_agency_username', keyring.get_password(keyring_service, key_agency_username)))
-    print('%23s : %s' % ('key_agency_pw', '*'*len(keyring.get_password(keyring_service, key_agency_pw))))
+    if keyring.get_password(keyring_service, key_agency_pw) is not None:
+        print('%23s : %s' % ('key_agency_pw', '*'*len(keyring.get_password(keyring_service, key_agency_pw))))
+    else:
+        print('%23s : %s' % ('key_agency_pw', 'None'))
 
 
 
