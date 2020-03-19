@@ -167,13 +167,14 @@ def all_jupyter_notebook_to_py_files(Gs):
     created_files = []
     for G in Gs:
         for s in G.nodes():
-            cmd = s.cmd.split()
-            if cmd[0] == 'python':
-                for c in cmd:
-                    if c.endswith('.py'):
-                        if not os.path.exists(c) and os.path.exists(c[:-3]+'.ipynb'):
-                            created_files.append(jupyter_notebook_to_py_file(c[:-3]+'.ipynb'))
-                            print(bcolors.BOLD+'    Convert ' + c[:-3]+'.ipynb' +  ' to ' + c + ' file.' + bcolors.ENDC)
+            if s.cmd is not None:
+                cmd = s.cmd.split()
+                if cmd[0] == 'python':
+                    for c in cmd:
+                        if c.endswith('.py'):
+                            if not os.path.exists(c) and os.path.exists(c[:-3]+'.ipynb'):
+                                created_files.append(jupyter_notebook_to_py_file(c[:-3]+'.ipynb'))
+                                print(bcolors.BOLD+'    Convert ' + c[:-3]+'.ipynb' +  ' to ' + c + ' file.' + bcolors.ENDC)
     return created_files
 
 def jupyter_notebook_to_py_file(path_to_ipynb):

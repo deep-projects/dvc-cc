@@ -1,4 +1,4 @@
-
+#TODO: It must be a script written that run all jobs and check them automaticly.
 
 
 # TEST DT-CLUSTER
