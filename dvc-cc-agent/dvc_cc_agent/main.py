@@ -62,7 +62,8 @@ def tensorboard_scalar_to_dagshub_rows(board, file=None):
     ea.Reload()
     for scalar in ea.Tags()['scalars']:
         for value in ea.Scalars(scalar):
-            print('"'+board.split('/')[-1]+'_'+scalar+'",'+str(value.value)+','+str(value.wall_time)+','+str(value.step), file=file)
+            print('"'+board.split('/')[-1]+'_'+scalar+'",'+str(value.value)+','+str(int(value.wall_time*1000))+','
+                                                                                                      ''+str(value.step), file=file)
 
 
 def cmd_paraneter_to_dagshub_paramfile(file=None):
