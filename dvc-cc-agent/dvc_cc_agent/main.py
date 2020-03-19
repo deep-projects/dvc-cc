@@ -450,7 +450,8 @@ def main():
         print('\tFor DAGsHub.com: Found the folling tensorboard folders: '+ str(tensorboard_folders))
 
         try:
-            with open('.dagshub/tensorboard.yml', 'w') as f:
+            with open('.dagshub/tensorboard.csv', 'w') as f:
+                print('Name,Value,Timestamp,Step', file=f)
                 for board in tensorboard_folders:
                     tensorboard_scalar_to_dagshub_rows(board,f)
             print('\tFor DAGsHub.com: All tensorboard files are converted to dagshub files.')
