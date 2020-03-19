@@ -458,6 +458,8 @@ def main():
             print('\tFor DAGsHub.com: Tensorboard files could not be converted to dagshub files.')
 
         subprocess.call(['git','add','.dagshub'])
+        subprocess.call(['git', 'commit', '-m', 'Add .dagshub folder with dagshub params file and dagshub metric '
+                                                'files.'])
 
 
 
