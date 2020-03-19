@@ -37,6 +37,83 @@ def collabs_text(title, text):
     posttext = '\n\n</p>\n</details>\n\n'
     return pretext+text+posttext
 
+
+def get_all_tensorboard_folders():
+    tensorboard_folders = []
+    for root, dirs, files in os.walk(".", topdown=True):
+        files = [f for f in files if not f[0] == '.']
+        dirs[:] = [d for d in dirs if not d[0] == '.']
+        for filename in files:
+            if 'events.out.tfevents' in filename:
+                tensorboard_folders.append(root)
+    return list(set(tensorboard_folders))
+
+
+def tensorboard_scalar_to_dagshub_rows(board, file=None):
+    from tensorboard.backend.event_processing import event_accumulator
+    ea = event_accumulator.EventAccumulator(board,
+    size_guidance={ # see below regarding this argument
+         #event_accumulator.COMPRESSED_HISTOGRAMS: 500,
+         #event_accumulator.IMAGES: 4,
+         #event_accumulator.AUDIO: 4,
+         event_accumulator.SCALARS: 0,
+         #event_accumulator.HISTOGRAMS: 1,
+     })
+    ea.Reload()
+    for scalar in ea.Tags()['scalars']:
+        for value in ea.Scalars(scalar):
+            print('"'+board.split('/')[-1]+'_'+scalar+'",'+str(value.value)+','+str(value.wall_time)+','+str(value.step), file=file)
+
+
+def cmd_paraneter_to_dagshub_paramfile(file=None):
+    from dvc.repo import Repo as DVCRepo
+    dvcrepo = DVCRepo('.')
+
+    parameters = {}
+    not_saved_parametername = None
+    for pipe in dvcrepo.pipelines:
+        for node in pipe.nodes:
+            num_of_unnamed_parameters_found = 0
+            node = node.cmd.split()
+            if node[0] == 'python':
+                name_of_pyfile = None
+                for i in range(1, len(node)):
+                    if name_of_pyfile is not None:
+                        if node[i].startswith('--'):
+                            not_saved_parametername = node[i][2:]
+                        elif node[i].startswith('-'):
+                            not_saved_parametername = node[i][1:]
+                        else:
+                            if not_saved_parametername is None:
+                                num_of_unnamed_parameters_found += 1
+                                parameters[name_of_pyfile + '_unnamed_' + str(num_of_unnamed_parameters_found)] = node[
+                                    i]
+                            else:
+                                parameters[name_of_pyfile + '_' + not_saved_parametername] = node[i]
+                                not_saved_parametername = None
+                        print(node[i])
+
+                    if node[i].endswith('.py'):
+                        name_of_pyfile = node[i][:-3].split('/')[-1].replace('-', '').replace('-', '')
+            elif node[0] == 'papermill':
+                position = None
+                for i in range(1, len(node)):
+                    if node[i] == '-p':
+                        position = 1
+                    elif position == 1:
+                        not_saved_parametername = node[i]
+                        position = 2
+                    elif position == 2:
+                        position = None
+                        parameters[name_of_pyfile + '_' + not_saved_parametername] = node[i]
+
+    for k in parameters.keys():
+        print(k + ': ' + str(parameters[k]), file=file)
+
+
+
+
+
 def write_readme(dvc_status_before_execution, used_sshfs):
     with open('README.md',"a+") as f:
         print('## About DVC-CC', file=f)
@@ -354,6 +431,33 @@ def main():
     print(bcolors.OKBLUE+'COMMIT AT DVC   ' + get_time()+bcolors.ENDC)
     command = "dvc commit --force"
     print(subprocess.check_output(command, shell=True).decode())
+
+
+
+
+
+    if 'dagshub.com' in git_path_to_working_repository.lower():
+        print(bcolors.OKBLUE + 'For DAGsHub.com: CREATING DAGsHub params.yml.' + get_time() + bcolors.ENDC)
+        try:
+            os.mkdir('.dagshub')
+            print('\ŧcreate the .dagshub-Folder for dagshub params and dagshub metric files.')
+        except:
+            print('\t.dagshub-Folder already exist.')
+        with open('.dagshub/params.yml', 'w') as f:
+            cmd_paraneter_to_dagshub_paramfile(f)
+
+        tensorboard_folders = get_all_tensorboard_folders()
+        print('\tFor DAGsHub.com: Found the folling tensorboard folders: '+ str(tensorboard_folders))
+
+        try:
+            with open('.dagshub/tensorboard.yml', 'w') as f:
+                for board in tensorboard_folders:
+                    tensorboard_scalar_to_dagshub_rows(board,f)
+            print('\tFor DAGsHub.com: All tensorboard files are converted to dagshub files.')
+        except:
+            print('\tFor DAGsHub.com: Tensorboard files could not be converted to dagshub files.')
+
+
 
     print(bcolors.OKBLUE+'PUSH TO DVC   ' + get_time()+bcolors.ENDC)
     pushed_successfull = False
