@@ -108,7 +108,6 @@ def read_definitions_from_parametercell(path_to_ipynb, cell_tag_name='outputs'):
                     varname = line_sep[0].strip()
                     value = line_sep[1].strip()
 
-                    if (value.startswith("'") or value.startswith("'")) and
-                        (value.endswith("'") or value.endswith("'"))
+                    if (value.startswith("'") or value.startswith("'")) and (value.endswith("'") or value.endswith("'")):
                         founded_parameters.append([varname, value[1:-1]])
     return founded_parameters
