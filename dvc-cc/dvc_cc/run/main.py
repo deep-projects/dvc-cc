@@ -602,14 +602,23 @@ def main():
             print(bcolors.BOLD + 'Create a DVC file for executing ' + ipynb_files_in_main_dir + ' with papermill.' +
                   bcolors.ENDC)
             from dvc_cc.run import papermill_helper
-            parameters = papermill_helper.read_params_from_parametercell(ipynb_files_in_main_dir)
+            parameters = papermill_helper.read_parameters_from_parametercell(ipynb_files_in_main_dir)
+            outputs = papermill_helper.read_definitions_from_parametercell(ipynb_files_in_main_dir, 'outputs')
+            metrics = papermill_helper.read_definitions_from_parametercell(ipynb_files_in_main_dir, 'metrics')
 
-            cmd = 'papermill ' + ipynb_files_in_main_dir + ' ' + ipynb_files_in_main_dir[:-6] + '_output.ipynb --log-output'
+            cmd = 'papermill ' + ipynb_files_in_main_dir + ' ' + ipynb_files_in_main_dir[:-6] + '_output.ipynb --log-output -k python'
             for p in parameters:
-                cmd = cmd +' -k python -p ' + p[0] + ' {{' + p[0] + ':' + p[1] + ':None}}'
+                cmd = cmd +' -p ' + p[0] + ' {{' + p[0] + ':' + p[1] + ':None}}'
 
-            subprocess.call(['dvc-cc', 'hyperopt', 'new', '-d', ipynb_files_in_main_dir, '-o',
-                             ipynb_files_in_main_dir[:-6] + '_output.ipynb', '-f','papermill.dvc',cmd])
+            dvc_cc_command = ['dvc-cc', 'hyperopt', 'new', '-d', ipynb_files_in_main_dir, '-o',
+                             ipynb_files_in_main_dir[:-6] + '_output.ipynb', '-f','papermill.dvc']
+            for o in outputs:
+                dvc_cc_command = dvc_cc_command + ['-o', o[0]]
+            for m in metrics:
+                dvc_cc_command = dvc_cc_command + ['-M', m[0]]
+            dvc_cc_command = dvc_cc_command + [cmd]
+
+            subprocess.call(dvc_cc_command)
             subprocess.call(['git', 'add', 'dvc/.hyperopt/papermill.hyperopt'])  # TODO: build quite mode!
             subprocess.call(['git', 'commit','-q','-m', 'Create a dvc file for papermill.'])
             subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
