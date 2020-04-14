@@ -613,9 +613,9 @@ def main():
             dvc_cc_command = ['dvc-cc', 'hyperopt', 'new', '-d', ipynb_files_in_main_dir, '-o',
                              ipynb_files_in_main_dir[:-6] + '_output.ipynb', '-f','papermill.dvc']
             for o in outputs:
-                dvc_cc_command = dvc_cc_command + ['-o', o[0]]
+                dvc_cc_command = dvc_cc_command + ['-o', o[1]]
             for m in metrics:
-                dvc_cc_command = dvc_cc_command + ['-M', m[0]]
+                dvc_cc_command = dvc_cc_command + ['-M', m[1]]
             dvc_cc_command = dvc_cc_command + [cmd]
 
             subprocess.call(dvc_cc_command)
