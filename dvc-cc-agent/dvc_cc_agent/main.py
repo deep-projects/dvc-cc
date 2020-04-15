@@ -44,6 +44,7 @@ def get_all_tensorboard_folders():
         files = [f for f in files if not f[0] == '.']
         dirs[:] = [d for d in dirs if not d[0] == '.']
         for filename in files:
+            print(filename)
             if 'events.out.tfevents' in filename:
                 tensorboard_folders.append(root)
     return list(set(tensorboard_folders))
@@ -449,14 +450,15 @@ def main():
         tensorboard_folders = get_all_tensorboard_folders()
         print('\tFor DAGsHub.com: Found the folling tensorboard folders: '+ str(tensorboard_folders))
 
-        try:
-            with open('.dagshub/tensorboard.csv', 'w') as f:
-                print('Name,Value,Timestamp,Step', file=f)
-                for board in tensorboard_folders:
-                    tensorboard_scalar_to_dagshub_rows(board,f)
-            print('\tFor DAGsHub.com: All tensorboard files are converted to dagshub files.')
-        except:
-            print('\tFor DAGsHub.com: Tensorboard files could not be converted to dagshub files.')
+        if tensorboard_folders:
+            try:
+                with open('.dagshub/tensorboard.csv', 'w') as f:
+                    print('Name,Value,Timestamp,Step', file=f)
+                    for board in tensorboard_folders:
+                        tensorboard_scalar_to_dagshub_rows(board,f)
+                print('\tFor DAGsHub.com: All tensorboard files are converted to dagshub files.')
+            except:
+                print('\tFor DAGsHub.com: Tensorboard files could not be converted to dagshub files.')
 
         subprocess.call(['git','add','.dagshub'])
         subprocess.call(['git', 'commit', '-m', 'Add .dagshub folder with dagshub params file and dagshub metric '
