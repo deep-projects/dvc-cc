@@ -44,7 +44,6 @@ def get_all_tensorboard_folders():
         files = [f for f in files if not f[0] == '.']
         dirs[:] = [d for d in dirs if not d[0] == '.']
         for filename in files:
-            print(filename)
             if 'events.out.tfevents' in filename:
                 tensorboard_folders.append(root)
     return list(set(tensorboard_folders))
@@ -53,18 +52,27 @@ def get_all_tensorboard_folders():
 def tensorboard_scalar_to_dagshub_rows(board, file=None):
     from tensorboard.backend.event_processing import event_accumulator
     ea = event_accumulator.EventAccumulator(board,
-    size_guidance={ # see below regarding this argument
-         #event_accumulator.COMPRESSED_HISTOGRAMS: 500,
-         #event_accumulator.IMAGES: 4,
-         #event_accumulator.AUDIO: 4,
-         event_accumulator.SCALARS: 0,
-         #event_accumulator.HISTOGRAMS: 1,
-     })
+                                            size_guidance={  # see below regarding this argument
+                                                # event_accumulator.COMPRESSED_HISTOGRAMS: 500,
+                                                # event_accumulator.IMAGES: 4,
+                                                # event_accumulator.AUDIO: 4,
+                                                event_accumulator.SCALARS: 0,
+                                                # event_accumulator.HISTOGRAMS: 1,
+                                            })
     ea.Reload()
+    print(ea.Tags())
     for scalar in ea.Tags()['scalars']:
         for value in ea.Scalars(scalar):
-            print('"'+board.split('/')[-1]+'_'+scalar+'",'+str(value.value)+','+str(int(value.wall_time*1000))+','
-                                                                                                      ''+str(value.step), file=file)
+            print('"' + board.split('/')[-1] + '_' + scalar + '",' + str(value.value) + ',' + str(
+                int(value.wall_time * 1000)) + ','
+                                               '' + str(value.step), file=file)
+
+    for tensor in ea.Tags()['tensors']:
+        for value in ea.Tensors(tensor):
+            print(
+                '"' + board.split('/')[-1] + '_' + tensor + '",' + str(tf.make_ndarray(value.tensor_proto)) + ',' + str(
+                    int(value.wall_time * 1000)) + ','
+                                                   '' + str(value.step), file=file)
 
 
 def cmd_paraneter_to_dagshub_paramfile(file=None):
