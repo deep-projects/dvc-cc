@@ -105,7 +105,7 @@ def cmd_paraneter_to_dagshub_paramfile(file=None):
                         position = 2
                     elif position == 2:
                         position = None
-                        parameters[name_of_pyfile + '_' + not_saved_parametername] = node[i]
+                        parameters[not_saved_parametername] = node[i]
 
     for k in parameters.keys():
         print(k + ': ' + str(parameters[k]), file=file)
