@@ -5,6 +5,7 @@ import os
 import datetime
 import time
 import shutil
+import dvc_cc_agent.version
 import dvc_cc_agent.copy_output_files
 from dvc_cc_agent.bcolors import bcolors
 
@@ -50,7 +51,9 @@ def get_all_tensorboard_folders():
 
 
 def tensorboard_scalar_to_dagshub_rows(board, file=None):
+    import tensorflow as tf
     from tensorboard.backend.event_processing import event_accumulator
+
     ea = event_accumulator.EventAccumulator(board,
                                             size_guidance={  # see below regarding this argument
                                                 # event_accumulator.COMPRESSED_HISTOGRAMS: 500,
@@ -205,7 +208,8 @@ def get_all_dvc_files_that_are_not_needed(dvc_filenames):
     return [s for s in all_stages if s not in descendants_stages]
 
 def main():
-    print('Start executer-python [version 9.1]')
+
+    print('Start executer-python [version '+str(dvc_cc_agent.version.VERSION)+']')
     
     parser = ArgumentParser()
     
