@@ -1,4 +1,4 @@
-FROM docker.io/tensorflow/tensorflow:2.2.0rc0-gpu-py3
+FROM docker.io/tensorflow/tensorflow:2.2.0rc2-gpu-py3
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update \

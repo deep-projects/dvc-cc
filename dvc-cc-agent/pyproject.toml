@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dvc-cc-agent"
-version = "0.9.23"
+version = "0.9.24"
 description = "This script is the agent that should only be called in a docker. It executes scripts of github defined with dvc."                
 authors = ["Jonas <jonas.annuscheit@gmail.com>"]
 license = "AGPL-3.0"

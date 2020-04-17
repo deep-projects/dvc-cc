@@ -60,22 +60,47 @@ def tensorboard_scalar_to_dagshub_rows(board, file=None):
                                                 # event_accumulator.IMAGES: 4,
                                                 # event_accumulator.AUDIO: 4,
                                                 event_accumulator.SCALARS: 0,
+                                                event_accumulator.TENSORS: 0,
                                                 # event_accumulator.HISTOGRAMS: 1,
                                             })
     ea.Reload()
-    print(ea.Tags())
+
+    founded_scalars_min = {} #[min_value,min_step]
+    founded_scalars_max = {} # [max_value,max_step]
+    last_used_timestamp = 0
+
     for scalar in ea.Tags()['scalars']:
+        name = '"' + board.split('/')[-1] + '_' + scalar + '"'
+        founded_scalars_min[name] = None
+        founded_scalars_max[name] = None
         for value in ea.Scalars(scalar):
-            print('"' + board.split('/')[-1] + '_' + scalar + '",' + str(value.value) + ',' + str(
+            if not founded_scalars_min[name] or founded_scalars_min[name][0] > value.value:
+                founded_scalars_min[name] = [value.value, value.step]
+            if not founded_scalars_max[name] or founded_scalars_max[name][0] < value.value:
+                founded_scalars_max[name] = [value.value, value.step]
+            if last_used_timestamp < value.wall_time * 1000:
+                last_used_timestamp = value.wall_time * 1000
+            print(name + ',' + str(value.value) + ',' + str(
                 int(value.wall_time * 1000)) + ','
                                                '' + str(value.step), file=file)
-
     for tensor in ea.Tags()['tensors']:
+        name = '"' + board.split('/')[-1] + '_' + tensor + '"'
+        founded_scalars_min[name] = None
+        founded_scalars_max[name] = None
         for value in ea.Tensors(tensor):
-            print(
-                '"' + board.split('/')[-1] + '_' + tensor + '",' + str(tf.make_ndarray(value.tensor_proto)) + ',' + str(
-                    int(value.wall_time * 1000)) + ','
-                                                   '' + str(value.step), file=file)
+            v = tf.make_ndarray(value.tensor_proto)
+            if not founded_scalars_min[name] or founded_scalars_min[name][0] > v:
+                founded_scalars_min[name] = [v, value.step]
+            if not founded_scalars_max[name] or founded_scalars_max[name][0] < v:
+                founded_scalars_max[name] = [v, value.step]
+            if last_used_timestamp < value.wall_time * 1000:
+                last_used_timestamp = value.wall_time * 1000
+            print(name + ',' + str(v) + ',' + str(int(value.wall_time * 1000)) + ',' + str(value.step), file=file)
+
+    for key in founded_scalars_min:
+        print(key[:-1] + '_min",' + str(founded_scalars_min[key][0]) + ',' + str(int(last_used_timestamp)) + ',' + str(founded_scalars_min[key][1]), file=file)
+    for key in founded_scalars_max:
+        print(key[:-1] + '_max",' + str(founded_scalars_max[key][0]) + ',' + str(int(last_used_timestamp)) + ',' + str(founded_scalars_max[key][1]), file=file)
 
 
 def cmd_paraneter_to_dagshub_paramfile(file=None):
@@ -458,6 +483,7 @@ def main():
             print('\t.dagshub-Folder already exist.')
         with open('.dagshub/params.yml', 'w') as f:
             cmd_paraneter_to_dagshub_paramfile(f)
+            print('generated_projectname: ' + name_of_result_branch[4:], file=f)
 
         tensorboard_folders = get_all_tensorboard_folders()
         print('\tFor DAGsHub.com: Found the folling tensorboard folders: '+ str(tensorboard_folders))
