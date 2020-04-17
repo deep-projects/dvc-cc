@@ -212,9 +212,8 @@ def get_last_cc_experimentid(keyring_service):
     return sorted(a,key=lambda x: x['registrationTime'])[-1]['_id']
 
 
-
-def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, live_output_files,
-                live_output_update_frequence, keyring_service):
+def create_cc_config(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, live_output_files,
+                live_output_update_frequence):
     git_path, git_owner, git_name = get_gitinformation()
 
     dvc_url, dvc_server, dvc_path = get_dvcurl()
@@ -315,9 +314,10 @@ def exec_branch(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, li
     subprocess.call(['git', 'commit', '-m', '\'Create red.yml file.\''])
     subprocess.call(['git', 'push'])
 
+def exec_branch(keyring_service):
+
     # Get last experiment ID
     last_cc_id = get_last_cc_experimentid(keyring_service)
-
 
     # EXECUTE THE RED-YML
     if keyring_service is None:
@@ -503,8 +503,12 @@ def main():
     parser.add_argument('-p','--papermill',help='Use papermill to run the jupyter notebook on the server and save the results in the jupyter notebook. If this parameter is set, no jupyter notebook will be converted to py files.',
                         default=False, action='store_true')
 
+
+    parser.add_argument('-de','--delay-execution',help='If this parameter is true, than it will create first ALL input branches and than execute it once.',
+                        default=False, action='store_true')
+
     args = parser.parse_args()
-    
+
     project_dir = get_main_git_directory_Path()
     #os.chdir(str(Path(project_dir)))
     
@@ -683,30 +687,66 @@ def main():
             else:
                 branch_name = exp_name
 
-            cc_id = exec_branch(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats,
-                                args.live_output_files, args.live_output_update_frequence, args.keyring_service)
+            create_cc_config(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats,
+                                args.live_output_files, args.live_output_update_frequence)
+            if not args.delay_execution:
+                cc_id = exec_branch(args.keyring_service)
 
-            if len(draw) > 0:  # one or more hyperparameters was set!
-                subprocess.call(['git', 'checkout', '-q', exp_name])
+                if len(draw) > 0:  # one or more hyperparameters was set!
+                    subprocess.call(['git', 'checkout', '-q', exp_name])
 
-            if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
-                with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
-                    loaded_yml = yaml.safe_load(f)
-            else:
-                loaded_yml = {}
+                if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
+                    with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
+                        loaded_yml = yaml.safe_load(f)
+                else:
+                    loaded_yml = {}
 
-            if branch_name in loaded_yml:
-                loaded_yml[branch_name].append(cc_id)
-            else:
-                loaded_yml[branch_name] = [cc_id]
+                if branch_name in loaded_yml:
+                    loaded_yml[branch_name].append(cc_id)
+                else:
+                    loaded_yml[branch_name] = [cc_id]
 
-            with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
-                yaml.dump(loaded_yml, f)
+                with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
+                    yaml.dump(loaded_yml, f)
 
-            print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
-            subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
-            subprocess.call(['git', 'commit', '-q','-m', 'Push CC-ID'])
-            subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
+                print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
+                subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
+                subprocess.call(['git', 'commit', '-q','-m', 'Push CC-ID'])
+                subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
+
+        if args.delay_execution:
+            for i, branch_name in enumerate(branch_names):
+
+                draw = hyperopt_draws[i]
+
+                if len(draw) > 0:  # one or more hyperparameters was set!
+                    subprocess.call(['git', 'checkout', '-q', branch_name])
+                else:
+                    subprocess.call(['git', 'checkout', '-q', exp_name])
+
+                cc_id = exec_branch(args.keyring_service)
+
+                if len(draw) > 0:  # one or more hyperparameters was set!
+                    subprocess.call(['git', 'checkout', '-q', exp_name])
+
+                if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
+                    with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
+                        loaded_yml = yaml.safe_load(f)
+                else:
+                    loaded_yml = {}
+
+                if branch_name in loaded_yml:
+                    loaded_yml[branch_name].append(cc_id)
+                else:
+                    loaded_yml[branch_name] = [cc_id]
+
+                with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
+                    yaml.dump(loaded_yml, f)
+
+                print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
+                subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
+                subprocess.call(['git', 'commit', '-q', '-m', 'Push CC-ID'])
+                subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
 
     finally:
         ##########################
