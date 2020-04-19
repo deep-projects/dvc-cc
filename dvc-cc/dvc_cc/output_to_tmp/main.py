@@ -50,6 +50,7 @@ def main():
     parser.add_argument('-p', '--list-of-pos',
                         help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.',
                         nargs="+", type=str)
+    parser.add_argument('-e','--print-error', action='store_true')
     args = parser.parse_args()
 
     repo = DVCRepo()
@@ -110,9 +111,14 @@ def main():
                     print(path_to_output)
                     os.mkdir(path_to_output)
                     repo.get('.', args.path_to_output,out=str(Path(path_to_output + '/' + path_to_output_clean)), rev=b)
-            except:
+            except Exception as ex:
                 print('File was not found.')
                 os.rmdir(path_to_output)
+                if args.print_error:
+                    print(ex)
     print()
     print('Found ' + str(len(os.listdir(str(Path(outputdir))))) + ' files or folders.')
+    if len(os.listdir(str(Path(outputdir)))) == 0:
+        print('Folder was removed.')
+        os.rmdir(str(Path(outputdir)))
     print('If files are missing, please use "dvc-cc git sync" to get new result branches and repeat this command.')
