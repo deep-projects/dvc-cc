@@ -12,6 +12,7 @@ import time
 import numpy as np
 import getpass
 from pathlib import Path
+import shutil
 
 DESCRIPTION = 'This script gives you the possibility to get all output files that match some regex over different branches and saves them in a tmp folder.'
 
@@ -50,7 +51,7 @@ def main():
     parser.add_argument('-p', '--list-of-pos',
                         help='A list of dvc-cc indizes that you want include in the display. You can also use slicing for example: 12:15:2 to use 12, 14.',
                         nargs="+", type=str)
-    parser.add_argument('-e','--print-error', action='store_true')
+    parser.add_argument('-e','--print-error',help='If this parameter is set, it will print the error message, why a file or folder could not be found.', action='store_true')
     args = parser.parse_args()
 
     repo = DVCRepo()
@@ -106,6 +107,9 @@ def main():
                     print(path_to_output)
                     os.mkdir(path_to_output)
                     repo.get('.', args.path_to_output,out=str(Path(path_to_output + '/' + path_to_output_clean)), rev=b)
+                    for p in os.listdir('/tmp'):
+                        if p.endswith('dvc-erepo'):
+                            shutil.rmtree('/tmp/' + p)
                 else:
                     path_to_output = str(Path(outputdir + '/' + b))
                     print(path_to_output)
