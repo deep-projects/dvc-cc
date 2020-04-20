@@ -359,7 +359,7 @@ def main():
     if os.path.isdir('dvc/'+name_of_result_branch):
         shutil.move('dvc/'+name_of_result_branch, 'dvc')
     for dvc_folder in os.listdir('dvc'):
-        if os.path.isdir(dvc_folder) and dvc_folder.startswith('rcc_'):
+        if os.path.isdir('dvc/'+dvc_folder) and dvc_folder.startswith('rcc_'):
             shutil.rmtree('dvc/'+dvc_folder)
     print(bcolors.OKBLUE + 'UPDATE CC RED YML FILE    ' + get_time() + bcolors.ENDC)
     if os.path.isfile('cc_execution_file.red.yml'):
