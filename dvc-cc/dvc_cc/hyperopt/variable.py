@@ -213,7 +213,7 @@ class VariableCache:
 
 
 
-    def set_values_for_hyperopt_files(self, values_to_set):
+    def set_values_for_hyperopt_files(self, values_to_set, dvc_save_path='dvc'):
         """
 
         :return:
@@ -238,6 +238,6 @@ class VariableCache:
                         content = content[:start_pos] + str(values_to_set[index]) + content[end_pos+2:]
                     start_pos += 2
 
-            with open(str(Path('dvc/'+filename[14:-9]+'.dvc')), 'w') as f:
+            with open(str(Path(dvc_save_path+'/'+filename[14:-9]+'.dvc')), 'w') as f:
                 print(content, file=f)
 

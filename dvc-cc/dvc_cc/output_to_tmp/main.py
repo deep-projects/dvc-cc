@@ -107,14 +107,14 @@ def main():
                     print(path_to_output)
                     os.mkdir(path_to_output)
                     repo.get('.', args.path_to_output,out=str(Path(path_to_output + '/' + path_to_output_clean)), rev=b)
-                    for p in os.listdir('/tmp'):
-                        if p.endswith('dvc-erepo'):
-                            shutil.rmtree('/tmp/' + p)
                 else:
                     path_to_output = str(Path(outputdir + '/' + b))
                     print(path_to_output)
                     os.mkdir(path_to_output)
                     repo.get('.', args.path_to_output,out=str(Path(path_to_output + '/' + path_to_output_clean)), rev=b)
+                for p in os.listdir('/tmp'):
+                    if p.endswith('dvc-erepo'):
+                        shutil.rmtree('/tmp/' + p)
             except Exception as ex:
                 print('File was not found.')
                 os.rmdir(path_to_output)

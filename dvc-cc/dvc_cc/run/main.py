@@ -212,7 +212,7 @@ def get_last_cc_experimentid(keyring_service):
     return sorted(a,key=lambda x: x['registrationTime'])[-1]['_id']
 
 
-def create_cc_config(dvc_files, branch_name, project_dir, no_exec, num_of_repeats, live_output_files,
+def create_cc_config(dvc_files, exp_name, rcc_branch_names, num_of_repeats, live_output_files,
                 live_output_update_frequence):
     git_path, git_owner, git_name = get_gitinformation()
 
@@ -230,81 +230,83 @@ def create_cc_config(dvc_files, branch_name, project_dir, no_exec, num_of_repeat
     with open('cc_execution_file.red.yml',"w") as f:
         print("batches:", file=f)
         for i in range(len(dvc_files)):
-            for j in range(num_of_repeats):
-                dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
-                # print("batches:", file=f)
-                print("  - inputs:", file=f)
-                print("      git_authentication_json:", file=f)
-                print("        class: File", file=f)
-                print("        connector:", file=f)
-                print("          access: {username: '{{" + git_path.replace('.', '_').replace('-',
-                                                                                              '_') + "_username}}', password: '{{" + git_path.replace(
-                    '.', '_').replace('-', '_') + "_password}}', email: '{{" + git_path.replace('.', '_').replace('-',
-                                                                                                                  '_') + "_email}}'}",
-                      file=f)
-                print("          command: dvc-cc-connector", file=f)
-                print("      git_path_to_working_repository: \"" + git_path + "\"", file=f)
-                print("      git_working_repository_owner: \"" + git_owner + "\"", file=f)
-                print("      git_working_repository_name: \"" + git_name + "\"", file=f)
-                print("      git_name_of_branch: \"" + branch_name + "\"", file=f)
-                print("      dvc_authentication_json:", file=f)
-                print("        class: File", file=f)
-                print("        connector:", file=f)
-                print("          access: {username: '{{" + dvc_server.replace('.', '_').replace('-',
-                                                                                                '_') + "_username}}', password: '{{" + dvc_server.replace(
-                    '.', '_').replace('-', '_') + "_password}}'}", file=f)
-                print("          command: dvc-cc-connector", file=f)
-                print("      dvc_servername: \"" + dvc_server + "\"", file=f)
-                print("      dvc_path_to_working_repository: \"" + dvc_path + "\"", file=f)
+            dvcfiles_to_execute = str(dvc_files[i])[1:-1].replace("'", "").replace('"', '').replace(' ', '')
+            for rcc_branch in rcc_branch_names:
+                for k in range(num_of_repeats):
+                    # print("batches:", file=f)
+                    print("  - inputs:", file=f)
+                    print("      git_authentication_json:", file=f)
+                    print("        class: File", file=f)
+                    print("        connector:", file=f)
+                    print("          access: {username: '{{" + git_path.replace('.', '_').replace('-',
+                                                                                                  '_') + "_username}}', password: '{{" + git_path.replace(
+                        '.', '_').replace('-', '_') + "_password}}', email: '{{" + git_path.replace('.', '_').replace('-',
+                                                                                                                      '_') + "_email}}'}",
+                          file=f)
+                    print("          command: dvc-cc-connector", file=f)
+                    print("      git_path_to_working_repository: \"" + git_path + "\"", file=f)
+                    print("      git_working_repository_owner: \"" + git_owner + "\"", file=f)
+                    print("      git_working_repository_name: \"" + git_name + "\"", file=f)
+                    print("      git_name_of_input_branch: \"" + exp_name + "\"", file=f)
+                    print("      git_name_of_result_branch: \"" + rcc_branch + "\"", file=f)
+                    print("      dvc_authentication_json:", file=f)
+                    print("        class: File", file=f)
+                    print("        connector:", file=f)
+                    print("          access: {username: '{{" + dvc_server.replace('.', '_').replace('-',
+                                                                                                    '_') + "_username}}', password: '{{" + dvc_server.replace(
+                        '.', '_').replace('-', '_') + "_password}}'}", file=f)
+                    print("          command: dvc-cc-connector", file=f)
+                    print("      dvc_servername: \"" + dvc_server + "\"", file=f)
+                    print("      dvc_path_to_working_repository: \"" + dvc_path + "\"", file=f)
 
-                if sshfs_data is not None:
-                    print("      sshfs_input_server_settings:", file=f)
-                    for i in range(len(sshfs_data.keys())):
-                        sshfs_dest_rel = list(sshfs_data.keys())[i]
-                        sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
-                        sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
-                        sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
-                        sshfs_password = '{{' + str(sshfs_server).replace('.', '_').replace('-', '_') + '_password}}'
+                    if sshfs_data is not None:
+                        print("      sshfs_input_server_settings:", file=f)
+                        for i in range(len(sshfs_data.keys())):
+                            sshfs_dest_rel = list(sshfs_data.keys())[i]
+                            sshfs_username = sshfs_data[sshfs_dest_rel]["username"]
+                            sshfs_server = sshfs_data[sshfs_dest_rel]["server"]
+                            sshfs_path = sshfs_data[sshfs_dest_rel]["remote_path"]
+                            sshfs_password = '{{' + str(sshfs_server).replace('.', '_').replace('-', '_') + '_password}}'
 
-                        print("        - class: Directory", file=f)
-                        print("          connector:", file=f)
-                        print("              command: \"red-connector-ssh\"", file=f)
-                        print("              mount: true", file=f)
-                        print("              access:", file=f)
-                        print("                host: '" + sshfs_server + "'", file=f)
-                        print("                port: 22", file=f)
-                        print("                auth:", file=f)
-                        print("                  username: '" + sshfs_username + "'", file=f)
-                        print("                  password: '" + sshfs_password + "'", file=f)
-                        print("                dirPath: '" + sshfs_path + "'", file=f)
+                            print("        - class: Directory", file=f)
+                            print("          connector:", file=f)
+                            print("              command: \"red-connector-ssh\"", file=f)
+                            print("              mount: true", file=f)
+                            print("              access:", file=f)
+                            print("                host: '" + sshfs_server + "'", file=f)
+                            print("                port: 22", file=f)
+                            print("                auth:", file=f)
+                            print("                  username: '" + sshfs_username + "'", file=f)
+                            print("                  password: '" + sshfs_password + "'", file=f)
+                            print("                dirPath: '" + sshfs_path + "'", file=f)
 
-                    print("      sshfs_input_dest_rel_paths:", file=f)
-                    for i in range(len(sshfs_data.keys())):
-                        sshfs_dest_rel = list(sshfs_data.keys())[i]
-                        print("        - '"+sshfs_dest_rel+"'", file=f)
+                        print("      sshfs_input_dest_rel_paths:", file=f)
+                        for i in range(len(sshfs_data.keys())):
+                            sshfs_dest_rel = list(sshfs_data.keys())[i]
+                            print("        - '"+sshfs_dest_rel+"'", file=f)
 
-                print("      dvc_remote_directory_sshfs:", file=f)
-                print("        class: Directory", file=f)
-                print("        connector:", file=f)
-                print("            command: \"red-connector-ssh\"", file=f)
-                print("            mount: true", file=f)
-                print("            access:", file=f)
-                print("              host: '" + dvc_server + "'", file=f)
-                print("              port: 22", file=f)
-                print("              auth:", file=f)
-                print("                username: '" + "{{" + dvc_server.replace('.', '_').replace('-',
-                                                                                                  '_') + "_username}}'",
-                      file=f)
-                print("                password: '" + "{{" + dvc_server.replace(
-                    '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
-                print("              writable: True", file=f)
-                print("              dirPath: '" + dvc_path + "'", file=f)
+                    print("      dvc_remote_directory_sshfs:", file=f)
+                    print("        class: Directory", file=f)
+                    print("        connector:", file=f)
+                    print("            command: \"red-connector-ssh\"", file=f)
+                    print("            mount: true", file=f)
+                    print("            access:", file=f)
+                    print("              host: '" + dvc_server + "'", file=f)
+                    print("              port: 22", file=f)
+                    print("              auth:", file=f)
+                    print("                username: '" + "{{" + dvc_server.replace('.', '_').replace('-',
+                                                                                                      '_') + "_username}}'",
+                          file=f)
+                    print("                password: '" + "{{" + dvc_server.replace(
+                        '.', '_').replace('-', '_') + "_password}}" + "'", file=f)
+                    print("              writable: True", file=f)
+                    print("              dirPath: '" + dvc_path + "'", file=f)
 
-                print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\', '/') + "'", file=f)
-                if live_output_files is not None:
-                    print("      live_output_files: '" + live_output_files + "'", file=f)
-                    print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
-                print("    outputs: {}", file=f)
+                    print("      dvc_file_to_execute: '" + dvcfiles_to_execute.replace('\\\\', '/') + "'", file=f)
+                    if live_output_files is not None:
+                        print("      live_output_files: '" + live_output_files + "'", file=f)
+                        print("      live_output_update_frequence: " + str(live_output_update_frequence), file=f)
+                    print("    outputs: {}", file=f)
         with open('.dvc_cc/cc_config.yml',"r") as r:
             print(r.read(), file=f)
 
@@ -663,90 +665,48 @@ def main():
         ######################################
         # TODO: DEFINE THE NEW BRANCH NAMES! #
         ######################################
-        branch_names = define_the_exp_name(exp_name, hyperopt_draws, vc.list_of_all_variables)
+        rcc_branch_names = define_the_exp_name(exp_name, hyperopt_draws, vc.list_of_all_variables)
 
         #################################
         # Loop each Hyperopt-Experiment #
         #################################
-        for i in range(len(hyperopt_draws)):
-            draw = hyperopt_draws[i]
-            if len(draw) > 0: # one or more hyperparameters was set!
-                branch_name = branch_names[i]
-                if len(branch_names) == 1: # use only one input branch, if only one experiment exists
-                    subprocess.call(['git', 'checkout', '-q', branch_name])
-                else: # create new input branches for each experiment
-                    subprocess.call(['git', 'checkout', '-q', '-b', branch_name])
-                print(bcolors.BOLD + 'Create an hyperopt-input git-branch: ' + branch_name + bcolors.ENDC)
+        print(bcolors.BOLD + 'DVC-CC: Generate all dvc files.' + bcolors.ENDC)
+        for i, (draw,rcc_branch_name) in enumerate(zip(hyperopt_draws, rcc_branch_names)):
 
-                # TODO: HYPEROPT-FILES TO DVC WITH SETTED PARAMETERS #
-                vc.set_values_for_hyperopt_files(draw)
-                subprocess.call(['git', 'add', '-A'])
-                subprocess.call(['git', 'commit', '-q', '-m', 'Convert DVC-CC-Hyperopt-Files to DVC-Files.'])
-                subprocess.call(['git', 'push', '-q', '-u', 'origin', branch_name + ':' + branch_name])
+            vc.set_values_for_hyperopt_files(draw, dvc_save_path='dvc/'+str(rcc_branch_name))
+            subprocess.call(['git', 'add', 'dvc/'+str(rcc_branch_name)])
 
-            else:
-                branch_name = exp_name
-
-            create_cc_config(dvc_files, branch_name, project_dir, args.no_exec, args.num_of_repeats,
+        print(bcolors.BOLD + 'DVC-CC: Build CC red yml.' + bcolors.ENDC)
+        create_cc_config(dvc_files, exp_name, rcc_branch_names, args.num_of_repeats,
                                 args.live_output_files, args.live_output_update_frequence)
-            if not args.delay_execution:
-                cc_id = exec_branch(args.keyring_service)
 
-                if len(draw) > 0:  # one or more hyperparameters was set!
-                    subprocess.call(['git', 'checkout', '-q', exp_name])
+        subprocess.call(['git', 'add', 'cc_execution_file.red.yml'])
 
-                if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
-                    with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
-                        loaded_yml = yaml.safe_load(f)
-                else:
-                    loaded_yml = {}
+        print(bcolors.BOLD + 'DVC-CC: Save DVC and CC files to git.' + bcolors.ENDC)
+        subprocess.call(['git', 'commit', '-q', '-m', 'DVC-CC: created DVC and the CC red yml file.'])
+        subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
 
-                if branch_name in loaded_yml:
-                    loaded_yml[branch_name].append(cc_id)
-                else:
-                    loaded_yml[branch_name] = [cc_id]
+        print(bcolors.BOLD + 'DVC-CC: Execute jobs.' + bcolors.ENDC)
+        cc_id = exec_branch(args.keyring_service)
 
-                with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
-                    yaml.dump(loaded_yml, f)
+        if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
+            with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
+                loaded_yml = yaml.safe_load(f)
+        else:
+            loaded_yml = {}
 
-                print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
-                subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
-                subprocess.call(['git', 'commit', '-q','-m', 'Push CC-ID'])
-                subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
+        if exp_name in loaded_yml:
+            loaded_yml[exp_name].append(cc_id)
+        else:
+            loaded_yml[exp_name] = [cc_id]
 
-        if args.delay_execution:
-            for i, branch_name in enumerate(branch_names):
+        with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
+            yaml.dump(loaded_yml, f)
 
-                draw = hyperopt_draws[i]
-
-                if len(draw) > 0:  # one or more hyperparameters was set!
-                    subprocess.call(['git', 'checkout', '-q', branch_name])
-                else:
-                    subprocess.call(['git', 'checkout', '-q', exp_name])
-
-                cc_id = exec_branch(args.keyring_service)
-
-                if len(draw) > 0:  # one or more hyperparameters was set!
-                    subprocess.call(['git', 'checkout', '-q', exp_name])
-
-                if os.path.exists(str(Path('.dvc_cc/cc_ids.yml'))):
-                    with open(str(Path('.dvc_cc/cc_ids.yml')), 'r') as f:
-                        loaded_yml = yaml.safe_load(f)
-                else:
-                    loaded_yml = {}
-
-                if branch_name in loaded_yml:
-                    loaded_yml[branch_name].append(cc_id)
-                else:
-                    loaded_yml[branch_name] = [cc_id]
-
-                with open(str(Path('.dvc_cc/cc_ids.yml')), 'w') as f:
-                    yaml.dump(loaded_yml, f)
-
-                print(bcolors.BOLD + 'Update the .dvc_cc/cc_ids.yml file.' + bcolors.ENDC)
-                subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
-                subprocess.call(['git', 'commit', '-q', '-m', 'Push CC-ID'])
-                subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
+        print(bcolors.BOLD + 'DVC-CC: Save the ID to git.' + bcolors.ENDC)
+        subprocess.call(['git', 'add', '.dvc_cc/cc_ids.yml'])
+        subprocess.call(['git', 'commit', '-q', '-m', 'DVC-CC: Start the jobs.'])
+        subprocess.call(['git', 'push', '-q', '-u', 'origin', exp_name + ':' + exp_name])
 
     finally:
         ##########################
@@ -756,17 +716,24 @@ def main():
         try:
             subprocess.call(['rm', '-R', '.dvc/lock'], stdout=subprocess.DEVNULL,
                                       stderr=subprocess.DEVNULL)
-            print('Information: delete ".dvc/lock" manually.')
+            print('Information: ".dvc/lock" was removed.')
         except:
-            print('Information: ".dvc/lock" does not exist.')
+            pass
 
         try:
             subprocess.call(['rm', 'cc_execution_file.red.yml'], stdout=subprocess.DEVNULL,
                                       stderr=subprocess.DEVNULL)
             print('Information: delete "cc_execution_file.red.yml')
         except:
-            print('Information: "cc_execution_file.red.yml" does not exist.')
+            pass
 
+        for rcc_branch_name in rcc_branch_names:
+            if os.path.isdir('dvc/'+str(rcc_branch_name)):
+                try:
+                    subprocess.call(['rm', '-fR', 'dvc/'+str(rcc_branch_name)], stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL)
+                except:
+                    pass
 
         if loaded_yml is not None:
             if os.path.exists(str(Path('.dvc_cc/cc_all_ids.yml'))):

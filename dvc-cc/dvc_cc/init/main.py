@@ -84,7 +84,7 @@ def main():
         print('   If you need more informations take a look at the following site: https://bit.ly/2mgbiVK')
         docker_image = input(bcolors.OKBLUE+'\tDocker Image'+bcolors.ENDC+' (default: "large"): ')
         if docker_image == '' or docker_image.lower() == 'large':
-            docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
+            docker_image = 'docker.io/deepprojects/dvc-cc-large:10.2'
             docker_image_needs_credentials = False
         else:
             docker_image_needs_credentials = None
@@ -169,7 +169,7 @@ def main():
         # set default values
         num_of_gpus = 1 ##
         ram = 60000
-        docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
+        docker_image = 'docker.io/deepprojects/dvc-cc-large:10.2'
         docker_image_needs_credentials = False
         batch_concurrency_limit = 12
         engine = 'ccagency'
@@ -194,7 +194,7 @@ def main():
         # set default values
         num_of_gpus = 1 ##
         ram = 180000
-        docker_image = 'docker.io/deepprojects/dvc-cc-large:10.1'
+        docker_image = 'docker.io/deepprojects/dvc-cc-large:10.2'
         docker_image_needs_credentials = False
         batch_concurrency_limit = 12
         engine = 'ccagency'
@@ -287,21 +287,25 @@ def create_cc_config_file(num_of_gpus,ram,docker_image, docker_image_needs_crede
         print("      doc: 'The git repository name.'", file=f)
         print("      inputBinding: {position: 3}", file=f)
         print("      type: string", file=f)
-        print("    git_name_of_branch:", file=f)
-        print("      doc: 'The source code jumps to this here defined git tag (with git checkout) and execute dvc repro there.'", file=f)
+        print("    git_name_of_input_branch:", file=f)
+        print("      doc: 'The source code jumps to this here defined git tag (with git checkout) and create from this the rcc branch.'", file=f)
         print("      inputBinding: {position: 4}", file=f)
+        print("      type: string", file=f)
+        print("    git_name_of_result_branch:", file=f)
+        print("      doc: 'This is the name of the result branch. It is also the name of the dvc folder for this branch.'", file=f)
+        print("      inputBinding: {position: 5}", file=f)
         print("      type: string", file=f)
         print("    dvc_authentication_json:", file=f)
         print("      doc: 'A path to json file which contains the dvc authentication. This should include the keys: username and password.'", file=f)
-        print("      inputBinding: {position: 5}", file=f)
+        print("      inputBinding: {position: 6}", file=f)
         print("      type: File", file=f)
         print("    dvc_servername:", file=f)
         print("      doc: 'The servername of the dvc directory.'", file=f)
-        print("      inputBinding: {position: 6}", file=f)
+        print("      inputBinding: {position: 7}", file=f)
         print("      type: string", file=f)
         print("    dvc_path_to_working_repository:", file=f)
         print("      doc: 'The directory that is used for the dvc script.'", file=f)
-        print("      inputBinding: {position: 7}", file=f)
+        print("      inputBinding: {position: 8}", file=f)
         print("      type: string", file=f)
         print("    dvc_remote_directory_sshfs:", file=f)
         print("      doc: 'A SSHFS connection to stream the output of DVC REPRO -P.'", file=f)
