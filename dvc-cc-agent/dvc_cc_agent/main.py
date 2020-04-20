@@ -8,6 +8,7 @@ import shutil
 import dvc_cc_agent.version
 import dvc_cc_agent.copy_output_files
 from dvc_cc_agent.bcolors import bcolors
+import yaml
 
 def get_command_list_in_right_order():
     from dvc.repo import Repo as DVCRepo
@@ -242,7 +243,8 @@ def main():
     parser.add_argument('git_path_to_working_repository', help='The git working directory. With this you can specify what the main git root is.')
     parser.add_argument('git_working_repository_owner', help='The name of the owner of the git repository which you want to execute.')
     parser.add_argument('git_working_repository_name', help='The git repository name.')
-    parser.add_argument('git_name_of_branch', help='The source code jumps to this here defined git tag (with git checkout) and execute dvc repro there. If you want to start from a tag use "tag/YOUR_TAG_NAME"')
+    parser.add_argument('git_name_of_input_branch', help='The source code jumps to this here defined git tag (with git checkout) and create from this the rcc branch.')
+    parser.add_argument('git_name_of_result_branch', help='This is the name of the result branch. It is also the name of the dvc folder for this branch.')
     parser.add_argument('dvc_authentication_json', help='A path to json file which contains the dvc authentication. This should include the keys: username and password.')
     parser.add_argument('dvc_servername', help='The servername of the dvc directory.')
     parser.add_argument('dvc_path_to_working_repository', help='The directory that is used for the dvc script.')
@@ -267,7 +269,7 @@ def main():
     git_path_to_working_repository = args.git_path_to_working_repository
     git_working_repository_owner = args.git_working_repository_owner
     git_working_repository_name = args.git_working_repository_name
-    git_name_of_branch = args.git_name_of_branch
+    git_name_of_branch = args.git_name_of_input_branch
     
     dvc_servername = args.dvc_servername
     dvc_path_to_working_repository = args.dvc_path_to_working_repository
@@ -319,7 +321,9 @@ def main():
     try:
         os.makedirs(path_to_save_output)
     except:
-        print('Warning: The folder already exists: ' + path_to_save_output)
+        # print('Warning: The folder already exists: ' + path_to_save_output)
+        pass
+
 
     print(bcolors.OKBLUE+'CD TO PATH   ' + get_time()+bcolors.ENDC)
     print('\t chdir: repo')
@@ -332,15 +336,14 @@ def main():
     #print(subprocess.check_output(command, shell=True).decode())
 
 
+    name_of_result_branch = args.git_name_of_result_branch
 
     print(bcolors.OKBLUE+'SWITCH GIT BRANCH   ' + get_time()+bcolors.ENDC)
     is_tag = git_name_of_branch.startswith('tag/')
     if is_tag:
         git_name_of_branch = git_name_of_branch[4:]
-    if dvc_files_to_execute is None:
-        name_of_result_branch  = 'r' + git_name_of_branch
-    else:
-        name_of_result_branch = 'r' + git_name_of_branch + '___' + ('_'.join(dvc_files_to_execute)).replace('/',
+    if dvc_files_to_execute is not None:
+        name_of_result_branch = name_of_result_branch + '__' + ('_'.join(dvc_files_to_execute)).replace('/',
                                                                                                      '_').replace(','
                                                                                                                   '','_').replace('[','').replace(']','').replace(' ','').replace('\'','').replace('\"','')
     if is_tag:
@@ -351,6 +354,27 @@ def main():
         command = 'git checkout ' + git_name_of_branch + ' -b ' + name_of_result_branch
     print('\t'+command)
     print(subprocess.check_output(command, shell=True).decode())
+
+    print(bcolors.OKBLUE + 'MOVE DVC FILES FROM THE SUBFOLDER TO THE MAIN DVC FOLDER   ' + get_time() + bcolors.ENDC)
+    if os.path.isdir('dvc/'+name_of_result_branch):
+        shutil.move('dvc/'+name_of_result_branch, 'dvc')
+    for dvc_folder in os.listdir('dvc'):
+        if os.path.isdir(dvc_folder) and dvc_folder.startswith('rcc_'):
+            shutil.rmtree('dvc/'+dvc_folder)
+    print(bcolors.OKBLUE + 'UPDATE CC RED YML FILE    ' + get_time() + bcolors.ENDC)
+    if os.path.isfile('cc_execution_file.red.yml'):
+        with open('cc_execution_file.red.yml') as file:
+            red_yml = yaml.load(file, Loader=yaml.FullLoader)
+        own_batch_pos = None
+        for i, b in enumerate(red_yml['batches']):
+            if b['inputs']['git_name_of_result_branch'] == args.git_name_of_result_branch:
+                own_batch_pos = i
+        if own_batch_pos:
+            red_yml['batches'] = [red_yml['batches'][own_batch_pos]]
+            with open('cc_execution_file.red.yml', 'w') as yaml_file:
+                yaml.dump(red_yml, yaml_file, default_flow_style=False)
+
+    #TODO: I AM HERE CURRENTLY !!
 
     for filename in os.listdir():
         if filename.lower() == 'requirements' or  filename.lower() == 'requirements.txt':
@@ -433,10 +457,11 @@ def main():
                 print('WARNING: A file that should be execute ('+f+') does not ends with .dvc. The job is skipped!')
         subprocess.call(['git','add','stdout_stderr/*'])
     else:
+        raise NotImplementedError('You need to pass dvc files in the red yml file.')
         # TODO USE HERE ALSO THE SCRIPT !!! Currently this will not work!
-        print(bcolors.OKBLUE+'START DVC REPRO -P   ' + get_time()+bcolors.ENDC)
-        command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_outputdvc-c + '/' + str(time.time()) + ' stdout_stderr'
-        print(subprocess.check_output(command, shell=True).decode())
+        #print(bcolors.OKBLUE+'START DVC REPRO -P   ' + get_time()+bcolors.ENDC)
+        #command = 'dvc repro -P' + ' 2>&1 | tee ' + path_to_save_outputdvc-c + '/' + str(time.time()) + ' stdout_stderr'
+        #print(subprocess.check_output(command, shell=True).decode())
     
     if dvc_files_to_execute is not None:
         print(bcolors.OKBLUE+'REMOVE ALL DVC FILES THAT ARE NOT NEEDED   ' + get_time()+bcolors.ENDC)
@@ -461,9 +486,9 @@ def main():
     
     print(bcolors.OKBLUE+'COMMIT AT GIT   ' + get_time()+bcolors.ENDC)
     if dvc_files_to_execute is not None:
-        command = "git commit -m 'run "+str(dvc_files_to_execute)+" in the experiment setup: " + git_name_of_branch + "'"
+        command = "git commit -m 'run "+str(dvc_files_to_execute)+" in the experiment setup: " + name_of_result_branch + "'"
     else:
-        command = "git commit -m 'run all dvc-files in the experiment setup: " + git_name_of_branch + "'"
+        command = "git commit -m 'run all dvc-files in the experiment setup: " + name_of_result_branch + "'"
     print(subprocess.check_output(command, shell=True).decode())
     
     print(bcolors.OKBLUE+'COMMIT AT DVC   ' + get_time()+bcolors.ENDC)
