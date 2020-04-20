@@ -356,11 +356,13 @@ def main():
     print(subprocess.check_output(command, shell=True).decode())
 
     print(bcolors.OKBLUE + 'MOVE DVC FILES FROM THE SUBFOLDER TO THE MAIN DVC FOLDER   ' + get_time() + bcolors.ENDC)
-    if os.path.isdir('dvc/'+name_of_result_branch):
-        shutil.move('dvc/'+name_of_result_branch, 'dvc')
+    if os.path.isdir('dvc/'+args.git_name_of_result_branch):
+        for file_to_copy in os.listdir('dvc/'+args.git_name_of_result_branch):
+            shutil.move('dvc/'+args.git_name_of_result_branch + '/' + file_to_copy, 'dvc')
     for dvc_folder in os.listdir('dvc'):
         if os.path.isdir('dvc/'+dvc_folder) and dvc_folder.startswith('rcc_'):
             shutil.rmtree('dvc/'+dvc_folder)
+
     print(bcolors.OKBLUE + 'UPDATE CC RED YML FILE    ' + get_time() + bcolors.ENDC)
     if os.path.isfile('cc_execution_file.red.yml'):
         with open('cc_execution_file.red.yml') as file:
@@ -373,8 +375,6 @@ def main():
             red_yml['batches'] = [red_yml['batches'][own_batch_pos]]
             with open('cc_execution_file.red.yml', 'w') as yaml_file:
                 yaml.dump(red_yml, yaml_file, default_flow_style=False)
-
-    #TODO: I AM HERE CURRENTLY !!
 
     for filename in os.listdir():
         if filename.lower() == 'requirements' or  filename.lower() == 'requirements.txt':
