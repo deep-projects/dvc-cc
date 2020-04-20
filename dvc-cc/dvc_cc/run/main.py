@@ -379,7 +379,7 @@ def strarray_to_shortstr(input_array):
             end_index += 1
         return [s[start_index:end_index] for s in input_array]
 
-def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
+def define_the_rcc_branch_names(exp_name, hyperopt_draws, list_of_variables):
     # TODO: USE PARAMS FOR THIS: + '___' + str(draw)[1:-1].replace(',','_').replace(' ','').replace('[','').replace(']','').replace('-','')
     hyperopt_draws = np.array(hyperopt_draws)
     result = []
@@ -400,7 +400,7 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
             result_only_values.append(values)
 
     if len(result) == 0:
-        return [ exp_name ]
+        return [ 'r'+exp_name ]
 
     result = list(map(list, zip(*result)))
     result_only_values = list(map(list, zip(*result_only_values)))
@@ -408,25 +408,25 @@ def define_the_exp_name(exp_name, hyperopt_draws, list_of_variables):
     batch_names = []
     for i in range(len(result)):
         batch_append = False
-        batch_name = exp_name + '_' + '_'.join(result[i])
+        batch_name = 'r'+exp_name + '_' + '_'.join(result[i])
         if len(batch_name) < 50:
             batch_names.append(batch_name)
             batch_append = True
         if batch_append == False:
             # try reducing the exp name
-            batch_name = exp_name[:18] + '_' + '_'.join(result[i])
+            batch_name = 'r'+exp_name[:18] + '_' + '_'.join(result[i])
             if len(batch_name) < 50:
                 batch_names.append(batch_name)
                 batch_append = True
         if batch_append == False:
             # try reducing the exp name + only_values
-            batch_name = exp_name[:18] + '_' + '_'.join(result_only_values[i])
+            batch_name = 'r'+exp_name[:18] + '_' + '_'.join(result_only_values[i])
             if len(batch_name) < 50:
                 batch_names.append(batch_name)
                 batch_append = True
         if batch_append == False:
             # use reduced exp name + index
-            batch_name = exp_name[:18] + '_' + str(i)
+            batch_name = 'r'+exp_name[:18] + '_' + str(i)
             batch_names.append(batch_name)
 
     return batch_names
@@ -665,8 +665,8 @@ def main():
         ######################################
         # TODO: DEFINE THE NEW BRANCH NAMES! #
         ######################################
-        rcc_branch_names = define_the_exp_name(exp_name, hyperopt_draws, vc.list_of_all_variables)
-
+        rcc_branch_names = define_the_rcc_branch_names(exp_name, hyperopt_draws, vc.list_of_all_variables)
+        define_the_exp_name
         #################################
         # Loop each Hyperopt-Experiment #
         #################################
