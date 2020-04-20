@@ -673,7 +673,9 @@ def main():
         print(bcolors.BOLD + 'DVC-CC: Generate all dvc files.' + bcolors.ENDC)
         for i, (draw,rcc_branch_name) in enumerate(zip(hyperopt_draws, rcc_branch_names)):
 
+            os.mkdir('dvc/'+str(rcc_branch_name))
             vc.set_values_for_hyperopt_files(draw, dvc_save_path='dvc/'+str(rcc_branch_name))
+
             subprocess.call(['git', 'add', 'dvc/'+str(rcc_branch_name)])
 
         print(bcolors.BOLD + 'DVC-CC: Build CC red yml.' + bcolors.ENDC)
