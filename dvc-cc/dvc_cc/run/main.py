@@ -666,7 +666,7 @@ def main():
         # TODO: DEFINE THE NEW BRANCH NAMES! #
         ######################################
         rcc_branch_names = define_the_rcc_branch_names(exp_name, hyperopt_draws, vc.list_of_all_variables)
-        define_the_exp_name
+
         #################################
         # Loop each Hyperopt-Experiment #
         #################################
