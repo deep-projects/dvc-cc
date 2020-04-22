@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dvc-cc"
-version = "0.10.2"
+version = "0.10.3"
 description = "This connector is used to combine the work of CC (www.curious-containers.cc) and DVC (Open-source Version Control System for Machine Learning Projects)."
 authors = ["Jonas Annuscheit <annusch@htw-berlin.de>"]
 license = "AGPL-3.0"
@@ -22,6 +22,7 @@ pandas = "^0"
 matplotlib = "^3.1"
 seaborn = "^0"
 pyrsistent = "^0.15.2"
+pexpect = "^4.8"
 
 [tool.poetry.dev-dependencies]
 
