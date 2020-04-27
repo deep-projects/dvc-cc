@@ -742,13 +742,14 @@ def main():
         except:
             pass
 
-        for rcc_branch_name in rcc_branch_names:
-            if os.path.isdir('dvc/'+str(rcc_branch_name)):
-                try:
-                    subprocess.call(['rm', '-fR', 'dvc/'+str(rcc_branch_name)], stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL)
-                except:
-                    pass
+        if rcc_branch_names is not None:
+            for rcc_branch_name in rcc_branch_names:
+                if os.path.isdir('dvc/'+str(rcc_branch_name)):
+                    try:
+                        subprocess.call(['rm', '-fR', 'dvc/'+str(rcc_branch_name)], stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.DEVNULL)
+                    except:
+                        pass
 
         if loaded_yml is not None:
             if os.path.exists(str(Path('.dvc_cc/cc_all_ids.yml'))):
