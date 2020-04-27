@@ -71,7 +71,7 @@ def show_nodes(auth,execution_engine):
         else:
             ram = bcolors.FAIL + '-' + bcolors.ENDC + '/' + bcolors.FAIL + '-' + bcolors.ENDC
 
-        if 'gpus' in n:
+        if 'gpus' in n and n['gpus'] is not None:
             gpus = []
             for gpu in n['gpus']:
                 gpus.append(str(int(gpu['vram']/1000.)) + 'GB')
