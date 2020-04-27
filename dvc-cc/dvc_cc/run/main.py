@@ -479,6 +479,8 @@ def find_all_dvc_leafs(args_dvc_files):
                 print(bcolors.WARNING+'Warning: File ' + str(Path('dvc/'+f[:-9]+'.dvc')) + ' not found.'+bcolors.ENDC)
     return dvc_files, list_of_hyperopt_files, Gs
 
+
+
 def main():
 
     parser = ArgumentParser(description=DESCRIPTION)
@@ -508,6 +510,12 @@ def main():
 
     parser.add_argument('-de','--delay-execution',help='If this parameter is true, than it will create first ALL input branches and than execute it once.',
                         default=False, action='store_true')
+    parser.add_argument('--optuna',
+                        help='This script to this parameter is in progress. It will create two directories beside your main git repository folder. In the first you find a generated script to '
+                             'run a hyperoptimization with optuna. In the second you find a script that copy metrics from different result branches to the other folder. You need to start '
+                             'both script manually.',
+                        default=False, action='store_true')
+
 
     args = parser.parse_args()
 
@@ -638,6 +646,11 @@ def main():
         for f in list_of_hyperopt_files:
             f = str(Path('dvc/.hyperopt/' + f))
             vc.register_dvccc_file(f)
+
+        if args.optuna:
+            import optuna_scripts
+            optuna_scripts.create_optuna_directories(exp_name, vc)
+            return
 
         ###################################
         # DEFINE ALL Hyperopt-Experiments #
