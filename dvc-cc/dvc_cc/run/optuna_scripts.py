@@ -148,7 +148,57 @@ def write_optuna_analyse_script(path, input_branch_name):
     with open(path,'w') as f:
         print(analyse_script, file=f)
 
+
+
+
+
+
+
+
+
+
+def write_optuna_paramfunction_script(path, inputs):
+    with open(path, 'w') as f:
+        pre_text = """# !/usr/bin/env python
+# coding: utf-8
+
+convert_to_realinput = {}
+
+"""
+        print(pre_text, file=f)
+
+        for k in inputs:
+            t,v = inputs[k]
+            if v.find('-') > 0:
+                if t == 'float':
+                    print('convert_to_realinput[\'' + k + '\'] = lambda x: x * ('+v[v.find('-') + 1:]+' - '+v[:v.find('-')]+') + '+v[:v.find('-')]+'', file=f)
+                else:
+                    print('convert_to_realinput[\'' + k + '\'] = lambda x: int(x  * (1 + '+v[v.find('-') + 1:]+' - '+v[:v.find('-')]+') + '+v[:v.find('-')] + ')', file=f)
+            elif v.find(',') > 0:
+                print(
+                    'convert_to_realinput[\'' + k + '\'] = lambda x: ['+v+'][int(x * (1 + ' + str(v.count(',')) + '))]', file=f)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def write_optuna_execution_script(path, inputs, input_branch_name, jobs, num_of_trials):
+
     with open(path,'w') as f:
         pre_text = """# !/usr/bin/env python
 # coding: utf-8
@@ -159,6 +209,9 @@ import os
 import subprocess
 from optuna.samplers import TPESampler
 from optuna.samplers import CmaEsSampler
+from param_dict import *
+
+use_CmaEsSampler = True
 
 with open('cc_execution_file.red.yml','r') as f:
     red_yml_ori = f.read()
@@ -190,34 +243,35 @@ def create_experiment_function(start_trial_number):
         pre_text = pre_text.replace('XXXBRANCHNAMEXXX', str(input_branch_name))
         print(pre_text, file=f)
 
-        print('    values = []', file=f)
+        print('        values = []', file=f)
         for k in inputs:
-            print('    ', file=f)
+            print('        ', file=f)
+            print('        # ' + k, file=f)
             t,v = inputs[k]
             if v.find('-') > 0:
                 if t == 'float':
-                    print('    s = trial.suggest_uniform("'+k+'", 0, 1)', file=f)
-                    print('    s = s * ('+v[v.find('-') + 1:]+' - '+v[:v.find('-')]+') + '+v[:v.find('-')]+'', file=f)
-                    print('    values.append(s)', file=f)
-                    print('    # Alternative:', file=f)
-                    print('    #values.append(trial.suggest_uniform("'+k+'", '+v[:v.find('-')]+','+v[v.find('-')+1:]+')'+')', file=f)
+                    print('        if use_CmaEsSampler:', file=f)
+                    print('            s = trial.suggest_uniform("'+k+'", 0, 1)', file=f)
+                    print('            values.append(convert_to_realinput[\''+k+'\'](s))', file=f)
+                    print('        else:', file=f)
+                    print('            values.append(trial.suggest_uniform("'+k+'", '+v[:v.find('-')]+','+v[v.find('-')+1:]+')'+')', file=f)
                 else:
-                    print('    s = trial.suggest_uniform("'+k+'", 0, 1)', file=f)
-                    print('    s = s * (1 + '+v[v.find('-') + 1:]+' - '+v[:v.find('-')]+') + '+v[:v.find('-')]+'', file=f)
-                    print('    values.append(int(s))', file=f)
-                    print('    # Alternative:', file=f)
-                    print('    #values.append(trial.suggest_int("'+k+'", '+v[:v.find('-')]+','+v[v.find('-')+1:]+')'+')', file=f)
+                    print('        if use_CmaEsSampler:', file=f)
+                    print('            s = trial.suggest_uniform("'+k+'", 0, 1)', file=f)
+                    print('            values.append(convert_to_realinput[\''+k+'\'](s))', file=f)
+                    print('        else:', file=f)
+                    print('            values.append(trial.suggest_int("'+k+'", '+v[:v.find('-')]+','+v[v.find('-')+1:]+')'+')', file=f)
             elif v.find(',') > 0:
-                print('    s = trial.suggest_uniform("' + k + '", 0, 1)', file=f)
-                print('    s = s * (1 + ' + v.count(',') + ')', file=f)
-                print('    values.append(['+v+'][s])', file=f)
-                print('    # Alternative:', file=f)
-                print('    #values.append(trial.suggest_categorical("'+k+'", ['+v+'])' +')', file=f)
+                print('        if use_CmaEsSampler:', file=f)
+                print('            s = trial.suggest_uniform("' + k + '", 0, 1)', file=f)
+                print('            values.append(convert_to_realinput[\''+k+'\'](s))', file=f)
+                print('        else:', file=f)
+                print('            values.append(trial.suggest_categorical("'+k+'", ['+v+'])' +')', file=f)
             else:
-                print('    values.append('+v+') # ' + k, file=f)
+                print('        values.append('+v+')', file=f)
 
         end_text = """
-                result_branch = 'rXXXBRANCHNAMEXXX_'+str(time.time_ns())
+        result_branch = 'rXXXBRANCHNAMEXXX_'+str(time.time_ns())
         dvc_save_path = 'dvc/' + result_branch
         os.mkdir(dvc_save_path)
         vc.set_values_for_hyperopt_files(values, dvc_save_path=dvc_save_path)
@@ -251,8 +305,13 @@ def create_experiment_function(start_trial_number):
 
 def save_study(study, trial):
     if trial.number % (XXXJOBSXXX - 1) == XXXJOBSXXX - 2:
-        print('\nSave Study!\n')
+        print('\\nSave Study!\\n')
         pickle.dump(study, open('study.p','wb'))
+        
+def trial_log_callback_converted(study, trial):
+    parameters = {p: convert_to_realinput[p](trial.params[p]) for p in trial.params}
+    print("TRIAL_NO={}, PARAMS={}, VALUE={}".format(trial.number, parameters, trial.value))
+
 
 if os.path.isfile('study.p'):
     print('Load existing study (study.p).')
@@ -266,9 +325,10 @@ if os.path.isfile('study.p'):
     run_experiment = create_experiment_function(last_used_id)
 else:
     print('Create new study.')
-    study = optuna.create_study(direction='minimize', sampler=CmaEsSampler(warn_independent_sampling=False,independent_sampler=TPESampler()))
-    # Alternative (Bayesian but independent):
-    #study = optuna.create_study(direction='minimize', sampler=TPESampler())
+    if use_CmaEsSampler: # CmaEs (no Bayesian method, but relative)
+        study = optuna.create_study(direction='minimize', sampler=CmaEsSampler(warn_independent_sampling=False,independent_sampler=TPESampler()))
+    else: # TPE (Bayesian method, but independent)
+        study = optuna.create_study(direction='minimize', sampler=TPESampler())
     run_experiment = create_experiment_function(0)
 
 print('Load Helper functions')
@@ -279,7 +339,10 @@ metric_getter = subprocess.Popen(['python', 'get_metrics.py'])
 os.chdir(current_path)
 
 print('Start optimization')
-study.optimize(run_experiment, n_trials=XXXTRIALSXXX, n_jobs=XXXJOBSXXX, callbacks = [save_study])
+if use_CmaEsSampler:
+    study.optimize(run_experiment, n_trials=XXXTRIALSXXX, n_jobs=XXXJOBSXXX, callbacks = [save_study,trial_log_callback_converted])
+else:    
+    study.optimize(run_experiment, n_trials=XXXTRIALSXXX, n_jobs=XXXJOBSXXX, callbacks = [save_study])
 
 print('Finish training, save study.')
 pickle.dump(study, open('study.p','wb'))
@@ -293,6 +356,17 @@ git_pusher.kill()
         end_text = end_text.replace('XXXTRIALSXXX', str(num_of_trials))
         end_text = end_text.replace('XXXBRANCHNAMEXXX', str(input_branch_name))
         print(end_text, file=f)
+
+
+
+
+
+
+
+
+
+
+
 
 
 def write_git_pusher_script(path):
@@ -318,6 +392,19 @@ while True:
         g.push()
 """
         print(script, file=f)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # parameters
 #metric_path = 'loss.metric'
@@ -370,6 +457,17 @@ while True:
         print(script, file=f)
 
 
+
+
+
+
+
+
+
+
+
+
+
 def get_batch_concurrency_limit():
     from pathlib import Path
     import yaml
@@ -380,18 +478,31 @@ def get_batch_concurrency_limit():
     return settings['execution']['settings']['batchConcurrencyLimit']
 
 
+
+
+
+
+
+
+
+
+
+
 def create_optuna_directories(input_branch_name, vc):
     # 1. copy current directory
     import os
     import shutil
     import subprocess
+
     cwd = os.getcwd()
     folder_name = os.getcwd().split('/')[-1]
     jobstarter_path = '../'+folder_name+'_'+input_branch_name.split('_')[1]+'_JobStarter'
     shutil.copytree('.', jobstarter_path)
     os.chdir(jobstarter_path)
+    print('GIT CLEAN -F')
     subprocess.call('git clean -f'.split(' '))
     subprocess.call('git reset --hard'.split(' '))
+    subprocess.Popen('rm -fR tmp_*', shell=True)
     os.chdir(cwd)
 
     metric_path = '../' + folder_name + '_MetricGetter'
@@ -409,20 +520,27 @@ def create_optuna_directories(input_branch_name, vc):
     print('It is possible that ' + str(bcl) + ' (Batch Concurrency Limit) jobs can run in parallel.')
     num_of_trials = input('How many trials do you want?: ')
 
-
     # 3. Create optuna script,
-    write_optuna_execution_script(path=jobstarter_path+'/run_optuna.py',inputs=inputs, input_branch_name=input_branch_name, jobs=bcl, num_of_trials=num_of_trials)
+    print('Write: ', jobstarter_path+'/run_optuna.py')
+    write_optuna_execution_script(path=jobstarter_path+'/run_optuna.py', inputs=inputs, input_branch_name=input_branch_name, jobs=bcl, num_of_trials=num_of_trials)
+    print('Write: ', jobstarter_path+'/param_dict.py')
+    write_optuna_paramfunction_script(path=jobstarter_path+'/param_dict.py', inputs=inputs)
+
+    print('Write: ', jobstarter_path + '/git_pusher.py')
     write_git_pusher_script(jobstarter_path+'/git_pusher.py')
     # 4. analyse script
+    print('Write: ', jobstarter_path + '/analyse_optuna.ipynb')
     write_optuna_analyse_script(jobstarter_path+'/analyse_optuna.ipynb', input_branch_name)
 
     # 5. Create metrics getter script
     # TODO: The 'loss.metric' must be a variable !
+    print('Write: ', jobstarter_path + '/get_metrics.py')
     write_metric_getter_script(metric_path + '/get_metrics.py', input_branch_name,
                                'loss.metric', jobstarter_path+'/metrics.json')
 
     print('The following files was generated: ')
     print('   - ' + jobstarter_path + '/run_optuna.py')
+    print('   - ' + jobstarter_path + '/param_dict.py')
     print('   - ' + jobstarter_path+'/git_pusher.py')
     print('   - ' + jobstarter_path+'/analyse_optuna.ipynb')
     print('   - ' + metric_path + '/get_metrics.py')
