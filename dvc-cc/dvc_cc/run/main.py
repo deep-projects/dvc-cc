@@ -648,7 +648,10 @@ def main():
             vc.register_dvccc_file(f)
 
         if args.optuna:
-            import optuna_scripts
+            from dvc_cc.run import optuna_scripts
+            rcc_branch_names = [exp_name+'_XXXXXXXXXX']
+            create_cc_config(dvc_files, exp_name, rcc_branch_names, args.num_of_repeats,
+                                args.live_output_files, args.live_output_update_frequence)
             optuna_scripts.create_optuna_directories(exp_name, vc)
             return
 
@@ -742,7 +745,7 @@ def main():
         except:
             pass
 
-        if rcc_branch_names is not None:
+        if 'rcc_branch_names' in locals():
             for rcc_branch_name in rcc_branch_names:
                 if os.path.isdir('dvc/'+str(rcc_branch_name)):
                     try:
