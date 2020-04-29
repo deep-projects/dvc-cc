@@ -7,59 +7,43 @@ def write_optuna_analyse_script(path, input_branch_name):
    "metadata": {},
    "outputs": [],
    "source": [
-    "import dvc_cc\n",
-    "import dvc_cc.run\n",
-    "dvc_cc.version.VERSION"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import subprocess\n",
-    "import json\n",
-    "import numpy as np\n",
-    "import optuna\n",
-    "import time"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import os\n",
-    "from pathlib import Path\n",
-    "import optuna\n",
-    "study = optuna.create_study(direction='minimize',\n",
-    "                            study_name='study_1', \n",
-    "                            storage='sqlite:///"""+input_branch_name+""".db?timeout=99999',\n",
-    "                            load_if_exists=True)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "trial = study.best_trial\n",
-    "\n",
-    "print('Accuracy: {}'.format(trial.value))\n",
-    "print(\"Best hyperparameters: {}\".format(trial.params))"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "import pickle\n",
     "import pandas as pd\n",
-    "df = pd.DataFrame(study.trials_dataframe())\n",
+    "import optuna\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with open('study.p','rb') as f:\n",
+    "    study = pickle.load(f)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(study.best_value)\n",
+    "print()\n",
+    "print(study.best_trial)\n",
+    "print()\n",
+    "print(study.best_params)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = study.trials_dataframe()\n",
     "df"
    ]
   },
@@ -69,15 +53,8 @@ def write_optuna_analyse_script(path, input_branch_name):
    "metadata": {},
    "outputs": [],
    "source": [
-    "df.groupby('state').count()"
+    "df.groupby('state')['number'].count()"
    ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": []
   },
   {
    "cell_type": "code",
@@ -94,7 +71,7 @@ def write_optuna_analyse_script(path, input_branch_name):
    "metadata": {},
    "outputs": [],
    "source": [
-    "optuna.visualization.plot_slice(study)"
+    "optuna.visualization.plot_parallel_coordinate(study)"
    ]
   },
   {
@@ -103,7 +80,8 @@ def write_optuna_analyse_script(path, input_branch_name):
    "metadata": {},
    "outputs": [],
    "source": [
-    "#optuna.visualization.plot_contour(study)#, params=['n_estimators', 'max_depth'])"
+    "# please set the parameters i.e.: params=[params_bz, params_end_model_kernels]\n",
+    "#optuna.visualization.plot_slice(study, params=...)"
    ]
   },
   {
@@ -111,9 +89,42 @@ def write_optuna_analyse_script(path, input_branch_name):
    "execution_count": null,
    "metadata": {},
    "outputs": [],
-   "source": [
-    "optuna.visualization.plot_contour(study, params=['learning_rate', 'model_kernels'])"
-   ]
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
   },
   {
    "cell_type": "code",
@@ -143,9 +154,9 @@ def write_optuna_analyse_script(path, input_branch_name):
   }
  },
  "nbformat": 4,
- "nbformat_minor": 2
+ "nbformat_minor": 4
 }"""
-    with open(path,'w') as f:
+    with open(path, 'w') as f:
         print(analyse_script, file=f)
 
 
@@ -211,7 +222,7 @@ from optuna.samplers import TPESampler
 from optuna.samplers import CmaEsSampler
 from param_dict import *
 
-use_CmaEsSampler = True
+use_CmaEsSampler = False
 
 with open('cc_execution_file.red.yml','r') as f:
     red_yml_ori = f.read()
@@ -271,7 +282,7 @@ def create_experiment_function(start_trial_number):
                 print('        values.append('+v+')', file=f)
 
         end_text = """
-        result_branch = 'rXXXBRANCHNAMEXXX_'+str(time.time_ns())
+        result_branch = 'rXXXBRANCHNAMEXXX_'+str(trial.number)
         dvc_save_path = 'dvc/' + result_branch
         os.mkdir(dvc_save_path)
         vc.set_values_for_hyperopt_files(values, dvc_save_path=dvc_save_path)
@@ -304,9 +315,12 @@ def create_experiment_function(start_trial_number):
     return run_experiment
 
 def save_study(study, trial):
-    if trial.number % (XXXJOBSXXX - 1) == XXXJOBSXXX - 2:
-        print('\\nSave Study!\\n')
+    #if trial.number % (XXXJOBSXXX - 1) == XXXJOBSXXX - 2:
+    try:
         pickle.dump(study, open('study.p','wb'))
+        print('Saved Study!')
+    except:
+        pass
         
 def trial_log_callback_converted(study, trial):
     parameters = {p: convert_to_realinput[p](trial.params[p]) for p in trial.params}
@@ -502,7 +516,9 @@ def create_optuna_directories(input_branch_name, vc):
     print('GIT CLEAN -F')
     subprocess.call('git clean -f'.split(' '))
     subprocess.call('git reset --hard'.split(' '))
-    subprocess.Popen('rm -fR tmp_*', shell=True)
+    p = subprocess.Popen('rm -fR tmp_*', shell=True)
+    p.communicate()
+    p.wait()
     os.chdir(cwd)
 
     metric_path = '../' + folder_name + '_MetricGetter'
