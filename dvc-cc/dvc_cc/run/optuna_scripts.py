@@ -417,7 +417,8 @@ while True:
 
 
 
-
+    write_metric_getter_script(metric_path + '/get_metrics.py', input_branch_name,
+                               'loss.metric', jobstarter_path+'/metrics.json')
 
 
 # parameters

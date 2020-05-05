@@ -80,13 +80,13 @@ def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
     f.close()
 
     # call the sshfs command with the password from keyring if possible.
-    pw = None
     username = None
+    pw_keyring = None
+    username_keyring = None
     if sshfs_parameters[-2].find('@') > 0:
         username, server = sshfs_parameters[-2].split('@')
         server = server.split(':')[0]
         server = server.replace('.','_').replace('-','_')
-
 
         pw_keyring = server + '_password'
         username_keyring = server + '_username'
