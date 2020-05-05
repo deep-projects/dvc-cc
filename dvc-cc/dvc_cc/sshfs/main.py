@@ -108,7 +108,8 @@ def new_sshfs_connection(sshfs_parameters, keyring_service = 'red'):
         bash.expect_exact(pexpect.EOF)
 
     else:
-        print(subprocess.call(['sshfs'] + sshfs_parameters[:-1] + [dest]))
+        subprocess.check_call(['sshfs'] + sshfs_parameters[:-1] + [dest])
+
     # Finden der wichtigen Parameter
     data_username, data_server, data_path = get_mount_values_for_a_direcotry(dest)
     if data_server is None or data_server == 'null':
